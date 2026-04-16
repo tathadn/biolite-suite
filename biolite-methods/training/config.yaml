@@ -1,0 +1,47 @@
+# BioLite-Methods DPO training configuration
+# Usage: python train_dpo.py --config config.yaml
+
+model:
+  base_model: "tathadn/biolite-interpret-1b"  # Phase 1 SFT checkpoint
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+dpo:
+  num_train_epochs: 2
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 5.0e-5
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.1
+  beta: 0.1
+  loss_type: "sigmoid"
+  max_grad_norm: 1.0
+  logging_steps: 5
+  eval_steps: 50
+  save_steps: 50
+  max_length: 512       # conservative for 4.8GB; increase after profiling
+  max_prompt_length: 256
+
+data:
+  train_file: "../data/splits/train.json"
+  eval_file: "../data/splits/val.json"
+  test_file: "../data/splits/test.json"
+
+wandb:
+  project: "biolite-suite"
+  run_name: "methods-dpo-from-sft"
+
+huggingface:
+  push_to_hub: true
+  hub_model_id: "tathadn/biolite-methods-1b-dpo"

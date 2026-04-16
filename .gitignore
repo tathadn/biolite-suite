@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# Data (tracked on HuggingFace, not git)
+data/raw/
+data/processed/
+data/splits/
+*.jsonl
+*.json
+!training/config.yaml
+
+# Training artifacts
+checkpoints/
+wandb/
+*.pt
+*.bin
+*.safetensors
+
+# HPC / system
+.cache/
+*.log
+*.out
+*.err
+slurm-*.out
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,29 @@
+# BioLite-Interpret training dependencies
+# Pin versions for reproducibility
+
+# Core
+torch>=2.1.0
+transformers>=4.40.0
+datasets>=2.19.0
+accelerate>=0.30.0
+peft>=0.11.0
+trl==0.29.1
+bitsandbytes>=0.43.0
+
+# Logging
+wandb>=0.17.0
+
+# Evaluation
+rouge-score>=0.1.2
+bert-score>=0.3.13
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+
+# Data pipeline
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+biopython>=1.83
+
+# Demo
+gradio>=4.0.0
