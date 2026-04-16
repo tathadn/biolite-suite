@@ -16,18 +16,22 @@ from datasets import load_dataset
 
 
 # Keywords indicating interpretation/summarization tasks
+# NOTE: Broad terms ("interpret", "summarize", "summary", bare "pathway",
+# "enriched", "depleted") removed — they overwhelmingly match generic medical
+# content, not bioinformatics interpretation. See spot-check 2026-04-15.
 KEEP_KEYWORDS = [
-    "interpret", "summarize", "summary", "differential expression",
-    "enrichment", "upregulated", "downregulated", "upregulation",
-    "downregulation", "pathway", "gene expression", "fold change",
+    "differential expression", "enrichment", "upregulated", "downregulated",
+    "upregulation", "downregulation", "gene expression", "fold change",
     "rna-seq", "rnaseq", "transcriptom", "biological significance",
     "go term", "gene ontology", "kegg", "functional analysis",
     "functional annotation", "overexpressed", "underexpressed",
     "significantly expressed", "differentially expressed",
     "biological process", "molecular function", "cellular component",
-    "enriched", "depleted", "abundance", "microbiome", "metagenom",
+    "abundance", "microbiome", "metagenom",
     "amplicon", "16s", "metabolic pathway", "signaling pathway",
     "gene set", "gsea", "over-representation",
+    "pathway analysis", "pathway enrichment", "expression profile",
+    "gene regulation", "sequencing data", "omics",
 ]
 
 # Keywords indicating tasks to EXCLUDE (NER, clinical, drug-related)
