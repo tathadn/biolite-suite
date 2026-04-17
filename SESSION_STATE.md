@@ -63,6 +63,23 @@ git log --oneline
 | Val split | 33 | data/splits/val.json |
 | Test split | 64 | data/splits/test.json |
 
+## Known Dataset Characteristics
+
+1. **Task type imbalance**: DE interpretation dominates at 81% of training.
+   Enrichment (14%) and combined (4.4%) are underrepresented.
+   Eval should report per-task-type scores, not just aggregate.
+
+2. **Mol-Instructions is largest source** (51% of training). Watch for
+   stylistic differences vs synthetic examples in model outputs.
+
+3. **Combined_interpretation has only 1 val / 3 test example** — too small
+   for reliable per-category evaluation. Report but don't draw
+   conclusions from it.
+
+4. **If eval shows weakness on enrichment/combined**, first fix is to
+   generate 100-200 more synthetic examples targeting those two types
+   specifically (adjust `task_weights` in `generate_synthetic.py`).
+
 ## Commands to Run First Next Session
 
 ```bash
