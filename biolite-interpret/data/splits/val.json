@@ -1,0 +1,233 @@
+[
+  {
+    "instruction": "Measurement of all proteins expressed in cell or tissue is",
+    "input": "",
+    "output": "Proteomics. Geomics - Study of all DNA sequences.\nEpigenetics - heritable changes in gene expression that are not caused by alteration in DNA sequence.",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The following table shows GO and KEGG enrichment results from an RNA-seq experiment comparing mouse cells under hypoxia (1% O2, 24h) versus normoxia (21% O2). Genes were filtered at padj < 0.05 and log2FoldChange > 1. A total of 165 upregulated genes were submitted for enrichment analysis. Interpret the biological significance of these enrichment results, explaining which processes are activated, why they make biological sense in the context of hypoxia, and what the overall cellular response appears to be.",
+    "input": "| Term | Category | GeneCount | pvalue | p.adjust | GeneRatio |\n|------|----------|-----------|--------|----------|-----------|\n| Response to hypoxia | GO Biological Process | 42 | 1.2e-18 | 4.8e-16 | 42/165 |\n| Cellular response to decreased oxygen levels | GO Biological Process | 31 | 3.4e-15 | 6.8e-13 | 31/165 |\n| HIF-1 signaling pathway | KEGG | 28 | 2.1e-14 | 2.8e-12 | 28/165 |\n| Angiogenesis | GO Biological Process | 35 | 5.6e-13 | 5.6e-11 | 35/165 |\n| VEGF signaling pathway | KEGG | 22 | 1.8e-11 | 1.4e-09 | 22/165 |\n| Oxidative phosphorylation | KEGG | 24 | 2.3e-09 | 9.2e-08 | 24/165 |\n| Glycolytic process | GO Biological Process | 18 | 4.3e-10 | 2.9e-08 | 18/165 |\n| Response to reactive oxygen species | GO Biological Process | 19 | 3.1e-08 | 1.2e-06 | 19/165 |\n| Erythrocyte differentiation | GO Biological Process | 11 | 8.2e-06 | 2.2e-04 | 11/165 |\n| Glucose transmembrane transport | GO Biological Process | 12 | 7.9e-08 | 4.5e-06 | 12/165 |\n| Oxygen binding | GO Molecular Function | 8 | 4.6e-05 | 1.4e-03 | 8/165 |",
+    "output": "The enrichment results reveal a coherent and biologically expected transcriptional program activated in response to hypoxic stress. The dominant signal \u2014 Response to hypoxia and Cellular response to decreased oxygen levels \u2014 reflects stabilization and nuclear translocation of HIF-1\u03b1 (Hif1a), the master oxygen-sensing transcription factor, consistent with the HIF-1 signaling pathway being the third most significantly enriched KEGG term. Downstream of HIF-1\u03b1, Angiogenesis and VEGF signaling pathway enrichment indicate upregulation of pro-angiogenic mediators including Vegfa, Kdr, Flt1, and Angpt2, representing the tissue's attempt to restore oxygen supply through neovascularization. The concurrent enrichment of Glycolytic process and Glucose transmembrane transport captures the canonical Warburg-like metabolic reprogramming, driven by induction of Ldha, Pkm, Pgk1, Hk2, and Slc2a1 (Glut1), as cells shift toward anaerobic ATP production. Oxidative phosphorylation enrichment likely reflects coordinated downregulation of mitochondrial electron transport chain subunits to reduce oxygen consumption and limit reactive oxygen species production. Response to reactive oxygen species enrichment highlights concurrent activation of antioxidant defenses including Hmox1, Sod2, and Nqo1. Erythrocyte differentiation and Oxygen binding enrichment suggest upregulation of erythropoiesis-promoting genes (Epo, Tfrc) and globin-related transcripts to enhance systemic oxygen-carrying capacity. Collectively, these results depict a multi-layered hypoxic adaptation: HIF-1\u03b1-driven metabolic rewiring toward glycolysis, compensatory angiogenesis, antioxidant cytoprotection, and systemic erythropoietic signaling.",
+    "source": "synthetic",
+    "task_type": "enrichment_interpretation"
+  },
+  {
+    "instruction": "How can RNA-seq be used for data analysis in Coffea eugenioides?\n",
+    "input": "",
+    "output": "RNA-seq can be used to generate reference transcriptomes and identify coding genes and potential candidates related to important agronomic traits in Coffea eugenioides.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is the role of catabolite activator protein (CAP) in LAC operon?",
+    "input": "",
+    "output": "Positive regulator. Catabolite activator protein, CAP is an activator required for high level transcription of the lac operon. CAP protein exes positive control and lac repressor exes negative control. What is an Operon? In prokaryotes, the genes coding for proteins involved in a paicular metabolic pathway are often sequentially arranged- together on the chromosome along with a single promoter or regulatory region. This entire cluster is termed as an operon, for eg, the lac operon (coding proteins for metabolism of lactose) or trp operon (coding proteins needed for the synthesis of tryptophan). Lac operon: Lac operon contains lacZ, lacY and lacA genes encoding beta galactosidase, galactose permease and thiogalactoside transacetylase and is preced by an operator (O) site and promoter (P) site. The operon is transcribed by RNA polymerase to produce a single polycistronic mRNA that is translated to produce all three enzymes which are involved in lactose metabolism.",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Given a genetic variant, provide information on its effect on gene expression or protein function.",
+    "input": "rs1042522",
+    "output": "rs1042522 is a genetic variant in the TP53 gene. It has been associated with decreased expression of TP53, which plays a critical role in regulating cell growth and preventing the formation of tumors. The variant has also been linked to increased susceptibility to certain cancers, such as colorectal and ovarian cancer.",
+    "source": "bioinstruct",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is SHP2 and how does it regulate RAS/ERK and PI3K/AKT signaling pathways? \n",
+    "input": "",
+    "output": "SHP2, or Src homology-2 domain containing protein tyrosine phosphatase 2, is a positive mediator required for most, if not all, receptor tyrosine kinase-evoked RAS/ERK activation, but differentially regulates the PI3K/AKT signaling cascade in various cellular contexts. \n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Is the abundance of fibromodulin in the anulus fibrosus similar to the abundance of lumican in the nucleus pulposus? \n",
+    "input": "",
+    "output": "Fibromodulin was more abundant in the anulus fibrosus than in nucleus pulposus at all ages, whereas lumican was much more abundant in nucleus pulposus than in anulus fibrosus in the young juvenile; in the adult, however, lumican was present in comparable levels in both tissues.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "How do the methods impact the analysis of oligonucleotide gene expression array data?\n",
+    "input": "",
+    "output": "The methods impact the analysis of oligonucleotide gene expression array data by accounting for sources of variation, recognizing the \"spots\" (or features) on the Affymetrix GeneChip(R) probe arrays, correcting for background and intensity gradients in the resulting images, scaling/normalizing an array to allow array-to-array comparisons, monitoring probe performance with respect to hybridization efficiency, and assessing whether a gene is present or differentially expressed. \n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is the brain-type fatty acid binding protein (Fabp7)?\n",
+    "input": "",
+    "output": "The Fabp7 is a gene expression that cycles globally throughout mammalian brain and is known to regulate sleep in multiple species, including humans.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is the significance of the observed differential expression during acute infection with high or low virulence BVDV?\n",
+    "input": "",
+    "output": "The observed differential expression during acute infection with high or low virulence BVDV might reflect differences in immune activation by these strains, which could be associated with differences in genotype and/or virulence.",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The following DESeq2 results table shows differentially expressed genes in Arabidopsis thaliana seedlings grown on media supplemented with a high-fat (palmitate-enriched) mixture compared to standard MS media controls. Genes with padj < 0.05 are shown. Please interpret these results by identifying major functional themes, connecting the expression changes to known plant biological processes, and noting any important caveats in the interpretation.",
+    "input": "| Gene | log2FC | padj | baseMean |\n|------|--------|------|----------|\n| ACX1 | 2.34 | 0.0012 | 456.2 |\n| MFP2 | 1.89 | 0.0031 | 321.7 |\n| KAT2 | 1.67 | 0.0089 | 289.4 |\n| LOX2 | 2.11 | 0.0004 | 512.8 |\n| JAZ1 | 1.45 | 0.0156 | 198.3 |\n| CYP86A2 | 1.78 | 0.0067 | 167.9 |\n| PDF1.2 | 1.23 | 0.0441 | 89.4 |\n| FAD2 | -1.56 | 0.0023 | 734.1 |\n| FAD3 | -1.34 | 0.0087 | 445.6 |\n| DGAT1 | -1.89 | 0.0008 | 623.2 |\n| WRI1 | -2.23 | 0.0001 | 387.5 |\n| ACC1 | -1.12 | 0.0312 | 892.3 |\n| PDAT1 | -1.44 | 0.0178 | 234.8 |",
+    "output": "The transcriptional response of Arabidopsis to exogenous palmitate supplementation reveals two dominant themes: induction of peroxisomal fatty acid catabolism and suppression of de novo lipid biosynthesis. The coordinated upregulation of ACX1, MFP2, and KAT2 \u2014 encoding sequential enzymes of peroxisomal beta-oxidation \u2014 indicates active mobilization of excess exogenous fatty acids, likely as a detoxification or energy-recovery strategy. Simultaneously, strong downregulation of the master transcription factor WRI1 (log2FC = -2.23) and its downstream target ACC1 suggests feedback inhibition of plastidic fatty acid synthesis in response to elevated cytosolic acyl-CoA pools. Reduced DGAT1 and PDAT1 expression further implies decreased channeling of fatty acids into triacylglycerol and membrane phospholipids, potentially reflecting saturated substrate availability. The upregulation of LOX2 and JAZ1 points to activation of jasmonate signaling, consistent with oxylipin-mediated stress perception of lipotoxic conditions. Downregulation of the desaturases FAD2 and FAD3 may shift the fatty acid unsaturation profile toward more saturated species, with potential implications for membrane fluidity and cold acclimation capacity. Importantly, several upregulated genes (PDF1.2, CYP86A2) are canonical defense markers, raising the caveat that some transcriptional changes may reflect a generalized stress or damage response rather than specific lipid metabolic reprogramming. Validation through lipidomics and genetic mutant analyses would help disentangle direct metabolic adaptation from secondary stress signaling.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What are the five core changes of ECA? \n",
+    "input": "",
+    "output": "The five core changes of ECA are loss of vascular integrity; expression of leucocyte adhesion molecules; change in phenotype from antithrombotic to prothrombotic; cytokine production, and upregulation of HLA molecules.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Interpret the following DESeq2 differential expression results from a human cell line treated with a small-molecule drug versus vehicle control (DMSO). Identify major functional themes, connect the gene expression changes to known biological pathways, and note any important caveats or limitations in the interpretation.",
+    "input": "| Gene | log2FC | padj | baseMean |\n|------|--------|------|----------|\n| DDIT4 | 3.12 | 4.5e-10 | 178.3 |\n| BNIP3 | 2.83 | 1.2e-08 | 245.1 |\n| GABARAPL1 | 2.31 | 3.4e-07 | 512.4 |\n| FOXO3 | 1.74 | 1.5e-04 | 289.0 |\n| SESN1 | 1.91 | 2.1e-05 | 320.7 |\n| ULK1 | 1.43 | 8.7e-04 | 433.2 |\n| CDKN1B | 1.62 | 2.3e-04 | 198.5 |\n| MYC | -2.41 | 7.8e-09 | 867.4 |\n| MCM2 | -1.94 | 4.6e-06 | 541.8 |\n| CCND1 | -1.83 | 5.2e-06 | 634.1 |\n| PCNA | -1.61 | 8.3e-05 | 932.0 |\n| CDK4 | -1.28 | 3.9e-04 | 445.3 |\n| RPL13A | -1.51 | 2.8e-05 | 1243.6 |\n| RPS6KB1 | -1.19 | 4.1e-04 | 721.2 |",
+    "output": "The expression signature is strongly consistent with inhibition of the mTORC1 signaling axis. Upregulated genes fall into two coherent functional clusters: autophagy induction (GABARAPL1, BNIP3, ULK1) and stress-responsive mTORC1 suppression (DDIT4/REDD1, SESN1), both of which are canonical transcriptional outputs of mTOR pathway attenuation. Concurrent upregulation of FOXO3 and its target CDKN1B (p27Kip1) further indicates derepression of FOXO transcription factors, which are normally phosphorylated and cytoplasmic under active PI3K/AKT/mTORC1 conditions. The downregulated genes reinforce this interpretation: loss of MYC, CCND1, and CDK4 transcript abundance suggests G1-phase cell cycle arrest, corroborated by reductions in the DNA replication markers PCNA and MCM2. Suppression of RPS6KB1 (S6K1) and the ribosomal protein RPL13A is consistent with reduced mTORC1-driven ribosomal biogenesis. Taken together, the data profile resembles treatment with a rapalog or dual PI3K/mTOR inhibitor. Important caveats: transcript-level changes do not confirm corresponding protein or phosphorylation changes for pathway nodes such as S6K1; cell-type identity and passage number may influence baseline mTOR tone; and the absence of time-course data precludes distinguishing primary transcriptional responses from secondary feedback effects.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Given a scientific question, rephrase it into a simpler version that can be understood by a wider audience.",
+    "input": "What is the role of microRNAs in the regulation of gene expression?",
+    "output": "What is the job of tiny RNA molecules in controlling how genes work and function?",
+    "source": "bioinstruct",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The following table shows GO and KEGG enrichment results for genes significantly upregulated in early-stage zebrafish embryos compared to late-stage embryos. Interpret which biological processes are enriched and explain why these findings are biologically meaningful in the context of zebrafish development.",
+    "input": "| Term | Category | GeneCount | pvalue | p.adjust | GeneRatio |\n|------|----------|-----------|--------|----------|-----------|\n| Cell cycle | GO:BP | 47 | 1.2e-15 | 8.4e-13 | 47/318 |\n| DNA replication | GO:BP | 31 | 3.5e-12 | 1.2e-10 | 31/318 |\n| Chromosome segregation | GO:BP | 24 | 2.1e-10 | 4.9e-09 | 24/318 |\n| Cell cycle (KEGG) | KEGG | 38 | 1.8e-14 | 6.3e-13 | 38/318 |\n| Nucleosome assembly | GO:BP | 16 | 3.1e-07 | 4.3e-06 | 16/318 |\n| Histone modification | GO:BP | 19 | 4.7e-08 | 8.2e-07 | 19/318 |\n| Wnt signaling pathway | GO:BP | 22 | 6.3e-08 | 8.8e-07 | 22/318 |\n| DNA-binding transcription factor activity | GO:MF | 28 | 9.2e-09 | 1.6e-07 | 28/318 |\n| p53 signaling pathway | KEGG | 18 | 2.4e-07 | 3.4e-06 | 18/318 |\n| Blastulation | GO:BP | 11 | 5.8e-06 | 6.1e-05 | 11/318 |\n| Chromatin remodeling | GO:BP | 14 | 8.3e-07 | 9.7e-06 | 14/318 |",
+    "output": "The enrichment results paint a coherent picture of early zebrafish embryogenesis, dominated by processes supporting the rapid synchronous cell divisions characteristic of cleavage-stage and blastula-stage embryos. The most significantly enriched terms\u2014cell cycle, DNA replication, and chromosome segregation\u2014reflect the extraordinarily short cell cycles (as brief as 15 minutes) that drive the exponential increase in cell number prior to the mid-blastula transition (MBT). The co-enrichment of nucleosome assembly and chromatin remodeling is particularly informative: during the maternal-to-zygotic transition (MZT) around sphere and dome stages, the embryo must package newly replicated DNA and simultaneously remodel chromatin architecture to permit zygotic genome activation (ZGA). The enrichment of histone modification terms is consistent with the wave of H3K4me3 and H3K27ac deposition that marks de novo transcriptional activation of thousands of zygotic loci. DNA-binding transcription factor activity enrichment likely reflects pioneer factors such as Nanog, Pou5f3, and Sox19b driving ZGA. Wnt signaling enrichment aligns with its essential role in dorsoventral axis specification during gastrulation, where maternal \u03b2-catenin accumulates dorsally. p53 pathway enrichment may reflect the DNA damage surveillance that monitors replication fidelity during rapid divisions. Together, these results are consistent with early-stage zebrafish embryos being in a proliferative, epigenetically plastic state transitioning from maternal to zygotic transcriptional control.",
+    "source": "synthetic",
+    "task_type": "enrichment_interpretation"
+  },
+  {
+    "instruction": "What is the HiCEP gene expression profiling method? \n",
+    "input": "",
+    "output": "HiCEP is an AFLP-based gene expression profiling method that has made improvements to the selective PCR technique in reducing false positive peaks to approximately 4% and therefore decreasing the number of peaks, including overlapping peaks.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is the goal of awareness of pathways alteration in cancer chemoprevention by naturally occurring compounds?\n",
+    "input": "",
+    "output": "The goal of awareness of pathways alteration in cancer chemoprevention by naturally occurring compounds is to gain improved understanding of the signaling pathway alterations in cancer chemoprevention.  \n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "You are given a DESeq2 differential expression results table from a human aging study (aged donors vs young donors, bulk RNA-seq of skeletal muscle biopsies). Interpret the biological significance of these results, identifying major functional themes, relevant aging pathways, and any important caveats.",
+    "input": "| Gene | log2FC | padj | baseMean |\n|----------|--------|------------|----------|\n| CDKN2A | 3.21 | 2.4e-08 | 142.3 |\n| SERPINE1 | 2.87 | 1.1e-06 | 891.4 |\n| IL6 | 2.43 | 3.8e-05 | 267.9 |\n| CXCL8 | 2.15 | 8.7e-05 | 88.2 |\n| GDF15 | 1.94 | 1.2e-03 | 1203.6 |\n| MMP3 | 1.67 | 8.9e-03 | 334.7 |\n| TXNIP | 1.38 | 2.1e-02 | 2456.1 |\n| SIRT1 | -1.82 | 4.3e-04 | 723.5 |\n| PPARGC1A | -2.14 | 6.9e-06 | 445.8 |\n| IGF1 | -2.39 | 2.2e-07 | 312.4 |\n| LMNB1 | -1.56 | 3.1e-03 | 589.3 |\n| MYOD1 | -1.71 | 4.3e-03 | 178.9 |\n| TERT | -3.04 | 1.8e-09 | 67.1 |\n| SIRT3 | -1.29 | 3.9e-02 | 834.6 |",
+    "output": "These results capture multiple intersecting hallmarks of skeletal muscle aging. The most prominent upregulated signal is CDKN2A (p16INK4a, log2FC=3.21), a cyclin-dependent kinase inhibitor and canonical marker of cellular senescence, consistent with senescent cell accumulation in aged muscle. Accompanying it, IL6, CXCL8, SERPINE1, and MMP3 form a recognizable senescence-associated secretory phenotype (SASP) signature, driving the chronic low-grade inflammation termed 'inflammaging.' GDF15 upregulation further reflects a mitokine stress response associated with mitochondrial dysfunction. TXNIP induction suggests elevated oxidative and metabolic stress. On the downregulated side, PPARGC1A (PGC-1\u03b1) and SIRT3 co-suppression indicates impaired mitochondrial biogenesis and reduced mitochondrial protein deacetylation, consistent with the energetic decline of sarcopenia. SIRT1 downregulation additionally implicates reduced NAD+-dependent deacetylase activity and compromised stress resistance. MYOD1 loss points to diminished myogenic progenitor activity and regenerative capacity. IGF1 downregulation reduces anabolic/pro-survival signaling through the IGF1-PI3K-AKT axis. TERT suppression (log2FC=\u22123.04) reflects loss of telomerase activity and progressive telomere attrition. LMNB1 downregulation confirms nuclear lamina deterioration in senescent cells. Caveats include: bulk RNA-seq averages across heterogeneous cell populations, potentially masking fiber-type-specific or satellite-cell-specific effects; donor age range and lifestyle covariates are uncontrolled here; and several genes (e.g., IL6, IGF1) show strong tissue-context dependence.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "All are true about glutathione except",
+    "input": "",
+    "output": "It conjugates xenobiotics. Glutathione (GSH) is an impoant antioxidant in plants, animals, fungi, and some bacteria and archaea. Glutathione is capable of preventing damage to impoant cellular components caused by reactive oxygen species such as free radicals, peroxides, lipid peroxides and heavy metals. It is a tripeptide with a gamma peptide linkage between the carboxyl group of the glutamate side chain and the amine group of cysteine, and the carboxyl group of cysteine is attached by the normal peptide linkage to a glycine. Glutathione is not an essential nutrient for humans since it can be synthesized in the body from the amino acids L-cysteine, L-glutamic acid, and glycine; it does not have to be present as a supplement in the diet. The sulfhydryl group (SH) of cysteine serves as a proton donor and is responsible for its biological activity. Cysteine is the rate-limiting factor in cellular glutathione biosynthesis since this amino acid is relatively rare in foods.",
+    "source": "mol_instructions",
+    "task_type": "enrichment_interpretation"
+  },
+  {
+    "instruction": "Sclerostin is produced by?",
+    "input": "",
+    "output": "Osteocytes. Sclerostin (SOST) is a glycoprotein produced by osteocytes. They also synthesize receptor activator of nuclear factor kappa B ligand (RANKL). Both of these are involved in regulating bone formation and resorption. EXTRA EDGE: Romosozumab, a humanized monoclonal antibody that binds to sclerostin, prevents sclerostin from exeing this inhibitory effect. Therefore, in the presence of romosozumab, the Wnt signaling pathway is activated leading to bone formation and bone mineral density gain.",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Identify common causes of back pain and recommend strategies for managing and preventing it.",
+    "input": "N/A",
+    "output": "Common causes of back pain include poor posture, muscle strain, and herniated discs. To manage and prevent back pain, it's important to maintain good posture, practice good ergonomics, and engage in regular exercise. You may also find relief through stretching, massage, or hot and cold therapies. If your back pain persists, it's important to seek medical attention to rule out more serious underlying conditions.",
+    "source": "bioinstruct",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The following tables show differential expression results and GO biological process enrichment for a mouse RNA-seq experiment comparing hypoxic conditions (1% O\u2082, 24 h) to normoxia in primary hepatocytes. Interpret the combined results, connecting the gene expression changes to the enriched pathways and explaining the underlying biology.",
+    "input": "**Differential Expression Results (hypoxia vs normoxia, |log2FC| > 1, padj < 0.05)**\n\n| Gene   | baseMean | log2FoldChange | lfcSE | padj     | Direction |\n|--------|----------|----------------|-------|----------|-----------|\n| Vegfa  | 842.3    | 3.21           | 0.18  | 1.4e-28  | UP        |\n| Bnip3  | 1203.7   | 2.74           | 0.21  | 3.9e-22  | UP        |\n| Slc2a1 | 2341.1   | 2.38           | 0.15  | 8.2e-31  | UP        |\n| Ldha   | 3102.4   | 2.05           | 0.13  | 5.1e-33  | UP        |\n| Pgk1   | 1876.9   | 1.87           | 0.16  | 2.7e-25  | UP        |\n| Egln3  | 654.2    | 1.52           | 0.19  | 4.3e-14  | UP        |\n| Cox5a  | 2987.6   | -1.63          | 0.14  | 6.8e-24  | DOWN      |\n| Mki67  | 489.1    | -2.11          | 0.24  | 1.2e-14  | DOWN      |\n\n**GO Biological Process Enrichment (upregulated gene sets)**\n\n| GO Term                                      | GO ID      | Gene Count | p.adjust | Representative Genes        |\n|----------------------------------------------|------------|------------|----------|-----------------------------|\n| Response to decreased oxygen levels          | GO:0036293 | 18         | 2.1e-12  | Vegfa, Slc2a1, Egln3, Bnip3 |\n| Glycolytic process                           | GO:0006096 | 12         | 7.4e-10  | Ldha, Pgk1, Slc2a1          |\n| Angiogenesis                                 | GO:0001525 | 14         | 1.8e-09  | Vegfa, Egln3                |\n| Regulation of autophagy                      | GO:0010506 | 9          | 3.3e-07  | Bnip3, Egln3                |\n| Cellular response to hypoxia                 | GO:0071456 | 16         | 5.9e-11  | Vegfa, Bnip3, Slc2a1, Ldha  |\n| Negative regulation of oxidative phosphorylation | GO:0090324 | 7      | 2.2e-06  | Cox5a, Ldha                 |",
+    "output": "These results reveal a coordinated HIF-1\u03b1-driven transcriptional response in hepatocytes adapting to acute hypoxia. The strong upregulation of Vegfa (log2FC 3.21) anchors the angiogenesis GO term and reflects canonical HIF-1\u03b1 target activation aimed at restoring oxygen delivery through neovascularization. Simultaneously, hepatocytes execute a pronounced metabolic rewiring toward anaerobic glycolysis: Slc2a1 (GLUT1, log2FC 2.38) increases glucose import, while Ldha (log2FC 2.05) and Pgk1 (log2FC 1.87) drive pyruvate-to-lactate conversion and ATP generation independent of the electron transport chain. This shift is reinforced by the downregulation of Cox5a (log2FC \u22121.63), a nuclear-encoded subunit of cytochrome c oxidase, consistent with the enrichment of negative regulation of oxidative phosphorylation. Bnip3 upregulation (log2FC 2.74) connects the response to hypoxia and autophagy terms, as BNIP3 promotes selective mitophagy to eliminate dysfunctional mitochondria that would otherwise generate damaging reactive oxygen species under oxygen-limiting conditions. Egln3, a PHD prolyl hydroxylase, is itself a HIF-1\u03b1 target whose upregulation provides negative feedback to restrain HIF-1\u03b1 activity as oxygen returns. The decline in Mki67 (log2FC \u22122.11) indicates suppression of cell proliferation, a conserved energy-conservation strategy under hypoxic stress. Together, the data describe a coherent survival program: redirect carbon flux to glycolysis, clear damaged mitochondria, promote vascular remodeling, and pause energetically costly proliferation.",
+    "source": "synthetic",
+    "task_type": "combined_interpretation"
+  },
+  {
+    "instruction": "What can be the potential application of this method?\n",
+    "input": "",
+    "output": "The potential application of this method is incorporation with a microfluidic platform which can simultaneously monitor several cell signaling pathways to aid in toxin detection and discrimination.",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Provide a short description of what \"epigenetics\" means.",
+    "input": "No input needed",
+    "output": "Epigenetics refers to the study of changes in gene function or expression that do not involve changes to the underlying DNA sequence. These reversible modifications can be influenced by factors such as environment and lifestyle, and play a crucial role in the regulation of gene activity in various biological processes.",
+    "source": "bioinstruct",
+    "task_type": "enrichment_interpretation"
+  },
+  {
+    "instruction": "Interpret the differential expression results from a human RNA-seq experiment comparing colorectal cancer vs normal colon.",
+    "input": "Dataset: GSE50760 | Organism: human | Contrast: colorectal cancer vs normal colon",
+    "output": "1. Mol Oncol. 2014 Dec;8(8):1653-66. doi: 10.1016/j.molonc.2014.06.016. Epub 2014\n Jul 4.\n\nA nineteen gene-based risk score classifier predicts prognosis of colorectal \ncancer patients.\n\nKim SK(1), Kim SY(1), Kim JH(1), Roh SA(2), Cho DH(3), Kim YS(4), Kim JC(5).\n\nAuthor information:\n(1)Medical Genomics Research Centre, Korea Research Institute of Bioscience and \nBiotechnology, Daejeon, Korea.\n(2)Department of Surgery, University of Ulsan College of Medicine, Seoul, Korea; \nDepartment of Cancer Research, Institute of Innovative Cancer Research and Asan \nInstitute for Life Sciences, Asan Medical Centre, Seoul, Korea.\n(3)Department of Cancer Research, Institute of Innovative Cancer Research and \nAsan Institute for Life Sciences, Asan Medical Centre, Seoul, Korea; Graduate \nSchool of East-West Medical Science, Kyung Hee University, Gyeonggi-do, Korea.\n(4)Medical Genomics Research Centre, Korea Research Institute of Bioscience and \nBiotechnology, Daejeon, Korea; Department of Cancer Research, Institute of \nInnovative Cancer Research and Asan Institute for Life Sciences, Asan Medical \nCentre, Seoul, Korea. Electronic address: yongsung@kribb.re.kr.\n(5)Department of Surgery, University of Ulsan College of Medicine, Seoul, Korea; \nDepartment of Cancer Research, Institute of Innovative Cancer Research and Asan \nInstitute for Life Sciences, Asan Medical Centre, Seoul, Korea. Electronic \naddress: jckim@amc.seoul.kr.\n\nColorectal cancer (CRC) patients frequently experience disease recurrence and \ndistant metastasis. This study aimed to identify prognostic indicators, \nincluding individual responses to chemotherapy, in CRC patients. RNA-seq data \nwas generated using 54 samples (normal colon, primary CRC, and liver metastases) \nfrom 18 CRC patients and genes associated with CRC aggressiveness were \nidentified. A risk score based on these genes was developed and validated in \nfour independent CRC patient cohorts (n\u00a0=\u00a01063). Diverse statistical methods \nwere applied to validate the",
+    "source": "geo",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What is the focus of this review? \n",
+    "input": "",
+    "output": "This review is an overview of the unique characteristics of nerve-associated macrophages in the peripheral nerves and sensory ganglia and of the molecules and signaling pathways involved in the neuro-immune cross-talk after a traumatic lesion, with the final aim of better understanding how the balance between pro- and anti-nociceptive dialogue between neurons and macrophages may be modulated for new therapeutic approaches.\n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Summarize a given research article from biomedical literature in one to two sentences.",
+    "input": "\"Temporal Variability in Spatial Transcriptomics of the Mouse Liver Tissue: Heterogeneous Population of Hepatocytes Revealed Through Study of Barcode-Sorted Cores.\"",
+    "output": "This study reveals the spatial heterogeneity in hepatocytes in mouse liver tissue through barcode-sorted cores and highlights the temporal variability in spatial transcriptomics of liver tissue.",
+    "source": "bioinstruct",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The following table shows GO and KEGG enrichment results from a differential expression analysis comparing aged (day 10) versus young (day 1) adult C. elegans. Upregulated genes in aged worms were used as input. Interpret which biological processes are enriched and explain the biological significance of these findings in the context of C. elegans aging.",
+    "input": "| Term | Category | GeneCount | pvalue | p.adjust | GeneRatio |\n|------|----------|-----------|--------|----------|-----------|\n| Longevity regulating pathway | KEGG | 27 | 2.1e-09 | 8.4e-07 | 27/318 |\n| protein folding | GO:BP | 24 | 1.2e-08 | 3.4e-06 | 24/318 |\n| Protein processing in endoplasmic reticulum | KEGG | 23 | 5.6e-07 | 1.0e-04 | 23/318 |\n| unfolded protein binding | GO:MF | 16 | 6.7e-07 | 1.1e-04 | 16/318 |\n| response to reactive oxygen species | GO:BP | 21 | 2.3e-07 | 6.2e-05 | 21/318 |\n| response to heat | GO:BP | 18 | 4.5e-07 | 8.9e-05 | 18/318 |\n| Oxidative phosphorylation | KEGG | 29 | 3.1e-06 | 5.2e-04 | 29/318 |\n| ubiquitin-dependent protein catabolic process | GO:BP | 19 | 8.7e-06 | 1.2e-03 | 19/318 |\n| Proteasome | KEGG | 17 | 7.8e-06 | 1.1e-03 | 17/318 |\n| lipid metabolic process | GO:BP | 31 | 1.8e-05 | 2.3e-03 | 31/318 |\n| autophagy | GO:BP | 14 | 3.4e-05 | 3.8e-03 | 14/318 |\n| ATPase activity | GO:MF | 22 | 4.2e-05 | 4.5e-03 | 22/318 |",
+    "output": "The enrichment results reveal a coherent signature of proteostatic stress and compensatory quality-control induction in aged C. elegans. The strongest signal comes from the longevity regulating pathway (daf-2/daf-16/insulin-IGF-1 signaling), consistent with DAF-16 transcriptional activation as worms age and experience reduced IIS flux. Co-enrichment of protein folding, unfolded protein binding, and ER protein processing terms reflects the well-documented collapse of proteostasis capacity with age: chaperones such as hsp-70 (C12C8.1) and hsp-90 (daf-21) are upregulated as cells attempt to manage the growing burden of misfolded proteins. Enrichment of ubiquitin-dependent protein catabolism and the proteasome pathway similarly indicates compensatory upregulation of the ubiquitin-proteasome system (UPS), likely driven by increased substrate load rather than enhanced degradative capacity. Oxidative stress terms (response to reactive oxygen species, response to heat) align with elevated mitochondrial ROS production in aged worms, while the oxidative phosphorylation KEGG term\u2014enriched despite mitochondrial dysfunction\u2014may reflect transcriptional compensation for declining electron transport chain efficiency. Autophagy enrichment suggests parallel induction of lysosomal degradation as a second-line proteostasis mechanism. The broad lipid metabolic process enrichment is consistent with age-associated lipid remodeling, including increased fat storage and altered fatty acid desaturation observed in day-10 adults. Collectively, these results portray aged C. elegans as mounting a broad but ultimately insufficient proteostatic and stress-response transcriptional program.",
+    "source": "synthetic",
+    "task_type": "enrichment_interpretation"
+  },
+  {
+    "instruction": "The table below shows DESeq2 differential expression results from an Arabidopsis thaliana experiment in which 4-week-old Col-0 plants were treated with 500 \u03bcM benzothiadiazole (BTH, a synthetic salicylic acid analog) or an equivalent volume of DMSO vehicle control for 24 hours (n=4 biological replicates per condition). Interpret the biological significance of these results: identify major functional themes and signaling pathways, explain the likely mechanistic basis for the observed expression changes, and note any important caveats or limitations.",
+    "input": "| Gene | log2FC | padj | baseMean |\n|--------|--------|------------|----------|\n| PR1 | 6.42 | 2.3e-18 | 45.2 |\n| PR5 | 5.23 | 1.4e-15 | 67.3 |\n| PR2 | 4.87 | 8.1e-14 | 128.7 |\n| ICS1 | 2.89 | 5.4e-08 | 156.3 |\n| EDS1 | 1.94 | 1.8e-05 | 312.1 |\n| WRKY70 | 3.14 | 3.7e-09 | 234.8 |\n| PAL1 | 2.56 | 2.1e-07 | 892.4 |\n| NPR3 | 1.78 | 4.2e-04 | 89.6 |\n| JAZ1 | -2.34 | 7.6e-07 | 445.2 |\n| LOX2 | -2.18 | 4.1e-06 | 334.6 |\n| PDF1.2 | -3.67 | 2.9e-11 | 78.9 |\n| VSP2 | -2.91 | 1.3e-08 | 203.5 |\n| MYC2 | -1.45 | 8.7e-03 | 567.8 |",
+    "output": "These results are consistent with robust activation of the salicylic acid (SA)-mediated systemic acquired resistance (SAR) pathway. The strongest upregulated genes \u2014 PR1, PR2, and PR5 \u2014 are canonical SAR markers whose pathogenesis-related proteins directly contribute to antimicrobial defense; their log2 fold changes of 5\u20136.4 reflect BTH's potent SA-mimetic activity. Upregulation of ICS1 (isochorismate synthase, the primary SA biosynthesis enzyme) suggests a positive-feedback loop amplifying endogenous SA alongside the exogenous BTH signal. EDS1 induction indicates engagement of TIR-NLR immune signaling upstream, while WRKY70 \u2014 a transcriptional activator of PR genes and repressor of JA responses \u2014 reinforces the transcriptional reprogramming observed. PAL1 upregulation reflects co-activation of the phenylpropanoid pathway, which supplies SA precursors and produces antimicrobial metabolites. The downregulated gene set reveals reciprocal suppression of the jasmonate (JA) defense arm: PDF1.2, VSP2, and LOX2 are canonical JA/ethylene markers, and their repression alongside JAZ1 and MYC2 is consistent with NPR1-mediated antagonism of MYC2 transcriptional activity \u2014 a well-documented SA\u2013JA crosstalk node. MYC2's borderline adjusted p-value (0.0087) suggests its repression may be a secondary effect. Key caveats: this single 24-hour time point captures early transcriptional responses but not late-phase dynamics; the 500 \u03bcM BTH concentration is supraphysiological relative to endogenous SA accumulation during infection, potentially amplifying fold changes beyond what occurs during natural pathogen challenge.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "Is survivin overexpressed and associated with parameters of poor prognosis in most human cancers? \n",
+    "input": "",
+    "output": "Yes, survivin is overexpressed and associated with parameters of poor prognosis in most human cancers, including carcinomas of the lung, breast, colon, stomach, esophagus and pancreas. \n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "You are provided with DESeq2 differential expression results from a mouse tumor progression study comparing early stage to late stage samples. Positive log2FC values indicate upregulation in late stage; negative values indicate downregulation in late stage. Interpret the biological significance of these results, identifying major functional themes, relevant pathways, and any important caveats.",
+    "input": "DESeq2 results: early stage vs late stage (mouse)\n\n| Gene | log2FC | padj | baseMean |\n|------|--------|------|----------|\n| Fn1 | 4.21 | 1.2e-18 | 512.8 |\n| Ccl2 | 4.56 | 6.8e-22 | 398.7 |\n| Krt8 | -4.12 | 3.9e-20 | 1456.2 |\n| Cdh1 | -3.67 | 1.4e-16 | 2145.8 |\n| Mmp9 | 3.82 | 2.1e-15 | 234.5 |\n| Twist1 | 3.44 | 9.1e-11 | 63.4 |\n| Epcam | -2.83 | 7.2e-13 | 987.3 |\n| Cdh2 | 2.68 | 3.4e-10 | 156.3 |\n| Snai1 | 3.15 | 4.3e-09 | 87.2 |\n| Vim | 2.94 | 8.7e-12 | 1823.4 |\n| Hif1a | 2.37 | 5.6e-08 | 341.6 |\n| Tjp1 | -2.45 | 2.8e-09 | 432.6 |\n| Grhl2 | -2.21 | 4.5e-07 | 278.9 |",
+    "output": "These results present a compelling signature of epithelial-to-mesenchymal transition (EMT) driving late-stage tumor progression. The coordinated loss of epithelial identity markers \u2014 Cdh1 (E-cadherin, log2FC \u22123.67), Epcam (\u22122.83), Krt8 (\u22124.12), and the tight junction component Tjp1 (\u22122.45) \u2014 coupled with downregulation of the epithelial master regulator Grhl2 (\u22122.21), indicates a systematic dismantling of the epithelial program. Concurrently, classical mesenchymal markers are induced: Vim (vimentin, +2.94), Cdh2 (N-cadherin, +2.68), and the extracellular matrix glycoprotein Fn1 (fibronectin, +4.21). The EMT transcription factors Snai1 (+3.15) and Twist1 (+3.44) are likely upstream drivers of this switch. Mmp9 upregulation (+3.82) suggests active basement membrane degradation, enabling invasive potential. Hif1a induction (+2.37) points to an emerging hypoxic microenvironment, which can itself reinforce EMT. The strong upregulation of Ccl2 (+4.56) implicates macrophage recruitment and inflammatory remodeling as co-occurring processes. Caveats include: bulk RNA-seq cannot resolve cell-type-specific contributions \u2014 Ccl2 and Mmp9 changes may partly reflect altered stromal composition rather than tumor-intrinsic shifts. Additionally, Hif1a protein activity is post-translationally regulated by oxygen tension, so transcript-level changes alone may underestimate or overestimate pathway activation.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "What studies have been done to evaluate the accuracy of RNA-Seq? \n",
+    "input": "",
+    "output": "Studies have been performed to determine which algorithms perform best and which, if any, algorithms are adequate. There have also been independent and unbiased benchmarking studies. \n",
+    "source": "mol_instructions",
+    "task_type": "de_interpretation"
+  },
+  {
+    "instruction": "The table below shows DESeq2 differential expression results from an skn-1 knockout vs. wild-type C. elegans experiment (young adult stage, three biological replicates). Interpret the key biological themes, identify affected pathways, and note any important caveats.",
+    "input": "| Gene | log2FC | padj | baseMean |\n|------|--------|------|----------|\n| gst-4 | -3.21 | 1.2e-18 | 892.4 |\n| gst-10 | -2.84 | 4.5e-15 | 621.1 |\n| gcs-1 | -2.13 | 2.3e-11 | 445.7 |\n| sod-1 | -1.79 | 8.7e-09 | 1203.2 |\n| ctl-2 | -1.63 | 1.9e-08 | 567.3 |\n| trx-1 | -1.41 | 3.4e-07 | 334.8 |\n| hsp-16.2 | +2.91 | 3.1e-16 | 278.5 |\n| clec-60 | +1.54 | 4.1e-08 | 321.0 |\n| hsp-70 | +1.73 | 5.6e-10 | 1876.3 |\n| abu-1 | +1.28 | 2.8e-06 | 412.9 |\n| fat-7 | +1.11 | 7.4e-05 | 889.6 |\n| mtl-1 | +0.93 | 0.018 | 156.2 |",
+    "output": "The expression profile of skn-1 knockout animals strongly reflects the loss of Nrf2/SKN-1-mediated oxidative stress defense. The most significantly downregulated genes are canonical SKN-1 transcriptional targets: gst-4 and gst-10 encode glutathione S-transferases central to phase II xenobiotic detoxification, while gcs-1 (glutamate-cysteine ligase, the rate-limiting step in glutathione biosynthesis) is co-suppressed, indicating collapse of the entire glutathione axis. Further downregulation of sod-1 (cytosolic superoxide dismutase), ctl-2 (catalase), and trx-1 (thioredoxin) confirms broad impairment of reactive oxygen species scavenging capacity. Counterintuitively, the heat shock proteins hsp-16.2 and hsp-70 are among the most strongly upregulated genes, consistent with secondary proteotoxic stress arising from unscavenged ROS damaging the proteome. Induction of abu-1 suggests concurrent ER unfolded protein response activation, while fat-7 upregulation may reflect adaptive membrane lipid remodeling to manage oxidative lipid damage. The elevated clec-60 (a C-type lectin) and mtl-1 (metallothionein) hint at innate immune crosstalk and metal-ion stress signaling, respectively. Two caveats merit attention: mtl-1 sits at the conventional significance boundary (padj = 0.018) and should be validated independently, and because skn-1 functions in both the intestine and ASI neurons, bulk RNA-seq cannot resolve tissue-specific contributions to this transcriptome.",
+    "source": "synthetic",
+    "task_type": "de_interpretation"
+  }
+]
