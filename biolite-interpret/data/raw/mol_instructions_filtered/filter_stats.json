@@ -1,0 +1,39 @@
+{
+  "total_examples": 53760,
+  "kept": 327,
+  "excluded_by_keywords": 3352,
+  "filtered_out": 50081,
+  "keep_rate": "0.61%",
+  "per_file": {
+    "chemical_disease_interaction_extraction.json": {
+      "total": 500,
+      "kept": 0,
+      "excluded": 0
+    },
+    "chemical_entity_recognition.json": {
+      "total": 1000,
+      "kept": 0,
+      "excluded": 0
+    },
+    "chemical_protein_interaction_extraction.json": {
+      "total": 767,
+      "kept": 0,
+      "excluded": 0
+    },
+    "multi_choice_question.json": {
+      "total": 12398,
+      "kept": 0,
+      "excluded": 736
+    },
+    "open_question.json": {
+      "total": 38095,
+      "kept": 325,
+      "excluded": 2549
+    },
+    "true_or_false_question.json": {
+      "total": 1000,
+      "kept": 2,
+      "excluded": 67
+    }
+  }
+}
