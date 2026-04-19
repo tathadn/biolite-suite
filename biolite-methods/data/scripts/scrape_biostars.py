@@ -4,6 +4,18 @@ scrape_biostars.py — Scrape methodology Q&A from Biostars.org
 
 Biostars content is CC-BY-4.0 licensed.
 
+NOTE (2026-04-19): Biostars now sits behind a Cloudflare managed challenge
+that blocks programmatic access from `requests`, `cloudscraper`, and
+`curl_cffi` (all return HTTP 403 with the "Just a moment..." JS challenge
+page). A real headless browser (Playwright) would be required to bypass.
+We instead switched the methodology corpus to bioinformatics.stackexchange.com
+— see scrape_stackexchange.py.
+
+Known bug if you do unblock it: fetch_posts_by_tag() silently returns []
+on any non-200 status (including 403/429), so failed scrapes report
+"Total Q&A pairs: 0" with no error. Add a hard-fail / log on non-200
+before relying on this script.
+
 Usage:
     python scrape_biostars.py --output_dir ../raw/biostars --max_pages 50
 """
