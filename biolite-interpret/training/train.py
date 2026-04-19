@@ -13,6 +13,7 @@ Usage:
 """
 
 import argparse
+import gc
 import json
 import os
 import yaml
@@ -22,10 +23,25 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
+    TrainerCallback,
     TrainingArguments,
 )
 from peft import LoraConfig, TaskType, get_peft_model
 from trl import SFTTrainer, SFTConfig
+
+
+class PreEvalCleanupCallback(TrainerCallback):
+    """Free cached CUDA memory right before each evaluation to avoid OOM on small MIG slices."""
+
+    def on_step_end(self, args, state, control, **kwargs):
+        if (
+            state.global_step > 0
+            and args.eval_strategy == "steps"
+            and args.eval_steps
+            and state.global_step % args.eval_steps == 0
+        ):
+            gc.collect()
+            torch.cuda.empty_cache()
 
 
 def load_config(config_path: str) -> dict:
@@ -107,29 +123,27 @@ def main():
         train_ds = train_ds.select(range(n))
         print(f"Using {n}/{len(train_ds)} examples ({args.data_fraction*100:.0f}%)")
 
-    def formatting_func(examples):
-        """Format into chat messages for Llama 3.2 Instruct."""
-        texts = []
-        for i in range(len(examples["instruction"])):
-            user_msg, assistant_msg = format_instruction({
-                "instruction": examples["instruction"][i],
-                "input": examples.get("input", [""])[i],
-                "output": examples["output"][i],
-            })
-            messages = [
-                {"role": "user", "content": user_msg},
-                {"role": "assistant", "content": assistant_msg},
-            ]
-            text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
-            texts.append(text)
-        return texts
+    def formatting_func(example):
+        """Format a single example into Llama 3.2 Instruct chat template."""
+        user_msg, assistant_msg = format_instruction({
+            "instruction": example["instruction"],
+            "input": example.get("input", ""),
+            "output": example["output"],
+        })
+        messages = [
+            {"role": "user", "content": user_msg},
+            {"role": "assistant", "content": assistant_msg},
+        ]
+        return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
 
     # --- Training args ---
     training_args = SFTConfig(
         output_dir=cfg["training"]["output_dir"],
         num_train_epochs=cfg["training"]["num_train_epochs"],
         per_device_train_batch_size=cfg["training"]["per_device_train_batch_size"],
+        per_device_eval_batch_size=cfg["training"].get("per_device_eval_batch_size", 1),
         gradient_accumulation_steps=cfg["training"]["gradient_accumulation_steps"],
+        eval_accumulation_steps=cfg["training"].get("eval_accumulation_steps"),
         learning_rate=cfg["training"]["learning_rate"],
         lr_scheduler_type=cfg["training"]["lr_scheduler_type"],
         warmup_ratio=cfg["training"]["warmup_ratio"],
@@ -141,11 +155,12 @@ def main():
         eval_steps=cfg["training"]["eval_steps"],
         save_strategy=cfg["training"]["save_strategy"],
         save_steps=cfg["training"]["save_steps"],
+        save_total_limit=cfg["training"].get("save_total_limit"),
         load_best_model_at_end=cfg["training"]["load_best_model_at_end"],
         metric_for_best_model=cfg["training"]["metric_for_best_model"],
         gradient_checkpointing=cfg["training"]["gradient_checkpointing"],
         optim=cfg["training"]["optim"],
-        max_seq_length=cfg["training"]["max_seq_length"],
+        max_length=cfg["training"]["max_seq_length"],
         report_to=cfg["training"]["report_to"],
         run_name=cfg["wandb"]["run_name"],
         packing=False,
@@ -159,13 +174,17 @@ def main():
         eval_dataset=eval_ds,
         peft_config=lora_config,
         formatting_func=formatting_func,
+        callbacks=[PreEvalCleanupCallback()],
     )
 
     # Log GPU memory before training
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
-        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_mem / 1e9:.2f} GB")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
         print(f"Allocated before training: {torch.cuda.memory_allocated(0) / 1e9:.2f} GB")
+
+    gc.collect()
+    torch.cuda.empty_cache()
 
     print("Starting training...")
     trainer.train()

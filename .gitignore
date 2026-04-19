@@ -12,6 +12,7 @@ data/splits/
 *.jsonl
 *.json
 !training/config.yaml
+!biolite-interpret/evaluation/results/*.json
 
 # Training artifacts
 checkpoints/
@@ -23,6 +24,7 @@ wandb/
 # HPC / system
 .cache/
 *.log
+train_run.log.*
 *.out
 *.err
 slurm-*.out
