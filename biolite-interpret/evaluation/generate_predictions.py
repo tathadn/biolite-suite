@@ -25,7 +25,7 @@ import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-BASE_MODEL = "meta-llama/Llama-3.2-1B-Instruct"
+DEFAULT_BASE_MODEL = "meta-llama/Llama-3.2-1B-Instruct"
 
 
 def build_prompt(tokenizer, instruction: str, input_text: str) -> str:
@@ -42,6 +42,7 @@ def main():
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--adapter_path", type=str, default=None)
+    parser.add_argument("--base_model", type=str, default=DEFAULT_BASE_MODEL)
     parser.add_argument("--max_new_tokens", type=int, default=512)
     args = parser.parse_args()
 
@@ -52,14 +53,14 @@ def main():
         bnb_4bit_use_double_quant=True,
     )
 
-    print(f"Loading base model {BASE_MODEL}...")
+    print(f"Loading base model {args.base_model}...")
     model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL,
+        args.base_model,
         quantization_config=bnb_config,
         device_map={"": 0},
         torch_dtype=torch.bfloat16,
     )
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+    tokenizer = AutoTokenizer.from_pretrained(args.base_model)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 

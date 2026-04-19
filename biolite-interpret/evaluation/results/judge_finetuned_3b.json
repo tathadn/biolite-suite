@@ -1,0 +1,1176 @@
+{
+  "rubric": "interpret",
+  "model_used_as_judge": "sonnet",
+  "n_evaluated": 64,
+  "aggregates": {
+    "biological_accuracy": {
+      "mean": 2.53,
+      "std": 1.31,
+      "n": 64
+    },
+    "completeness": {
+      "mean": 2.2,
+      "std": 1.13,
+      "n": 64
+    },
+    "clarity": {
+      "mean": 3.73,
+      "std": 0.95,
+      "n": 64
+    }
+  },
+  "individual_results": [
+    {
+      "index": 0,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "All biological claims are accurate: MDR K. pneumoniae, efflux pump upregulation in 86% of isolates, ramA and acrA as top expressed genes, and their role in antibiotic resistance are correctly stated."
+        },
+        "completeness": {
+          "score": 5,
+          "justification": "Captures all key elements: objective, sample size (150 isolates), methodology (qRT-PCR, 16 genes), quantitative result (86%), top genes (ramA, acrA), and conclusion on resistance role."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured with logical flow from aim to method to results to conclusion. Technical terms are used appropriately without being jargon-heavy, and sentences are concise and readable."
+        }
+      }
+    },
+    {
+      "index": 1,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The core pathway (cAMP signaling \u2192 IOP \u2192 glaucoma susceptibility in African Americans) is directionally correct, but introducing PDE6 as the mechanistic link is unsupported and likely hallucinated \u2014 PDE6 is a cGMP phosphodiesterase primarily involved in phototransduction, not cAMP signaling or glaucoma susceptibility in this context."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Captures the population-risk angle but omits the key finding about elevated intraocular pressure as the intermediate mechanism, which is central to the reference answer."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Grammatically clear and readable, but the fabricated PDE6 detail adds misleading specificity that obscures rather than clarifies the actual biological relationship."
+        }
+      }
+    },
+    {
+      "index": 2,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Core gene functions are correctly described (bmm as ATGL ortholog, Hsl as lipase, FASN1 lipogenesis). However, the model misidentifies GstD1 and Sod2 as 'top GO enrichment terms' \u2014 they are genes, not GO terms. The model also states TOR signaling is 'activated' in response to HFD, but Thor upregulation reflects 4E-BP induction under reduced insulin/TOR signaling, not TOR activation \u2014 a meaningful mechanistic inversion. Lsd-2 is described as indicating 'active mobilization,' which oversimplifies its scaffolding role at lipid droplet surfaces."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers the main themes (lipolysis, oxidative stress, lipogenesis suppression, insulin signaling). However, the critical mechanistic link between dilp2 downregulation and Thor induction \u2014 the hypoinsulinemic, catabolism-permissive state \u2014 is entirely absent. This Thor/4E-BP axis is the most mechanistically distinctive finding and its omission is a significant gap. The response is also truncated mid-sentence."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Generally readable and logically organized. The truncation at the end is a clear flaw. Some imprecise phrasing ('enrichment of the TOR signaling' used ambiguously as both activation and pathway enrichment) and the mischaracterization of genes as GO terms adds confusion for a specialist reader."
+        }
+      }
+    },
+    {
+      "index": 3,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Cell proliferation and survival is a plausible general role but the model omits the key finding of overexpression in gastric carcinoma and the link to multi-drug resistance signaling."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Captures only a generic oncogenic function; misses overexpression as the primary evidence, neoplastic epithelium context, and the multi-drug resistance property."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and readable sentence with no jargon issues, though brevity contributes to incompleteness."
+        }
+      }
+    },
+    {
+      "index": 4,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Correctly identifies 3'UTR as the binding site and mentions mRNA degradation, but omits translation inhibition as an equally valid silencing mechanism, and misses that miRNAs can act through RNAi/RISC complex."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers only the basic location and one outcome; missing miRNA biogenesis details, size (21-22 nt), RNA interference terminology, translation inhibition pathway, and gene silencing context provided in the reference."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and easy to understand with no unnecessary jargon; logical structure, though brevity sacrifices important mechanistic nuance."
+        }
+      }
+    },
+    {
+      "index": 5,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "States a tautology without any mechanistic content; omits the key biological claim about permissive role enabling fetal gene program reactivation and hypertrophic compensation."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Merely restates the question as a declarative sentence; misses all substantive findings: permissive role, fetal gene program, afterload compensation context."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Grammatically clear and readable, but conveys no meaningful information beyond the input question."
+        }
+      }
+    },
+    {
+      "index": 6,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The model misidentifies the core mechanism as 'insulin resistance' rather than glucocorticoid receptor agonism \u2014 a fundamental interpretive error given that Fkbp5, Sgk1, Tsc22d3/GILZ, and Dusp1 are canonical GR transcriptional targets. More critically, the model states 'Tnf and Il1b induction is a well-established marker of hepatic inflammation' and 'Cxcl1 upregulation suggests neutrophil recruitment,' but both genes are downregulated (log2FC -3.54 and -3.15). This directional error propagates through the interpretation. Tsc22d3 as 'IRS-1 negative feedback' is incorrect; GILZ is a GR-induced anti-inflammatory effector."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Most genes receive some mention. However, the GR agonist pharmacodynamic signature \u2014 the central interpretable finding \u2014 is entirely absent. The NF-\u03baB suppression framing for the downregulated cluster is missed. G6pc is mentioned only in passing. Caveats include a useful note on low-baseMean validation but omit the n=4 power limitation, non-parenchymal cell contamination, and absence of dose-response data flagged in the reference."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Prose is generally fluent and structured. However, internal contradictions undermine coherence: the downregulated cluster is first described as reflecting 'pro-inflammatory state' and then as 'reduced innate immune activation,' and directional errors create logical inconsistencies that a bioinformatics reader would immediately notice."
+        }
+      }
+    },
+    {
+      "index": 7,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Contains notable factual errors: Sgk1 is a serine/threonine kinase, not a phosphatase (it phosphorylates substrates, not dephosphorylates AKT). Tsc22d3/GILZ primarily inhibits NF-\u03baB and AP-1, not GR directly. The caveat speculating about cortisone/11-deoxycortisol as the likely ligand is biologically unsound \u2014 mouse and human GR have similar ligand specificities, and cortisone is actually less potent than cortisol; dexamethasone is the far more parsimonious inference. Missing the critical NF-\u03baB mechanistic framing that links the upregulated and downregulated clusters."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers all 12 genes and correctly identifies the anti-inflammatory downregulation cluster. However, the caveats are poor quality \u2014 the mouse-vs-human GR caveat is irrelevant and incorrect, while the three substantive caveats from the reference (cell-type mixing in bulk RNA, single time point conflating primary/secondary targets, need for ChIP-seq to confirm direct GR binding) are entirely absent. Dusp1's MAP kinase suppression role and Ptgs2's prostaglandin connection are not articulated."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-organized, flows logically from upregulated to downregulated genes, and uses appropriately technical language without being opaque. The narrative structure is coherent. Docked one point because confidently stated errors (Sgk1 as phosphatase) could mislead a reader without domain expertise."
+        }
+      }
+    },
+    {
+      "index": 8,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple factual errors undermine the interpretation: fkbp5 is incorrectly linked to NF-\u03baB signaling rather than being correctly identified as a canonical glucocorticoid receptor target; igf1a is misdescribed as a 'growth hormone receptor ligand' rather than the IGF-1 ligand itself; the model uses 'HPA axis' rather than the teleost-specific HPI (hypothalamic-pituitary-interrenal) axis, a meaningful species-level error; and gh1/eef1a1l1 are incorrectly stated to be 'transcriptionally induced by glucocorticoids' (they are downregulated here, and gh1 is typically suppressed by glucocorticoids). hspa5/GRP78's ER stress role is also conflated with generic HSP70 function."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All 13 genes are addressed and major themes (chaperone activation, HPI axis, oxidative stress, growth suppression) are present. However, the model omits the biologically important caveat about pomca downregulation being counterintuitive given HPI activation, misses the ER stress interpretation for hspa5/GRP78, and does not develop eef1a1l1 as evidence of broad translational slowdown. The caveats offered are generic rather than data-specific."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The response is logically organized and readable, but contains a notable error at the outset (hsp70.1 listed twice instead of distinguishing hsp70.1 and hspa5). Some sentences are mechanistically confused (e.g., the glucocorticoid induction claim for downregulated genes), which hinders comprehension. The closing caveat about ChIP-seq for 'pathway-specific occupancy' is non-sequitur given the framing."
+        }
+      }
+    },
+    {
+      "index": 9,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The model fabricates a specific 70% figure that has no basis in the reference, which explicitly states these contributions have not been quantified in mammalian species."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Misses the critical caveat that quantification is lacking; omits mention of stochastic factors entirely, which the reference identifies as a co-contributor alongside epigenetic factors."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The sentence is grammatically clear and concise, but clarity of a factually invented answer is not a virtue here."
+        }
+      }
+    },
+    {
+      "index": 10,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies BRCA1 mutation risks for breast and ovarian cancer, appropriate family testing scope, and evidence-based interventions. Minor gap: implies the patient lacks a mutation already confirmed by diagnosis, but content is factually sound."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers first-degree relative testing and surgical risk reduction, but omits increased surveillance, chemoprevention, staged testing strategy (known mutation first, then broader panel if negative), and BRCA2 context for relatives."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured, logical flow from diagnosis to counseling to testing to intervention. Accessible language appropriate for clinical summary without excessive jargon."
+        }
+      }
+    },
+    {
+      "index": 11,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Mentions NF-\u03baB and MAPK pathways, which are downstream of both TNF and RANKL, but misses the key mechanistic point about PKC's role in cell fate determination between immunity and bone resorption."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits the central finding: PKC activation as the distinguishing factor, and entirely misses the functional consequence of progenitor cell fate (immunity vs. bone resorption)."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Sentence is grammatically clear and concise, but the content is too vague to be informative in context."
+        }
+      }
+    },
+    {
+      "index": 12,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Correctly describes autophagy as highly conserved, accurately links it to catabolic/recycling pathways, cellular homeostasis, and disease dysregulation \u2014 no factual errors."
+        },
+        "completeness": {
+          "score": 5,
+          "justification": "Captures all three major themes from the source: conservation, homeostatic function via catabolic/recycling pathways, and disease associations from dysregulation."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Single well-structured sentence, no unnecessary jargon, logical flow from function to consequence."
+        }
+      }
+    },
+    {
+      "index": 13,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Core PPAR\u03b1 biology is correct, but citing Acaca and Fasn as 'well-established markers of PPAR\u03b1 activation' is a factual error \u2014 both are lipogenic genes, not oxidation markers (reference correctly names Acox1, Hadha, Acadl, Cpt1a). Framing acyl-CoA dehydrogenases as reflecting 'electron transport chain' induction is mechanistically misleading. The distinction between mitochondrial vs. peroxisomal beta-oxidation is blurred."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All 12 enriched terms are addressed, but the model lacks specific gene-level mechanistic connections (Hmgcs2/Bdh1 for ketogenesis, Cyp7a1 for bile acids, Acox1 for peroxisomal oxidation). The metabolic logic linking enhanced fatty acid catabolism \u2192 acetyl-CoA surplus \u2192 ketogenesis is present but underdeveloped compared to the reference."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured with logical flow from primary to secondary effects, and a clear integrative closing sentence. Prose is readable and avoids unnecessary jargon. Minor redundancy in repeatedly anchoring to 'PPAR\u03b1's role in' weakens concision slightly."
+        }
+      }
+    },
+    {
+      "index": 14,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The response vaguely associates unique information with 'data quality' but misses the mechanistically correct point: unique sequence information enables accurate read assignment to specific genes for quantification. The answer is not wrong but is biologically superficial and misleading."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits the core concept entirely \u2014 read uniqueness enabling correct gene assignment and its downstream importance for accurate gene expression quantification. Less than 30% of the key finding is captured."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and jargon-free, but the vagueness of 'quality of sequencing data' makes it unhelpfully circular as an explanation."
+        }
+      }
+    },
+    {
+      "index": 15,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Critical error: the model applies an animal HIF-1\u03b1 framework to Arabidopsis, which lacks HIF-1\u03b1 entirely; plant hypoxia is mediated by Group VII ERF transcription factors via the N-degron pathway. Secondary errors compound this: SUS4 is a sucrose synthase that cleaves (sucrolytic) not synthesizes sucrose; PCO2 is a plant cysteine oxidase in the N-degron oxygen-sensing pathway, not an acid-base regulator; ADH1/PDC1 drive ethanolic fermentation not lipid desaturation; ACO1 is a TCA cycle enzyme (aconitase), not a fatty acid oxidation gene."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All 14 genes are mentioned, covering both upregulated and downregulated clusters. However, the model omits the mechanistically important point that RAP2.12 is primarily regulated by proteolytic stabilization (N-degron pathway) rather than transcriptional induction, misses the PCO2-as-oxygen-sensor feedback angle, and the single caveat given (cell-type heterogeneity) replaces the statistically grounded caveats in the reference (AOX1A borderline padj, low baseMean for PCO2)."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-organized, logical flow from upregulated to downregulated genes with a closing caveat. Sentences are concise and connected by a coherent (if biologically wrong) narrative thread. Minor awkwardness in calling HRE1/HRE2 'hypoxia-responsive elements' rather than transcription factors, but overall easy to follow."
+        }
+      }
+    },
+    {
+      "index": 16,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Correctly identifies betaFTZ-F1 as a transcription factor in Drosophila with a role in temporal gene expression, but omits the specific regulatory relationship with Edg78E and metamorphosis onset."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Captures only the general concept; misses key details: Edg78E target gene, tissue-specificity (head/thorax), and the critical developmental context of metamorphosis onset."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and readable sentence, free of jargon, though brevity comes at the cost of meaningful content."
+        }
+      }
+    },
+    {
+      "index": 17,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Three notable errors: (1) uses 'HPA axis' throughout \u2014 zebrafish have an HPI (hypothalamic-pituitary-interrenal) axis, a distinction the reference flags as important; (2) mischaracterizes fkbp5 as 'master regulator of the HPA axis' when it is a canonical GR transcriptional readout/co-chaperone, not an axis regulator; (3) states socs3a is 'suppressed' when the data clearly show it is upregulated (log2FC=1.78), inverting the JAK-STAT interpretation entirely."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All eight genes and all six GO terms are addressed, which is good breadth. However, the mechanistic link between hsp90 and glucocorticoid receptor folding/activity is absent, the immunosuppressive consequence of cortisol-driven socs3a upregulation is stated backwards, and the HPI vs. HPA species-specificity caveat is missing entirely."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Writing is well-organized and flows logically from core stress-axis activation through secondary metabolic effects. Sentences are clear and appropriately technical. The socs3a inversion creates a locally confusing passage, but overall structure and readability are strong."
+        }
+      }
+    },
+    {
+      "index": 18,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Directly contradicts the reference: H89 did NOT alter IGF-I inhibition, meaning PKA does not mediate the cAMP effect. The model asserts the opposite."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits the key mechanistic conclusion that PKA is not the mediator of cAMP's inhibitory effect on IGF-I gene expression."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Grammatically clear and readable, but clarity is undermined by conveying incorrect information."
+        }
+      }
+    },
+    {
+      "index": 19,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Incorrect vitamin identified. The answer states Vitamin D causes metabolic bone disease via hypercalcemia, but the correct answer is Vitamin A (retinoic acid). Excess Vitamin A disrupts bone remodeling through RAR/RXR nuclear receptor pathways, not Vitamin D toxicity mechanisms."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Entirely misses the correct mechanism: retinoic acid receptor signaling (RAR/RXR), steroid hormone-like gene regulation, and the RAR-RXR-VDR dimer interaction explaining the Vitamin A/D crosstalk. No relevant pathway information is provided."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The response is concise and clearly written with a logical structure (cause \u2192 mechanism \u2192 effect), but clarity cannot compensate for fundamental factual error."
+        }
+      }
+    },
+    {
+      "index": 20,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Citation is factually correct with accurate author names, year, journal, volume, issue, and page numbers."
+        },
+        "completeness": {
+          "score": 5,
+          "justification": "All required APA citation elements are present and correctly formatted."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Output is a clean, standard APA citation with no formatting errors or ambiguity."
+        }
+      }
+    },
+    {
+      "index": 21,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Correctly identifies all three as genome-editing nucleases, but omits their mechanism distinctions and therapeutic context (oncogene deletion, retroviral delivery)."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers only the broadest category (genome editing) and misses key details: oncogene targeting, signaling pathway inactivation, wild-type gene delivery, and retroviral delivery context."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and grammatically clear; accessible to a general audience, though brevity sacrifices meaningful content."
+        }
+      }
+    },
+    {
+      "index": 22,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies miRNAs as small non-coding RNAs involved in post-transcriptional gene regulation \u2014 no factual errors."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers the core definition but omits specific functional roles (immunity, antiviral response) mentioned in the reference."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Concise, well-structured, and free of unnecessary jargon."
+        }
+      }
+    },
+    {
+      "index": 23,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple factual errors: egln3/PHD3 is a prolyl hydroxylase, not an E3 ligase; slc2a1a (GLUT1) encodes a glucose transporter, not a mitochondrial biogenesis factor; pfkla encodes phosphofructokinase (glycolysis), not a fatty acid beta-oxidation enzyme; and pfkla (log2FC +1.31) is incorrectly described as downregulated. The Warburg phrasing ('away from aerobic glycolysis') is also inverted."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers the main HIF-1 targets, glycolytic shift, ETC suppression, and some caveats. However, misses the teleost whole-genome duplication caveat (paralog compensation masking total pathway output), tissue heterogeneity in bulk larval RNA, and does not systematically assign downregulated genes to specific ETC complexes as the reference does."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-organized with a logical flow from upregulated to downregulated genes to caveats. Writing is concise and accessible. The structural quality is high, though the factual errors create misleading statements that a knowledgeable reader would find jarring."
+        }
+      }
+    },
+    {
+      "index": 24,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The model output describes the mechanism of ACTION of tetracyclines (binding 30S ribosomal subunit), not the mechanism of RESISTANCE. Tetracycline resistance is primarily mediated by efflux pumps, not ribosomal binding."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Completely misses the actual resistance mechanism (efflux pumps). Provides zero relevant information about resistance; instead describes the drug's pharmacodynamic target."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and concise, but it answers the wrong question entirely, making clarity moot in context."
+        }
+      }
+    },
+    {
+      "index": 25,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple factual errors: SGR1 is STAY-GREEN 1 driving chlorophyll breakdown, not secondary metabolic/defense reprogramming; FSD1 is Fe-superoxide dismutase (ROS signaling), not flavonoid biosynthesis; GLK1 is a Golden2-Like TF sustaining chloroplast biogenesis, not auxin signaling; FBN1A is a plastoglobule fibrillin, not a cell wall protein; MYB30 is not the master senescence regulator coordinating these genes."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers all 14 genes and both up/downregulated clusters, but misses key functional details: SAG12 as cysteine protease, SAG113 as PP2C phosphatase, the nutrient remobilization angle, and the critical caveat about positional vs. chronological age confounding interpretation."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured, readable prose with logical flow from upregulated to downregulated genes and a closing synthesis. Minor awkwardness in some transitions, but generally clear to a plant biology audience."
+        }
+      }
+    },
+    {
+      "index": 26,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Core JAZ1 biology is correct (negative regulator of JA signaling, glucosinolate connection via MYC2). However, attributing GST enrichment to 'repression of WRKY33' is unsupported and misleading \u2014 WRKY33 is primarily SA/ethylene-associated, not a canonical JAZ1 target. The reference correctly attributes this to elevated immune/oxidative status without invoking WRKY33. Also, JAZ proteins repress MYB51/R2R3-MYBs for glucosinolate control, not primarily MYC2, which is an oversimplification. The 'jasmonate/ethylene signaling' framing conflates two distinct pathways."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers most enriched terms from the table including JA signaling, fungal defense, glucosinolates, secondary metabolites, phenylpropanoids, and GST activity. However, omits the SCFCOI1-mediated JAZ degradation mechanism linking wounding to JA activation, the TOPLESS/HDA19 co-repressor complex, MYC3/MYC4 as additional targets, the aliphatic vs. indolic glucosinolate distinction, and specific biosynthetic genes (CYP79B2, CYP79B3, UGT74B1). The transcription factor activity GO:MF term (largest gene count) receives no dedicated discussion."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured narrative with logical flow from signaling to metabolism to stress response. Accessible to a broad scientific audience without sacrificing precision. The closing synthesis sentence is effective. Minor issue: 'negative feedback brakes on their own expression' slightly muddies the mechanism."
+        }
+      }
+    },
+    {
+      "index": 27,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple significant errors: lin-28 and hbl-1 are attributed to the DAF-16/FOXO pathway when they are heterochronic pathway genes regulated by the let-7 microRNA \u2014 a fundamental mis-attribution. col-19 is described as a larval molting collagen when it is a well-established adult-specific marker. fat-7 (log2FC=-1.94, enriched in adults) is incorrectly described as 'downregulated in adults.' The baseMean caveat is factually inverted \u2014 vit-2 (3241.5) and vit-5 (2876.3) have among the highest baseMeans in the table, not low values."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All 12 genes are mentioned and receive some functional annotation, and caveats are included. However, the heterochronic pathway is never named as a unifying framework, the let-7 microRNA connection is absent, and the DAF-2/IIS longevity axis is not coherently described. The adult vitellogenin biology (oogenesis onset, hermaphrodite-specific) is partially captured but lacks the reproductive-investment framing of the reference."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Writing is fluent and well-organized, moving logically from early-stage to late-stage genes and ending with caveats. Sentence-level prose is clean. Score is held at 4 rather than 5 because the incorrect biological framing (e.g., DAF-16 as driver of larval genes) creates internal inconsistencies that would confuse a domain-expert reader."
+        }
+      }
+    },
+    {
+      "index": 28,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Gene functions and pathway associations are largely correct: APP/APOE/CD33 as AD risk loci, TNF/IL1B/CCL2 neuroinflammation, BDNF synaptic plasticity, ATG7/LAMP2 autophagy. Minor issue: framing APOE as 'upregulated' conflates expression change with risk allele status. SOD1 downregulation in AD is plausible but less established than SOD2."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers four major AD pathways (amyloid/risk genes, neuroinflammation, oxidative stress, autophagy-lysosomal) but omits tau pathology genes (MAPT, PTEN), mitochondrial dysfunction, and cell-type composition confounds. Also, no caveats about effect sizes, FDR thresholds, or whether findings replicate known GSE132903 results. Note: reference answer describes a cfDNA cancer study and is mismatched to this task."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured, logical flow grouping genes by regulation direction then by biological theme. Accessible to a non-specialist without sacrificing precision. No unnecessary jargon."
+        }
+      }
+    },
+    {
+      "index": 29,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple significant factual errors: Acadm is misidentified as 'acetyl-CoA carboxylase' involved in de novo lipogenesis (it encodes MCAD, a FAO enzyme); Hadha is misidentified as 'branched-chain \u03b1-ketoacid dehydrogenase' (it encodes the mitochondrial trifunctional protein alpha subunit); Cycs is misidentified as 'cytochrome c oxidase subunit' (it encodes cytochrome c). The caveat claiming 'absence of a negative control (wild-type RNA-seq)' contradicts the stated experimental design, which explicitly includes wild-type controls. The NRF2/ATF stress-response context for Hmox1/Atf3 and the ROS-DAMP mechanistic link are absent."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "All 13 genes are named and both major themes (inflammatory upregulation, metabolic/mitochondrial downregulation) are identified. However, the model misses the key mechanistic cascade \u2014 PGC-1\u03b1 repression propagating to downstream FAO enzymes \u2014 and omits the ROS burden hypothesis connecting mitochondrial dysfunction to sterile inflammation. The reference's recommended validation steps (Seahorse respirometry, protein-level confirmation) are absent from caveats."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Prose is structured and readable with a logical flow from upregulated to downregulated genes. However, the factual errors introduce misleading statements that would actively misdirect a reader (e.g., attributing FAO suppression to a lipogenesis enzyme), reducing the effective clarity of the biological interpretation."
+        }
+      }
+    },
+    {
+      "index": 30,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Output describes Alzheimer's disease and gene discovery, which is entirely unrelated to the reference answer's focus on TPO signaling pathways, HSCs, and anticancer DNA agents."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Fails to mention any of the key findings: TPO-desirable effects, HSC enhancement, or anticancer DNA agent safety \u2014 covering 0% of the reference content."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and well-structured, but clarity is irrelevant when the content is entirely wrong."
+        }
+      }
+    },
+    {
+      "index": 31,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The claim that AOX activates the MAPK pathway is not supported and appears fabricated. AOX's actual role is retrograde signaling from mitochondria to nucleus to influence nuclear gene expression."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Misses all key concepts: mitochondrial metabolic status signaling, retrograde communication, and nuclear gene expression influence."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and concise, but clarity of a factually wrong statement offers little value."
+        }
+      }
+    },
+    {
+      "index": 32,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies gut microbiota analysis via fecal samples; omits the specific 16S rRNA sequencing method, which is a meaningful biological detail."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Captures the core aim but drops the 16S rRNA technique and the explicit metabolic disease angle is less prominent than in the input."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and readable, but slightly more technical than the reference; stays close to the input phrasing rather than plain-language translation."
+        }
+      }
+    },
+    {
+      "index": 33,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Critical errors: 50S is a prokaryotic subunit (not eukaryotic), contains 23S and 5S rRNA (not 28S/5.8S/5S), and has ~31 proteins (not 44). Conflates prokaryotic and eukaryotic ribosome components."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Mentions rRNA and protein components generally, but names wrong RNAs and omits the key prokaryotic rRNAs (23S, 5S) specified in the reference. Peptidyl transferase mention is a minor bonus."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured and readable prose; information is presented clearly and logically, despite being factually incorrect."
+        }
+      }
+    },
+    {
+      "index": 34,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The model describes a valid but generic DEG + enrichment pipeline, which is not what 'two-stage analysis' refers to in this context. The reference describes a specific method for resolving multi-mapped reads at the gene-group level \u2014 a distinct algorithmic concept the model missed entirely."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "The model omits the core concept entirely: multi-mapped/ambiguous read assignment to gene groups. It substitutes an unrelated workflow, covering 0% of the reference's key finding."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The response is well-structured, uses appropriate terminology, and is easy to follow, even though the content is off-target."
+        }
+      }
+    },
+    {
+      "index": 35,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The model fabricates specific molecular findings (CD18 downregulation, integrin alpha4beta1) not supported by the reference, which only describes the experimental approach (RNA-seq, ATAC-seq, ChIP-seq) without specifying those results."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Entirely misses the reference content: the multi-omics methodology (RNA-seq, ATAC-seq, H3K27ac and H3K4me1 ChIP-seq) and the three time points (1, 4, 24 hours) are not mentioned at all."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and readable, but clarity is undermined by confidently stating fabricated details."
+        }
+      }
+    },
+    {
+      "index": 36,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Mentions PI3K/Akt but omits the upstream TLR4 receptor and downstream NF-\u03baB components, and misses the key mechanism of protecting intestinal DCs from tumor-induced apoptosis."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Captures only one partial element of the pathway; omits TLR4, NF-\u03baB, DC apoptosis protection, and the immunological context entirely."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The sentence is grammatically clean and easy to read, though its brevity sacrifices necessary biological detail."
+        }
+      }
+    },
+    {
+      "index": 37,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple significant factual errors: Srxn1 is a sulfiredoxin (reduces hyperoxidized peroxiredoxins), not a protein disulfide isomerase; Gclc is the catalytic subunit of glutamate-cysteine ligase (GSH biosynthesis), not a glutathione peroxidase; Txnrd1 is mischaracterized as a pro-oxidant when it is a canonical Nrf2-target antioxidant enzyme. The central Nrf2/Keap1 mechanistic framework is entirely absent, and the Nrf2\u2013NF-\u03baB cross-inhibition that explains the reciprocal expression pattern is not identified."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers the broad antioxidant-down/inflammatory-up pattern but omits the central Nrf2 framing, the mechanistically critical Sqstm1/p62\u2013Keap1\u2013Nrf2 feed-forward loop, and both reference caveats (unspecified cell/tissue composition confounding immune infiltration; Prdx1 high baseMean vs. modest fold-change questioning functional significance). The caveat offered for Srxn1 is misplaced and partially incoherent."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Prose is readable and follows a logical structure from antioxidant to inflammatory genes with a concluding summary. However, the Srxn1 caveat paragraph is confusing (flags a downregulated gene inconsistently with surrounding logic), and factual errors introduce misleading framing that would confuse a biologically informed reader."
+        }
+      }
+    },
+    {
+      "index": 38,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Multiple factual errors: (1) GADD45A (log2FC +2.08) is called 'downregulated' \u2014 the sign is wrong; (2) HSPB1 and HMOX1 are mislabeled as 'canonical HSP70 targets' \u2014 HSPB1 is HSF1-regulated, HMOX1 is NRF2-regulated; (3) the checkpoint is misidentified as G1/S when CDK1/CCNB1/TOP2A suppression points to G2/M; (4) ATF3 is not known to directly transactivate HSP70/HSPB1 promoters in a feedback loop as claimed; (5) HMOX1 induction via NRF2 and DDIT3 as ISR/CHOP marker are not recognized."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "DDIT3/CHOP is listed in the table but never biologically interpreted. Entire upstream pathway layer is absent: no HSF1, no NRF2, no NF-\u03baB (for CXCL8), no ISR/ATF4/PERK/UPR framing. CCNB1 is not discussed. No caveats are offered regarding unknown stressor identity, cell type, or the distinction between statistical and biological significance \u2014 all present in the reference answer."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Prose is readable and moves logically from upregulated to downregulated genes. However, the GADD45A sentence is internally contradictory ('modest downregulation' for a positive log2FC value) and ends with a clumsy 'secondary, secondary-stress component' repetition. The lack of pathway-level framing makes the narrative feel gene-by-gene rather than thematically integrated."
+        }
+      }
+    },
+    {
+      "index": 39,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "The claim is not wrong, but it merely echoes the question without adding verifiable biological content. No specific studies, cohorts, or gene identity (full name) are provided."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits all key details: no mention of TCGA, METABRIC, or CPTAC studies, no sample size (>3000 tumors), and no expansion of the CPT1A acronym."
+        },
+        "clarity": {
+          "score": 2,
+          "justification": "Grammatically correct but is a near-verbatim restatement of the question, providing no useful summary. Reads as a circular non-answer."
+        }
+      }
+    },
+    {
+      "index": 40,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies miRNAs and their investigative context in AD; no factual errors introduced."
+        },
+        "completeness": {
+          "score": 4,
+          "justification": "Captures the core research question accurately; slightly less precise than reference but no key elements missing for this task type."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Concise, jargon-free framing of the research question; natural phrasing and easy to read."
+        }
+      }
+    },
+    {
+      "index": 41,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The model introduces specific claims (glucocorticoid/mineralocorticoid receptor regulation) not supported by the reference, which describes broader pathway alterations (metabolism, apoptosis, ER stress). HPA axis framing is plausible but fabricated relative to the actual findings."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Misses all key pathways from the reference: hypothalamic metabolism, cellular defense, apoptosis, and ER stress. Also omits the dual causative factors (dietary manipulations and Tau treatment)."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured and readable sentence with appropriate scientific terminology, though clarity cannot compensate for inaccurate content."
+        }
+      }
+    },
+    {
+      "index": 42,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Core pathway logic is correct (TLR/NLR PAMP sensing, NF-\u03baB, JAK-STAT, type I IFN). However, 'activation-induced cell death' is incorrectly inferred from 'inflammatory response' and 'antigen processing and presentation' \u2014 these terms do not imply apoptosis. The reference correctly links NF-\u03baB to specific cytokines (Il6, Tnf, Il1b) and IFN to Irf3/Irf7; the model output is vaguer and omits IRF transcription factors entirely."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers all 12 enriched terms and the major biological themes. Missing: the innate-to-adaptive crosstalk framing, specific mouse gene names (Ifnb1, ISGs), PAMP diversity (LPS, flagellin, nucleic acids), and the NF-\u03baB/IFN dual-axis framing that the reference uses to synthesize findings."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-organized, flows logically from PAMP sensing to cytokine signaling to IFN response. The erroneous 'activation-induced cell death' clause is a confusing non-sequitur, but the rest reads clearly and accessibly."
+        }
+      }
+    },
+    {
+      "index": 43,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The model speaks generically about 'rehabilitation strategies' and 'cognitive function' without capturing the study's specific finding about environmental enrichment (EE) failing to prevent TBI-induced sleep dysfunction or affect sleep-modulatory peptide expression \u2014 a distinct biological mechanism."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits all key specifics: environmental enrichment as the intervention, sleep dysfunction as the outcome, and sleep-modulatory peptide expression as the molecular readout. The generic framing covers none of the study's actual findings."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is readable and well-structured, but its generality makes it uninformative rather than unclear."
+        }
+      }
+    },
+    {
+      "index": 44,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly describes miRNA as small non-coding RNA and post-transcriptional regulator that binds mRNA to prevent translation. Misses that miRNAs can also cause mRNA degradation, not just translational repression, and omits size (18-25 nt) and single-stranded nature mentioned in reference."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers the core mechanism (mRNA binding, translational repression) but omits key details: nucleotide length (18-25 nt), single-stranded structure, DNA transcription origin, and the broader regulatory role modulating protein-coding genes."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured, concise, and accessible. Defines the molecule type before explaining function, uses plain language, and flows logically without unnecessary jargon."
+        }
+      }
+    },
+    {
+      "index": 45,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "All biological claims are accurate: RCT design, IBS symptom improvement, and increased beneficial bacteria in the probiotic group are correctly represented without distortion."
+        },
+        "completeness": {
+          "score": 4,
+          "justification": "Covers all major findings but omits the 12-week duration and double-blind design details present in both input and reference, which are methodologically important."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured, concise, and jargon-free. Logical flow from study design to results to conclusion."
+        }
+      }
+    },
+    {
+      "index": 46,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Mentions immune cells and cytokines accurately, but omits specific cell types (macrophages, neutrophils) and the innate/adaptive distinction, leaving the biology vague."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers less than half the key concepts; missing phagocytosis, innate vs. adaptive immune system roles, antibody production, and signaling pathways."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Grammatically clear but repetitive ('activation' used twice) and lacks structure; reads as a list rather than a coherent summary."
+        }
+      }
+    },
+    {
+      "index": 47,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The general descriptions of melatonin and auxin are not wrong, but the answer misses the critical shared biochemistry (both are tryptophan-derived) and entirely omits the transcriptomic context central to the reference answer. The claim they are 'not directly related' is oversimplified given their shared biosynthetic origin."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "The response omits nearly all key findings from the reference: no mention of Arabidopsis thaliana, tryptophan derivation, gene expression effects, the specific concentrations (4.5 \u00b5M auxin vs 5/100 \u00b5M melatonin), or the comparative transcriptome impact."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The response is clearly written, well-structured, and easy to understand. The prose is accessible and logically organized, though the content it conveys is insufficient."
+        }
+      }
+    },
+    {
+      "index": 48,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The model output contains no biological claims \u2014 it merely restates the question without providing any factual content about the comparison."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Zero key findings are mentioned. The reference identifies three distinct advantages (noncoding RNA detection, reduced noise in lowly expressed genes, improved long gene quantification), none of which appear in the output."
+        },
+        "clarity": {
+          "score": 2,
+          "justification": "The sentence is grammatically intelligible but is essentially a tautological restatement of the input question, conveying no information to the reader."
+        }
+      }
+    },
+    {
+      "index": 49,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "The mechanisms cited (cell cycle regulation, apoptosis, DNA repair, pro-carcinogenic enzyme inhibition) are plausible general cancer biology but do not reflect the actual mechanism: Nrf2-mediated antioxidant/oxidative stress attenuation against DENA-induced hepatocarcinogenesis."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Misses all key specific findings: no mention of oxidative stress, Nrf2 signaling pathway, DENA-inflicted hepatocarcinogenesis, or the hepatoprotective context."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured and readable sentence with appropriate scientific terminology, even though the content is inaccurate."
+        }
+      }
+    },
+    {
+      "index": 50,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly describes autophagy as cellular cleanup of damaged/unwanted components. Omits the lysosomal degradation mechanism and stress-response context, but contains no factual errors."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Misses key concepts: lysosomal pathway, homeostasis/balance, and stress conditions (nutrient deprivation, hypoxia). Reference answer covers these; model output captures only ~30% of the core content."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Simple, direct language appropriate for a lay audience. Two clean sentences with no jargon."
+        }
+      }
+    },
+    {
+      "index": 51,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Two significant factual errors: PDF1.2 is labeled an SA marker (it is a JA/ET defensin marker), and ICS1 is attributed to the JA/ET branch (it encodes isochorismate synthase, the rate-limiting SA biosynthesis enzyme). 'NBK pathway' for RbohD is a fabricated term. AOS attribution is muddled. These errors misrepresent the SA/JA pathway split, which is the central biological story."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers most genes individually and includes caveats, but misses the key interpretive point that apparent SA/JA co-activity requires validation given their canonical antagonism. The invented 'n=4' caveat and qRT-PCR suggestion are unsupported by the data provided. GI reasoning (low baseMean) is strained and misses its role as a flowering integrator alongside FT."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Well-structured, flows logically from upregulated to downregulated genes, and concludes with caveats. The fabricated 'NBK' acronym and some muddled pathway attributions reduce precision, but the overall prose is clear and readable."
+        }
+      }
+    },
+    {
+      "index": 52,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The foundational claim that repo is the 'Drosophila ortholog of mammalian PPAR\u03b1' is a serious hallucination \u2014 repo is a Paired-type homeodomain transcription factor unrelated to PPAR\u03b1. This error propagates throughout. Additional errors: wrapper and moody are mischaracterized as 'transcription factors' (wrapper is an Ig-domain adhesion protein; moody is a GPCR); pros is called a 'pro-neurotrophic factor' rather than a homeodomain neuroblast determinant; CycE is described as a 'cyclin E target' when it is cyclin E itself; nrv2's primary role in Na+/K+-ATPase and BBB function is omitted in favor of an incorrect 'axonal guidance' attribution; the PPAR\u03b1\u2013Hedgehog connection is fabricated."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "All 8 genes and most GO terms are nominally mentioned, but critical mechanistic linkages are absent or wrong: the wrapper\u2192wrapping glia\u2192axon ensheathment connection is not made; moody and nrv2 are not connected to septate junction assembly or ion transport respectively; the key interpretation that elav/pros upregulation reflects glial-to-neuronal fate conversion (not merely 'neuronal expansion') is missed; CycE's role in aberrant cell cycle re-entry of undifferentiated precursors is not discussed."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The prose is fluent and structurally logical, but the incorrect PPAR\u03b1 framing actively misleads a domain-expert reader and undermines interpretability. Conclusions follow from the stated premises, but those premises are wrong, making the overall narrative coherent-sounding yet biologically incoherent."
+        }
+      }
+    },
+    {
+      "index": 53,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The answer is factually wrong. The correct reason involves asymmetric PCR producing single-stranded amplicons that interact with TaqMan probes causing low amplification efficiency, not interfering substances."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits all key mechanistic details: asymmetric PCR, single-stranded amplicons, TaqMan probe interaction, and low amplification efficiency."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is clear and grammatically correct, but clarity is irrelevant when the content is entirely incorrect."
+        }
+      }
+    },
+    {
+      "index": 54,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Correctly captures autophagy as cellular recycling, its dual tumor suppressor/promoter roles, inflammation reduction, genomic stability, and metabolic support for cancer cells."
+        },
+        "completeness": {
+          "score": 4,
+          "justification": "Covers all three key concepts (recycling, tumor suppression, tumor promotion) but omits 'lysosomal system' and 'cellular homeostasis' details present in the source."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Plain language throughout, no jargon, logical flow, and the 'energy/stress resistance' framing is more concrete than the reference answer."
+        }
+      }
+    },
+    {
+      "index": 55,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "Notable factual error: CHS1 (CHALCONE SYNTHASE 1) is attributed as driving chlorophyll breakdown \u2014 it is a flavonoid biosynthesis enzyme, not a chlorophyllase; the reference correctly cites the PAO/RCCR pathway. WRKY33 is primarily a defense-response TF, not a canonical senescence/ROS regulator. FUS3 is a seed maturation factor, not a typical senescence-associated ubiquitination substrate. Auxin is implicated in hormone crosstalk without justification; ABA and ethylene are the primary senescence hormones. Gene associations are often imprecise or unsupported by the data."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Response to reactive oxygen species (GO:BP, 2nd most significant term at p.adjust=1.6e-05) receives no direct treatment \u2014 only peripherally implied via peroxidase. Response to abscisic acid (5th most enriched, 35 genes) is mentioned only in passing. Nitrogen compound metabolic process is entirely omitted, losing the key nutrient-remobilization interpretation. SAG12, RD21A, and the PAO/RCCR pathway are absent. The output is also truncated mid-sentence ('Together, these terms describe'), leaving the synthesis incomplete."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "Generally readable with logical progression from high to lower significance, and mechanistic links are attempted. However, the truncated final sentence breaks the conclusion, RBX1 is redundantly cited in two separate paragraphs, and the narrative reads more as a list of annotated terms than a truly integrated mechanistic story."
+        }
+      }
+    },
+    {
+      "index": 56,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The single stated fact (ribosomes are the site of protein synthesis) is trivially correct but the output completely fails to address the actual question about ribosomal subunits, rRNA components, GTP/ATP usage, or the false statement to identify."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Output covers none of the key findings: 50S/60S subunit composition, 30S rRNA, aminoacyl-tRNA GTP usage, shine-Dalgarno recognition, or free vs. RER-bound ribosome distinctions."
+        },
+        "clarity": {
+          "score": 1,
+          "justification": "Severe repetition loop \u2014 the same sentence repeated ~50 times. Output is incoherent and non-responsive to the prompt."
+        }
+      }
+    },
+    {
+      "index": 57,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 2,
+          "justification": "PI3K/AKT is a real oncogenic pathway, but the model conflates a generic pathway with the specific novel pathway described in the reference, which involves EGFR-mutated NSCLC with acquired TKI resistance. The answer is not wrong in isolation but is biologically misattributed in context."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits all key specifics: EGFR mutation context, NSCLC disease setting, acquired TKI resistance mechanism, and the 'exclusive' activity qualifier. Less than 10% of the reference content is captured."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "The sentence is concise and grammatically clear, free of jargon, and easy to read \u2014 the clarity problem is substance, not expression."
+        }
+      }
+    },
+    {
+      "index": 58,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 3,
+          "justification": "Oxidative stress is related but imprecise \u2014 MDA is specifically a marker of lipid peroxidation, which is a subprocess of oxidative stress. The model conflates the broader phenomenon with the specific process MDA directly measures."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers only the surface identification of MDA as a marker; omits lipid peroxidation mechanism, PUFA involvement, MDA's dual role in signaling vs. cytotoxicity, and its relationship to 4-HNE."
+        },
+        "clarity": {
+          "score": 4,
+          "justification": "Concise and grammatically clear, easy to read, though brevity contributes to incompleteness rather than being a clarity fault per se."
+        }
+      }
+    },
+    {
+      "index": 59,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "Fails to identify the poly(A) tail; 'mRNA codes for the tail' is nonsensical. General mRNA description is superficially correct but irrelevant."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Omits poly(A) tail, polyadenylation, 3' end processing, eukaryotic context, and alternative polyadenylation \u2014 all key content from the reference."
+        },
+        "clarity": {
+          "score": 1,
+          "justification": "Severe repetition loop ('The sequence of amino acids...') indicates generation failure; output is truncated and incoherent."
+        }
+      }
+    },
+    {
+      "index": 60,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies LGG supplementation and butyrate increase; no factual errors."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Captures the key positive finding but omits the null result on microbiota diversity/composition, which is a central conclusion."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Concise, jargon-free, and well-structured."
+        }
+      }
+    },
+    {
+      "index": 61,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 1,
+          "justification": "The model incorrectly identifies PI3K/Akt as the relevant pathway. The reference describes Gq-coupled receptor signaling involving PLC\u03b31, PLA2, IP3, diacylglycerol, and Ca2+ mobilization \u2014 PI3K/Akt is not mentioned."
+        },
+        "completeness": {
+          "score": 1,
+          "justification": "Misses all key findings: PLC\u03b31/PLA2 dephosphorylation, IP3/DAG generation, Gq-coupled receptor family, ER Ca2+ release, and store-operated Ca2+ entry."
+        },
+        "clarity": {
+          "score": 3,
+          "justification": "The sentence is grammatically clear and concise, but clarity cannot compensate for factually incorrect content."
+        }
+      }
+    },
+    {
+      "index": 62,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies receptor tyrosine kinases and phosphorylation cascade leading to gene expression changes. Omits the important TGF-beta exception (serine/threonine kinase activity) noted in the reference."
+        },
+        "completeness": {
+          "score": 2,
+          "justification": "Covers RTK mechanism but misses cytokines as growth factors, signal transduction terminology, TGF-beta exception, and specific growth factor examples (VEGF, EGF, PDGF, GM-CSF)."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured, logical flow from growth factor binding through signaling cascade to cellular outcome. Accessible language without excessive jargon."
+        }
+      }
+    },
+    {
+      "index": 63,
+      "model": "biolite-interpret-3b",
+      "scores": {
+        "biological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies Ndufs4 as Complex I subunit and links enrichment terms to ETC dysfunction. Correctly notes Parkinson disease overlap and NAFLD plausibility. However, misattributes 'ATP synthesis coupled electron transport' enrichment as compensatory upregulation rather than coordinated downregulation of ETC genes, and omits the mechanistic explanation (proton gradient disruption)."
+        },
+        "completeness": {
+          "score": 3,
+          "justification": "Covers major findings: ETC disruption, NADH dehydrogenase activity, cellular respiration, mitochondrion organization, Parkinson disease, and NAFLD. Missing: specific gene examples (Ndufv1, Ndufa9), explanation of why disease pathway terms appear (shared gene modules), and the directionality of expression changes (downregulation)."
+        },
+        "clarity": {
+          "score": 5,
+          "justification": "Well-structured with logical flow from primary lesion to downstream consequences. Paragraphs are organized by theme, language is accessible without sacrificing precision, and the concluding synthesis sentence effectively ties findings together."
+        }
+      }
+    }
+  ]
+}
