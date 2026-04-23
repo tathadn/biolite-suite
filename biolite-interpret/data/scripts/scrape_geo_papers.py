@@ -38,6 +38,28 @@ SEED_DATASETS = [
     {"gse": "GSE147507", "organism": "human", "contrast": "SARS-CoV-2 infected vs mock lung cells",  "pmid": "32416070"},
     {"gse": "GSE116250", "organism": "human", "contrast": "dilated cardiomyopathy vs donor heart",   "pmid": "30535219"},
     {"gse": "GSE89632",  "organism": "human", "contrast": "NAFLD steatosis vs healthy liver",        "pmid": "28859095"},
+
+    # Drosophila — added to address organism gap
+    {"gse": "GSE317804", "organism": "Drosophila",  "contrast": "starved vs fed follicle stem cells",                  "pmid": "41648421"},
+    {"gse": "GSE313293", "organism": "Drosophila",  "contrast": "TORC1-active vs TORC1-deficient oocytes",             "pmid": "41588113"},
+    {"gse": "GSE297750", "organism": "Drosophila",  "contrast": "H3.2K9me2-deficient vs wild-type heterochromatin",    "pmid": "41755642"},
+    {"gse": "GSE308015", "organism": "Drosophila",  "contrast": "CP190 architectural protein KO vs wild-type",          "pmid": "41444637"},
+    {"gse": "GSE299646", "organism": "Drosophila",  "contrast": "IntS11 maternal KO vs wild-type embryos",              "pmid": "41955115"},
+
+    # Arabidopsis
+    {"gse": "GSE293194", "organism": "Arabidopsis", "contrast": "cambium-activated vs quiescent root tissue",           "pmid": "41823877"},
+    {"gse": "GSE303753", "organism": "Arabidopsis", "contrast": "enhanced tocopherol biosynthesis vs control leaves",    "pmid": "41446143"},
+    {"gse": "GSE277320", "organism": "Arabidopsis", "contrast": "thermotolerance transgene vs wild-type under heat",     "pmid": "41675614"},
+    {"gse": "GSE255301", "organism": "Arabidopsis", "contrast": "met1-derived epiRIL vs wild-type",                      "pmid": "41700090"},
+    {"gse": "GSE309559", "organism": "Arabidopsis", "contrast": "sORF peptide signaling vs control phloem",              "pmid": "41937606"},
+
+    # C. elegans
+    {"gse": "GSE306611", "organism": "C. elegans",  "contrast": "fasted H3K27ac-deficient vs wild-type",                 "pmid": "40950206"},
+    {"gse": "GSE307065", "organism": "C. elegans",  "contrast": "Vitamin B12-treated PUF60 mutant vs untreated",         "pmid": "41333426"},
+    {"gse": "GSE318477", "organism": "C. elegans",  "contrast": "dauer vs reproductive development",                     "pmid": "39229130"},
+    {"gse": "GSE285634", "organism": "C. elegans",  "contrast": "PERK-induced ER stress vs unstressed adults",           "pmid": "41176528"},
+    {"gse": "GSE279559", "organism": "C. elegans",  "contrast": "Urolithin A-treated vs control aged worms",             "pmid": "40944367"},
+    {"gse": "GSE317801", "organism": "C. elegans",  "contrast": "3D enriched habitat vs standard plate-reared",          "pmid": "41622909"},
 ]
 
 
