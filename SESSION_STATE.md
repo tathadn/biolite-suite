@@ -1,91 +1,82 @@
-# Session State — 2026-04-17
+# Session State — 2026-04-23
 
 ## Status Checklist
 
-- [x] Step 1: Download Llama 3.2 1B-Instruct tokenizer (cached, vocab=128k)
-- [x] Step 2: Commit tokenizer access (aefabb8)
-- [x] Step 3: BioInstruct spot-check — found 93% noise, tightened filter
-- [x] Step 4: Commit filter fix (b24d92c) — 2,054 → 112 examples
-- [x] Step 5: Scrape 10 GEO seed datasets — 10/10 abstracts, 6/10 full text
-- [x] Step 6: Claude CLI smoke test — `claude -p "say hi" --model sonnet` works
-- [x] Step 7: Synthetic test batch (20/20 success, 0 failures, biology verified)
-- [x] Step 8: Scale synthetic gen — 191/200 (95.5%), batch1=97, batch2=94
-- [x] Step 9: Filter Mol-Instructions biotext — 327/53,760 kept (0.61%)
-- [x] Step 10: Merge all 4 sources → 640 examples, create train/val/test splits
-- [x] Step 11: Upload dataset to HuggingFace (tathadn/biolite-interpret-data)
-- [ ] Step 12: Fine-tune Llama 3.2 1B-Instruct on merged dataset
+### Phase 1 (v1 dataset, 640 examples)
+- [x] 4 data sources filtered and merged → 640 examples (commit eb13a67-ish)
+- [x] Dataset uploaded to HuggingFace (tathadn/biolite-interpret-data)
+- [x] 1B + 3B QLoRA SFT on v1 data (commit f6e0129)
+- [x] Judge eval (Sonnet, interpret rubric) on 64-ex v1 test (commit 556adb3)
 
-## Resume Point
+### Phase 2 (v2 dataset, 1,262 examples) — completed 2026-04-23
+- [x] Synthetic batch3: +606 examples (99.5% success rate)
+- [x] GEO expansion: 10 → 26 seeds (added Drosophila, Arabidopsis, C. elegans)
+- [x] Merge + stratified 85/5/10 split with **pinned v1-test anchor** (all 64 v1 test ex ⊆ v2 test)
+- [x] v2 dataset pushed to HuggingFace (commit 54d6273)
+- [x] 1B + 3B retrained on v2 data (commit 5962dd8)
+- [x] v2 predictions + judge eval on full 126 v2 test
+- [x] 5-row scaling comparison table (v1 vs v2, pinned 64 subset)
 
-Dataset is ready. Next: fine-tune Llama 3.2 1B-Instruct using LoRA/QLoRA on the merged dataset.
+### Next up (DPO phase)
+- [ ] DPO preference-pair generation pipeline (Biostars scrape validated on 50-pair test batch, commit a38ef48)
+- [ ] Scale preference-pair generation
+- [ ] DPO training run
 
-```bash
-cd /fs1/scratch/tathadbn/biolite-suite
-source .venv/bin/activate
-cat SESSION_STATE.md
-git log --oneline
-```
+## Scaling Comparison Results (v1 vs v2, pinned 64 ex)
 
-## Key Decisions
+| Model | bio_acc | completeness | clarity |
+|---|---|---|---|
+| Baseline 1B | 1.95 | 1.73 | 2.71 |
+| FT 1B @ 640 | 2.30 | 1.86 | 3.17 |
+| FT 3B @ 640 | 2.53 | 2.20 | 3.73 |
+| FT 1B @ v2  | 2.16 | 1.92 | 3.20 |
+| FT 3B @ v2  | **2.78** | **2.31** | **3.97** |
 
-1. **BioInstruct is a clean seed, not the primary volume source.**
-   Original filter kept 2,054 examples but spot-check revealed 93% were generic
-   medical content (BMI interpretation, article summaries, SOAP notes) triggered
-   by overly broad keywords "interpret", "summarize", "summary". Tightened to
-   112 domain-relevant examples by removing broad keywords and adding specific
-   compound terms (pathway analysis, expression profile, gene regulation, etc.).
+**Headline:** 3B scales positively (+0.25 bio, +0.11 comp, +0.24 clar).
+1B is capacity-bound — doubling data didn't improve bio_acc (−0.14, within 1σ).
 
-2. **Synthetic generation is the primary training volume source.**
-   Test batch of 20 achieved 100% success rate. Full run: 191/200 (95.5%).
-   7 organisms, 12 conditions, 3 task types. No quality degradation in late runs.
+Supplementary (v2 models on full 126 and new-62-only subsets) in
+`biolite-interpret/evaluation/results/scaling_comparison_summary.json`.
 
-3. **Claude CLI auth works via subscription** (no API key needed).
-   `claude -p` with `--model sonnet` confirmed working on this HPC node.
+## Artifacts & Locations
 
-4. **Mol-Instructions as supplementary source.**
-   327 examples from open_question/true_or_false after tight filtering.
-   Extraction-format files skipped (false positives). Min 20-word output gate
-   drops terse multi-choice answers.
+| Artifact | Path |
+|---|---|
+| v2 train/val/test splits | `biolite-interpret/data/splits/{train,val,test}.json` |
+| Pinned 64-ex filter | `biolite-interpret/evaluation/pinned_64_indices.json` (regeneratable from v1_split_keys.json) |
+| v1 reproducibility anchor | `biolite-interpret/data/splits/v1_split_keys.json` (SHA1 content-hashes) |
+| v1 adapters (archived) | `biolite-interpret/training/checkpoints_v1_archive/biolite-interpret-{1b,3b}/` |
+| v2 adapters (live) | `biolite-interpret/training/checkpoints/biolite-interpret-{1b,3b}/` |
+| Predictions (v2) | `biolite-interpret/evaluation/results/finetuned_{1b,3b}_v2_predictions.json` |
+| Judge scores (v2) | `biolite-interpret/evaluation/results/judge_finetuned_{1b,3b}_v2.json` |
 
-5. **Dataset hosted on HuggingFace** at tathadn/biolite-interpret-data.
-   Splits: 543 train / 33 val / 64 test (85/5/10, stratified by task_type+source).
+## HuggingFace Hub
 
-## Data Counts
+- Dataset: `tathadn/biolite-interpret-data` (v2, 1,262 ex, 85/5/10 pinned)
+- Models:  `tathadn/biolite-interpret-1b` (v2), `tathadn/biolite-interpret-3b` (v2)
 
-| Source | Count | Location |
-|--------|-------|----------|
-| BioInstruct (filtered) | 112 | data/raw/bioinstruct_filtered/bioinstruct_filtered.json |
-| GEO paper pairs | 10 | data/raw/geo_pairs/geo_paper_pairs.json |
-| Mol-Instructions (filtered) | 327 | data/raw/mol_instructions_filtered/mol_instructions_filtered.json |
-| Synthetic (merged) | 191 | data/processed/synthetic_interpretations.json |
-| **Merged dataset** | **640** | data/processed/merged_dataset.json |
-| Train split | 543 | data/splits/train.json |
-| Val split | 33 | data/splits/val.json |
-| Test split | 64 | data/splits/test.json |
-
-## Known Dataset Characteristics
-
-1. **Task type imbalance**: DE interpretation dominates at 81% of training.
-   Enrichment (14%) and combined (4.4%) are underrepresented.
-   Eval should report per-task-type scores, not just aggregate.
-
-2. **Mol-Instructions is largest source** (51% of training). Watch for
-   stylistic differences vs synthetic examples in model outputs.
-
-3. **Combined_interpretation has only 1 val / 3 test example** — too small
-   for reliable per-category evaluation. Report but don't draw
-   conclusions from it.
-
-4. **If eval shows weakness on enrichment/combined**, first fix is to
-   generate 100-200 more synthetic examples targeting those two types
-   specifically (adjust `task_weights` in `generate_synthetic.py`).
-
-## Commands to Run First Next Session
+## Resume Commands
 
 ```bash
 cd /fs1/scratch/tathadbn/biolite-suite
 source .venv/bin/activate
 cat SESSION_STATE.md
-git status
-git log --oneline
+git log --oneline -10
 ```
+
+## Key Decisions (persistent)
+
+1. **Pinned v1-test anchor split** — v2 test is a strict superset of v1 test
+   (all 64 v1 test examples pinned). Guarantees leak-free scaling comparison
+   without resorting to two separate test denominators. v1_split_keys.json
+   is the committed SHA1 content-hash reference.
+
+2. **5-row comparison uses pinned 64** — apples-to-apples with existing v1
+   judge scores (which were on v1 test = pinned 64 of v2 test). Supplementary
+   scores on full 126 and new-62-only reported separately.
+
+3. **1B is capacity-bound** at 1,262 training examples — scaling didn't help
+   biological_accuracy. Future data work should prioritize 3B or move to DPO.
+
+4. **v1 adapters preserved at checkpoints_v1_archive/** so the v1 3B model
+   can still be run on v2 test for spot-checks and re-evaluation if needed.
