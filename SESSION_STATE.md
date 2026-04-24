@@ -17,10 +17,17 @@
 - [x] v2 predictions + judge eval on full 126 v2 test
 - [x] 5-row scaling comparison table (v1 vs v2, pinned 64 subset)
 
+### Phase 2 DPO data — completed 2026-04-24
+- [x] StackExchange full scrape: 60 methodology Q&A
+- [x] SE rejects generated (60 pairs), filter yield **23** (sim 0.2–0.85, length 0.4–2.5)
+- [x] Docs Q&A (DESeq2 vignette 40 + QIIME 2 tutorials 50 → combined 90 → paired 74), filter yield **53** at max_sim 0.90 (docs pairs cluster tight, avg kept sim 0.793)
+- [x] Synthetic methodology pairs: **200/200** across 7 buckets (splicing 30, microbiome 30, exp-design 30, stats 30, normalization 25, alignment 25, general 30) with weighted error-type choice (STAT_CONFUSION 2×, MISSING_ASSUMPTION 1.5×, OVERCONFIDENT 0.5×) and inline QC. All drops (259) were `too_similar`; length_mismatch and reject_fail were both 0.
+- [x] Merge + 85/5/10 split: **276 unique pairs** → train 234 / val 14 / test 28. SHA1 pinning in `v1_preference_test_keys.json`. Leakage self-check OK.
+- [x] Upload `tathadn/biolite-methods-preferences` to HuggingFace (3 splits + manifest + pinning file)
+
 ### Next up (DPO phase)
-- [ ] DPO preference-pair generation pipeline (Biostars scrape validated on 50-pair test batch, commit a38ef48)
-- [ ] Scale preference-pair generation
-- [ ] DPO training run
+- [ ] DPO training on `tathadn/biolite-methods-preferences` (train 234, val 14) — 1B and 3B variants
+- [ ] DPO eval with judge rubric against `biolite-interpret-{1b,3b}` v2 on pinned methods test set
 
 ## Scaling Comparison Results (v1 vs v2, pinned 64 ex)
 
@@ -49,6 +56,13 @@ Supplementary (v2 models on full 126 and new-62-only subsets) in
 | v2 adapters (live) | `biolite-interpret/training/checkpoints/biolite-interpret-{1b,3b}/` |
 | Predictions (v2) | `biolite-interpret/evaluation/results/finetuned_{1b,3b}_v2_predictions.json` |
 | Judge scores (v2) | `biolite-interpret/evaluation/results/judge_finetuned_{1b,3b}_v2.json` |
+| SE preference pairs (filtered) | `biolite-methods/data/processed/preference_pairs_se_filtered.json` (23) |
+| Docs preference pairs (filtered) | `biolite-methods/data/processed/preference_pairs_docs_filtered.json` (53) |
+| Synthetic preference pairs | `biolite-methods/data/processed/preference_pairs_synthetic.json` (200) |
+| Merged splits | `biolite-methods/data/splits/{train,val,test}.json` (234/14/28) |
+| Split pinning | `biolite-methods/data/splits/v1_preference_test_keys.json` (SHA1 anchors) |
+| HF methods dataset | `tathadn/biolite-methods-preferences` |
+| Methods data scripts | `biolite-methods/data/scripts/{extract_from_docs,generate_synthetic_methods,generate_rejects,quality_control,merge_and_split_preferences,upload_to_hf}.py` |
 
 ## HuggingFace Hub
 
@@ -80,3 +94,11 @@ git log --oneline -10
 
 4. **v1 adapters preserved at checkpoints_v1_archive/** so the v1 3B model
    can still be run on v2 test for spot-checks and re-evaluation if needed.
+
+5. **Relaxed QC thresholds (0.2–0.85 sim, 0.4–2.5 len) are the new defaults** in
+   `quality_control.py`. Rationale: the tight 0.3–0.8 window dropped 73% of SE
+   pairs, including near-copy STAT_CONFUSION edits that are exactly the subtle
+   factual contrast DPO is designed for. Length ceiling raised because
+   OVERCONFIDENT rejects are legitimately verbose. SE pairs recovered from
+   16 → 23; docs pairs filter 74 → 31 (docs drops are all `too_similar`, a
+   known artifact of reference-answer-derived Q&A).

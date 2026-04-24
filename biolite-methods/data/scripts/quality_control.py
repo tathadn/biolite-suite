@@ -3,21 +3,29 @@
 quality_control.py — Quality checks for DPO preference pairs.
 
 Checks:
-  1. Rejected answers aren't too similar to chosen (ROUGE-L < 0.8)
-  2. Rejected answers aren't too obviously wrong (length check)
+  1. Rejected vs chosen ROUGE-L sits in [min_sim, max_sim] (default 0.2-0.85).
+     Too-similar pairs (>max_sim) are near-duplicates with no DPO contrast;
+     too-divergent pairs (<min_sim) are likely full rewrites that teach style,
+     not content signal. The 0.2 lower bound retains near-copy STAT_CONFUSION
+     pairs that are actually strong DPO signal (subtle factual edits).
+  2. Rejected length in [min_length_ratio, max_length_ratio] × chosen
+     (default 0.4-2.5). Overconfident/verbose wrong answers legitimately
+     run longer than the chosen, so the ceiling is generous.
   3. Error type distribution is balanced
   4. No empty or extremely short responses
 
 Usage:
     python quality_control.py \
         --input ../processed/preference_pairs.json \
-        --output ../processed/preference_pairs_filtered.json
+        --output ../processed/preference_pairs_filtered.json \
+        --min_sim 0.2 --max_sim 0.85 \
+        --min_length_ratio 0.4 --max_length_ratio 2.5
 """
 
 import argparse
 import json
 import os
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 def compute_rouge_l(reference: str, hypothesis: str) -> float:
@@ -47,62 +55,80 @@ def compute_rouge_l(reference: str, hypothesis: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
-def run_quality_checks(pairs: list[dict]) -> tuple[list[dict], dict]:
+def run_quality_checks(
+    pairs: list[dict],
+    min_sim: float,
+    max_sim: float,
+    min_length_ratio: float = 0.4,
+    max_length_ratio: float = 2.5,
+) -> tuple[list[dict], dict]:
     """Run quality checks and return filtered pairs + report."""
     filtered = []
     issues = {
         "too_similar": 0,
+        "too_divergent": 0,
         "rejected_too_short": 0,
         "chosen_too_short": 0,
         "length_mismatch": 0,
         "empty_fields": 0,
     }
+    drops_by_error_type = defaultdict(lambda: defaultdict(int))
+
+    def drop(reason, et):
+        issues[reason] += 1
+        drops_by_error_type[et][reason] += 1
 
     for pair in pairs:
         question = pair.get("question", "")
         chosen = pair.get("chosen", "")
         rejected = pair.get("rejected", "")
+        et = pair.get("error_type", "unknown")
 
         # Check empty
         if not question or not chosen or not rejected:
-            issues["empty_fields"] += 1
+            drop("empty_fields", et)
             continue
 
         # Check minimum lengths
         if len(chosen.split()) < 20:
-            issues["chosen_too_short"] += 1
+            drop("chosen_too_short", et)
             continue
         if len(rejected.split()) < 20:
-            issues["rejected_too_short"] += 1
+            drop("rejected_too_short", et)
             continue
 
-        # Check similarity (reject if too similar — DPO needs contrast)
-        rouge = compute_rouge_l(chosen, rejected)
-        if rouge > 0.8:
-            issues["too_similar"] += 1
-            continue
-
-        # Check length ratio (rejected should be ±50% of chosen length)
         chosen_len = len(chosen.split())
         rejected_len = len(rejected.split())
         ratio = rejected_len / chosen_len if chosen_len > 0 else 0
-        if ratio < 0.5 or ratio > 2.0:
-            issues["length_mismatch"] += 1
+        if ratio < min_length_ratio or ratio > max_length_ratio:
+            drop("length_mismatch", et)
+            continue
+
+        # Check similarity window: too-high = near-duplicate (no DPO contrast),
+        # too-low = full rewrite (teaches style, not content).
+        rouge = compute_rouge_l(chosen, rejected)
+        if rouge > max_sim:
+            drop("too_similar", et)
+            continue
+        if rouge < min_sim:
+            drop("too_divergent", et)
             continue
 
         # Passed all checks
         pair["rouge_l_similarity"] = round(rouge, 3)
         filtered.append(pair)
 
-    # Error type distribution
     error_dist = Counter(p.get("error_type", "unknown") for p in filtered)
 
     report = {
         "input_count": len(pairs),
         "output_count": len(filtered),
         "removed": len(pairs) - len(filtered),
+        "similarity_window": [min_sim, max_sim],
+        "length_ratio_window": [min_length_ratio, max_length_ratio],
         "issues": issues,
-        "error_type_distribution": dict(error_dist),
+        "error_type_distribution_kept": dict(error_dist),
+        "error_type_distribution_dropped": {et: dict(reasons) for et, reasons in drops_by_error_type.items()},
         "avg_rouge_l": sum(p["rouge_l_similarity"] for p in filtered) / len(filtered) if filtered else 0,
     }
 
@@ -113,13 +139,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--min_sim", type=float, default=0.2,
+                        help="Lower ROUGE-L bound — pairs below are too divergent (default 0.2)")
+    parser.add_argument("--max_sim", type=float, default=0.85,
+                        help="Upper ROUGE-L bound — pairs above are near-duplicates (default 0.85)")
+    parser.add_argument("--min_length_ratio", type=float, default=0.4,
+                        help="Min rejected/chosen length ratio (default 0.4)")
+    parser.add_argument("--max_length_ratio", type=float, default=2.5,
+                        help="Max rejected/chosen length ratio (default 2.5)")
     args = parser.parse_args()
 
     with open(args.input) as f:
         pairs = json.load(f)
 
-    print(f"Running quality checks on {len(pairs)} pairs...")
-    filtered, report = run_quality_checks(pairs)
+    print(f"Running quality checks on {len(pairs)} pairs "
+          f"(sim {args.min_sim}-{args.max_sim}, len {args.min_length_ratio}-{args.max_length_ratio})...")
+    filtered, report = run_quality_checks(
+        pairs, args.min_sim, args.max_sim,
+        min_length_ratio=args.min_length_ratio,
+        max_length_ratio=args.max_length_ratio,
+    )
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, "w") as f:
@@ -132,13 +171,17 @@ def main():
     print(f"\n=== Quality control report ===")
     print(f"Input:  {report['input_count']}")
     print(f"Output: {report['output_count']} ({report['removed']} removed)")
+    print(f"Similarity window: {report['similarity_window']}")
     print(f"\nIssues found:")
     for issue, count in report["issues"].items():
         print(f"  {issue}: {count}")
-    print(f"\nError type distribution:")
-    for et, count in sorted(report["error_type_distribution"].items()):
+    print(f"\nKept — error type distribution:")
+    for et, count in sorted(report["error_type_distribution_kept"].items()):
         print(f"  {et}: {count}")
-    print(f"\nAvg ROUGE-L similarity: {report['avg_rouge_l']:.3f}")
+    print(f"\nDropped — by error type and reason:")
+    for et, reasons in sorted(report["error_type_distribution_dropped"].items()):
+        print(f"  {et}: {dict(reasons)}")
+    print(f"\nAvg ROUGE-L similarity (kept): {report['avg_rouge_l']:.3f}")
     print(f"\nSaved to: {args.output}")
     print(f"Report:   {report_path}")
 

@@ -66,7 +66,8 @@ CORRECT ANSWER:
 Generate ONLY the rejected answer text. No preamble, no explanation of what's wrong. No markdown formatting."""
 
 
-def call_claude_code(prompt: str, model: str = "sonnet", max_turns: int = 1) -> Optional[str]:
+def call_claude_code(prompt: str, model: str = "sonnet", max_turns: int = 1,
+                     retries: int = 3) -> Optional[str]:
     """Call Claude Code CLI in print mode using subscription auth.
 
     Uses `claude -p` which authenticates via your Pro/Max subscription
@@ -79,32 +80,33 @@ def call_claude_code(prompt: str, model: str = "sonnet", max_turns: int = 1) -> 
         "--max-turns", str(max_turns),
     ]
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=120,
-            encoding="utf-8",
-        )
+    for attempt in range(retries):
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                encoding="utf-8",
+            )
 
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-        else:
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
             if result.stderr:
                 print(f"  stderr: {result.stderr[:200]}")
-            return None
+            time.sleep(5)
 
-    except subprocess.TimeoutExpired:
-        print("  TIMEOUT")
-        return None
-    except FileNotFoundError:
-        print("  ERROR: 'claude' CLI not found. Install with: npm install -g @anthropic-ai/claude-code")
-        print("  Then authenticate: claude (follow browser login)")
-        return None
-    except Exception as e:
-        print(f"  ERROR: {e}")
-        return None
+        except subprocess.TimeoutExpired:
+            print(f"  TIMEOUT (attempt {attempt+1}/{retries})")
+            time.sleep(5)
+        except FileNotFoundError:
+            print("  ERROR: 'claude' CLI not found. Install with: npm install -g @anthropic-ai/claude-code")
+            print("  Then authenticate: claude (follow browser login)")
+            return None
+        except Exception as e:
+            print(f"  ERROR (attempt {attempt+1}/{retries}): {e}")
+            time.sleep(5)
+    return None
 
 
 def main():
