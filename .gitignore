@@ -14,6 +14,7 @@ data/splits/
 !training/config.yaml
 !biolite-interpret/evaluation/results/*.json
 !biolite-methods/evaluation/results/*.json
+!biolite-methods/rag/faiss_index/*.json
 
 # Training artifacts
 checkpoints/

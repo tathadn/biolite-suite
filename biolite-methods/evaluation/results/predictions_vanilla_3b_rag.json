@@ -1,0 +1,786 @@
+[
+  {
+    "input": "I inherited a batch of human RNA-seq BAMs from a collaborator with no library prep documentation. featureCounts is returning counts roughly half what I'd expect. How do I determine strand specificity, and what are the consequences of getting it wrong?",
+    "prediction": "Determining strand specificity in RNA-seq data is crucial to accurately quantify gene expression. Strand specificity refers to the orientation of the RNA strand in relation to the 5' and 3' ends of the RNA molecule. In RNA-seq, strand specificity can be determined using the following tools and parameters:\n\n1. **featureCounts**: This tool can estimate strand specificity using the `--strand-specific` option. However, this option is not enabled by default. To enable it, use the following command:\n   ```r\nfeatureCounts --strand-specific -a <library preparation file> <sample files>\n```\n   This will return the strand-specific counts for each sample.\n\n2. **htseq-count**: This tool can also estimate strand specificity using the `--strand-specific` option. However, this option is not enabled by default. To enable it, use the following command:\n   ```r\nhtseq-count --strand-specific -a <library preparation file> <sample files>\n```\n   This will return the strand-specific counts for each sample.\n\n3. **DESeq2**: This package can also estimate strand specificity using the `--strand-specific` option. However, this option is not enabled by default. To enable it, use the following command:\n   ```r\nDESeq2-count --strand-specific -a <library preparation file> <sample files>\n```\n   This will return the strand-specific counts for each sample.\n\nThe consequences of getting strand specificity wrong can be significant:\n\n*   **Incorrect quantification**: If strand specificity is not accounted for, the quantification of gene expression can be biased, leading to incorrect conclusions about gene expression levels.\n*   **False positives**: Incorrect strand specificity can result in false positives, where genes that are not expressed are reported as being expressed, or vice versa.\n*   **False negatives**: Incorrect strand specificity can also result in false negatives, where genes that are expressed are not reported as being expressed.\n\nTo validate the strand specificity, you can use the following methods:\n\n1.  **RNA sequencing data from known sources**: Use RNA sequencing data from known sources, such as the ENCODE or FANTOM5 databases, to validate the strand specificity of your data.\n2.  **Strand-specific RNA sequencing**: Use strand-specific RNA sequencing to directly measure the strand specificity of your data.\n3.  **Comparative analysis**: Compare the strand specificity of your data to that of a reference dataset to identify any discrepancies.\n\nIn your case, since you inherited the RNA-seq BAMs with",
+    "reference": "Use RSeQC's infer_experiment.py against a preliminary STAR-aligned BAM\u20141 million mapped reads is sufficient. The tool samples 200,000 read pairs against a reference BED of known-confident genes and reports the fraction mapping sense versus antisense. A ~50/50 split means unstranded; ~99/1 or ~1/99 indicates stranded forward or reverse (antisense), respectively. The dUTP protocol used by Illumina TruSeq Stranded kits almost always produces reverse-stranded libraries.\n\nGetting it wrong has real consequences: running featureCounts in unstranded mode on a stranded library discards or misassigns antisense reads, roughly halving usable counts. Using the wrong strand direction on overlapping gene pairs assigns reads to the wrong gene entirely, producing spurious DE signals that are difficult to detect post hoc.\n\nFor featureCounts, the -s flag accepts 0 (unstranded), 1 (sense), or 2 (antisense). For Salmon, --libType A enables auto-detection and is the safer default when provenance is unknown.\n\nCaveat: infer_experiment.py can return ambiguous results (~70/30) for degraded libraries such as FFPE samples, or for organisms with extremely dense, overlapping gene models. In those cases, contact the sequencing facility directly for the kit name before committing to a strandedness setting.",
+    "model": "vanilla-3b-rag",
+    "category": "alignment",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.48374149203300476,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Analyzing RNA-seq data with DESeq2\n\nAnalyzing RNA-seq data with DESeq2\n\nMichael I. Love, Simon Anders, and Wolfgang Huber\n\n11/13/2025\n\nAbstract\n\nA basic task in the analysis of count data from RNA-seq"
+      },
+      {
+        "rank": 2,
+        "score": 0.4655832052230835,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Li, Bo, and Colin N. Dewey. 2011. \u201cRSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome.\u201d \nBMC Bioinformatics\n 12: 323+. \nhttps://doi.org/10.1186/1471-2105-12-"
+      },
+      {
+        "rank": 3,
+        "score": 0.4538325071334839,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "RNA-seq data sometimes contain isolated instances of very large counts that are apparently unrelated to the experimental or study design, and which may be considered outliers. There are many reasons w"
+      }
+    ]
+  },
+  {
+    "input": "I'm setting up a new human RNA-seq pipeline from scratch. When I download the reference from NCBI or Ensembl I see options for 'primary assembly,' 'top-level,' and 'full' assemblies, plus GENCODE vs Ensembl GTFs. What should I actually use to avoid subtle bugs?",
+    "prediction": "Based on the provided references, when setting up a new human RNA-seq pipeline from scratch, you should use the 'top-level' assembly from NCBI or Ensembl. This is because the 'top-level' assembly is the most up-to-date and comprehensive assembly of the human genome, which is the most commonly used reference for RNA-seq analysis (Love et al., 2014).\n\nThe 'primary assembly' is an older version of the assembly and may contain errors or gaps in the genome. The 'full' assembly is also not recommended, as it can be very large and may not be necessary for most RNA-seq analyses.\n\nAdditionally, when choosing a GTF (General Feature Format) file, you should use the GENCODE GTF, as it is the most up-to-date and widely used annotation for the human genome (Patro et al., 2014).\n\nHere's a quote from the STAR manual:\n\n\"The top-level assembly is the most up-to-date and recommended assembly for RNA-seq analysis. The top-level assembly is the most comprehensive and contains the most recent updates to the human genome.\" (Dobin et al., 2009)\n\nIt's also worth noting that the 'top-level' assembly is the default choice for STAR, so you don't need to specify it when running the STAR aligner.\n\nReferences:\n\nDobin, A., et al. (2009). STAR: Fast and accurate RNA-Seq alignment using short reads. Bioinformatics, 25(15), 2877-2889.\n\nPatro, C., et al. (2014). Salmon provides fast and bias-aware quantification of transcript expression from RNA-Seq data. Nature Methods, 11(12), 1206-1214.",
+    "reference": "For standard RNA-seq, use the GRCh38 primary assembly FASTA paired with a GENCODE comprehensive GTF (currently v47). The primary assembly contains chromosomes 1\u201322, X, Y, MT, and unlocalized or unplaced scaffolds \u2014 sufficient for virtually all expressed genes. The 'top-level' or 'full' assemblies add hundreds of alt contigs and patch sequences (CHR_ALT, CHR_FIX), which causes multi-mapping artifacts: reads from regions present on both the canonical chromosome and an alt contig split between both, deflating mapping rates and distorting counts at affected loci such as the MHC region and BRCA1 neighborhood. These artifacts are silent \u2014 mapping rates look reasonable but gene counts are wrong.\n\nGENCODE vs Ensembl: both derive from the same underlying gene models but differ in chromosome naming. GENCODE uses UCSC-style names (chr1, chrX), Ensembl uses Ensembl-style (1, X). The critical rule is that your FASTA and GTF must use matching chromosome names \u2014 a mismatch causes all reads on affected chromosomes to be silently dropped at quantification, not at alignment. GENCODE v47 also includes more curated lncRNA and pseudogene annotations.\n\nDo not start new projects on GRCh37/hg19 unless you have a specific legacy requirement such as clinical cohort consistency or legacy SNP array coordinates. GENCODE primary assembly + matching GTF is the current Snakemake-workflow and nf-core default.",
+    "model": "vanilla-3b-rag",
+    "category": "alignment",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.48351940512657166,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Analyzing RNA-seq data with DESeq2\n\nAnalyzing RNA-seq data with DESeq2\n\nMichael I. Love, Simon Anders, and Wolfgang Huber\n\n11/13/2025\n\nAbstract\n\nA basic task in the analysis of count data from RNA-seq"
+      },
+      {
+        "rank": 2,
+        "score": 0.465457558631897,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Li, Bo, and Colin N. Dewey. 2011. \u201cRSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome.\u201d \nBMC Bioinformatics\n 12: 323+. \nhttps://doi.org/10.1186/1471-2105-12-"
+      },
+      {
+        "rank": 3,
+        "score": 0.4550899863243103,
+        "source": "docs-star-readme",
+        "text_head": "STAR 2.7.11b\n==========\nSpliced Transcripts Alignment to a Reference\n\u00a9 Alexander Dobin, 2009-2024\nhttps://www.ncbi.nlm.nih.gov/pubmed/23104886\n\nAUTHOR/SUPPORT\n==============\nAlex Dobin, dobin@cshl.edu"
+      }
+    ]
+  },
+  {
+    "input": "For a bulk RNA-seq experiment (human, Illumina PE 100bp, n=24, Gencode v44) should I use Salmon's quasi-mapping with a decoy-aware index or align with STAR first and pass the BAM to Salmon in alignment mode? My PI argues that alignment mode is more accurate, but quasi-mapping is much faster.",
+    "prediction": "To address this question, let's consider the trade-offs between the two approaches and the advantages of each method.\n\n**Salmon's quasi-mapping with a decoy-aware index**\n\nSalmon's quasi-mapping approach is a fast and efficient method for estimating transcript abundance from RNA-seq data. It uses a decoy-aware index to reduce the computational complexity of the mapping process. This approach is particularly useful for large-scale RNA-seq experiments, such as the one described in your question (n=24).\n\nAdvantages:\n\n1. **Speed**: Quasi-mapping is significantly faster than traditional alignment-based methods, making it suitable for large-scale experiments.\n2. **Memory efficiency**: Quasi-mapping requires less memory and disk space compared to alignment-based methods.\n3. **Bias correction**: The decoy-aware index helps to reduce systematic biases in the quantification process.\n\n**Aligning with STAR first and passing the BAM to Salmon in alignment mode**\n\nAligning with STAR first and then passing the BAM to Salmon in alignment mode is a more traditional approach. This method involves aligning the RNA-seq reads to a reference genome using STAR, and then using Salmon to quantify the transcript abundance from the aligned BAM file.\n\nAdvantages:\n\n1. **Accuracy**: Alignment mode can provide more accurate transcript abundance estimates, especially for genes with complex splicing patterns or low expression levels.\n2. **Normalization**: Alignment mode allows for more accurate normalization of the data, which is essential for downstream analyses.\n\n**Comparison and recommendations**\n\nConsidering the advantages and disadvantages of each approach, I would recommend using Salmon's quasi-mapping with a decoy-aware index for the following reasons:\n\n1. **Speed**: The experiment has a large sample size (n=24), and speed is crucial for high-throughput analyses.\n2. **Memory efficiency**: The experiment has a large number of samples, and memory efficiency is essential to avoid running out of memory.\n3. **Bias correction**: The decoy-aware index in Salmon's quasi-mapping approach can help reduce systematic biases in the quantification process.\n\nHowever, if your PI is concerned about the accuracy of the transcript abundance estimates, aligning with STAR first and passing the BAM to Salmon in alignment mode might be a better option. In this case, you can use the `--gcBias` flag in Salmon to estimate a correction factor for systematic biases, as recommended in the original paper (Patro et al., 2017).\n\n**Best practices**\n\nTo ensure the accuracy and reliability of the results, I recommend the following best practices",
+    "reference": "For standard bulk RNA-seq differential expression with a well-annotated genome like human Gencode v44, decoy-aware quasi-mapping produces quantification accuracy that is essentially indistinguishable from alignment-mode Salmon in published benchmarks, including Soneson et al. 2016 and more recent workflow comparisons from the Bioconductor ARMOR pipeline. Your PI's intuition about accuracy was better-founded before Salmon 1.0 introduced full-genome decoy indexing; with a proper decoy, the gap has largely closed.\n\nThe decoy sequence is critical: building a selective alignment index without it allows reads from intergenic or intronic regions to quasi-map spuriously to transcripts, inflating counts for lowly expressed genes. Build the index with `--decoys` pointing to the genome FASTA and validate with the `--validateMappings` flag.\n\nAlignment mode (STAR \u2192 Salmon `--alignments`) adds clear value when: (1) you need the BAM file for other purposes \u2014 variant calling, QC with RSeQC or Qualimap, or IGV visualization; (2) you want junction-level evidence for alternative splicing analysis; (3) transcriptome completeness is uncertain and you want the aligner's splice site log as a diagnostic.\n\nCaveat: quasi-mapping produces no alignment coordinates or per-base coverage, so tools requiring BAM input (GATK, featureCounts, Picard) cannot use it. If your pipeline needs both quantification and a BAM, align with STAR and pass the coordinate-sorted BAM to Salmon in alignment mode rather than running both workflows in parallel.",
+    "model": "vanilla-3b-rag",
+    "category": "alignment",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5294366478919983,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "(Patro et al. 2017)\n\nSailfish\n\n(Patro, Mount, and Kingsford 2014)\n\nkallisto\n\n(Bray et al. 2016)\n\nRSEM\n\n(Li and Dewey 2011)\n\nSome advantages of using the above methods for transcript abundance estimati"
+      },
+      {
+        "rank": 2,
+        "score": 0.4544164836406708,
+        "source": "docs-star-readme",
+        "text_head": "STAR 2.7.11b\n==========\nSpliced Transcripts Alignment to a Reference\n\u00a9 Alexander Dobin, 2009-2024\nhttps://www.ncbi.nlm.nih.gov/pubmed/23104886\n\nAUTHOR/SUPPORT\n==============\nAlex Dobin, dobin@cshl.edu"
+      },
+      {
+        "rank": 3,
+        "score": 0.45342516899108887,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Li, Bo, and Colin N. Dewey. 2011. \u201cRSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome.\u201d \nBMC Bioinformatics\n 12: 323+. \nhttps://doi.org/10.1186/1471-2105-12-"
+      }
+    ]
+  },
+  {
+    "input": "When should I use apeglm shrinkage instead of the older 'normal' prior, and why does lfcShrink() with apeglm require the coef= argument rather than contrast=?",
+    "prediction": "You should use apeglm shrinkage instead of the older 'normal' prior when you want to rank or visualize genes by effect size, particularly for MA plots, volcano plots, or ranked gene lists. This is because apeglm uses an adaptive Cauchy-like prior that is heavy-tailed, allowing genuinely large log-fold changes to remain large, while small or noisy LFCs are pulled toward zero. This results in more biologically appropriate shrinkage pressure, avoiding over-shrinkage of true large effects.\n\nThe lfcShrink() function with apeglm requires the coef= argument rather than contrast= because apeglm operates directly on a single coefficient from the model matrix, refitting a penalized GLM for that coefficient using the MLE estimates already computed by DESeq(). In contrast, the contrast= interface constructs arbitrary linear combinations of coefficients, which apeglm cannot handle. If your comparison of interest maps cleanly to one coefficient name from resultsNames(dds), use apeglm with coef=. If you need a contrast that doesn't correspond to a single coefficient, use type='ashr' instead, which supports the contrast= interface.\n\nAdditionally, apeglm is preferred over the original normal-prior shrinkage because it uses a heavy-tailed prior that is more biologically appropriate, allowing large fold changes to remain large while small or noisy LFCs are shrunk toward zero. This results in more accurate and reliable estimates of effect sizes, particularly for downstream analysis such as ranking genes or visualization.",
+    "reference": "apeglm (Zhu et al. 2019, Bioinformatics) is the recommended default for LFC shrinkage in DESeq2 when you want to rank or visualize genes by effect size. It uses an adaptive Cauchy-like prior that is heavy-tailed: genuinely large log-fold changes are allowed to remain large, while small or noisy LFCs are pulled toward zero. The older 'normal' prior uses a zero-centered normal distribution, which is symmetric and can over-shrink genes with truly large effects because the prior places relatively little mass in the tails. The practical consequence is that apeglm-shrunken LFCs are better calibrated for MA plots, volcano plots, and ranked gene lists. The coef= requirement exists because apeglm operates directly on a single coefficient from the model matrix \u2014 it refits a penalized GLM for that coefficient using the MLE estimates already computed by DESeq(). The contrast= interface constructs arbitrary linear combinations of coefficients (e.g., a difference-of-differences in an interaction model), which apeglm cannot handle because it needs a single, identifiable coefficient axis to place the prior on. If your comparison of interest maps cleanly to one coefficient name from resultsNames(dds), use apeglm with coef=. If you need a contrast that doesn't correspond to a single coefficient, use type='ashr' instead, which does support the contrast= interface.",
+    "model": "vanilla-3b-rag",
+    "category": "deseq2",
+    "source": "docs-deseq2-vignette",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.829475998878479,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: When should I use apeglm shrinkage instead of the older 'normal' prior, and why does lfcShrink() with apeglm require the coef= argument rather than contrast=?\n\nA: apeglm (Zhu et al. 2019, Bioinform"
+      },
+      {
+        "rank": 2,
+        "score": 0.8181520700454712,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I want to apply apeglm LFC shrinkage. What are the requirements, and why is it preferred over the original normal-prior shrinkage?\n\nA: To use apeglm shrinkage, call `lfcShrink(dds, coef = \"conditio"
+      },
+      {
+        "rank": 3,
+        "score": 0.7119954824447632,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I want to use apeglm for LFC shrinkage. When is it the right choice and why does it have to be applied after running DESeq2 rather than as part of the main fitting?\n\nA: The `apeglm` method is the r"
+      }
+    ]
+  },
+  {
+    "input": "I want to apply apeglm LFC shrinkage. What are the requirements, and why is it preferred over the original normal-prior shrinkage?",
+    "prediction": "To apply apeglm LFC shrinkage, the requirements are:\n\n1. The `lfcShrink()` function must be called after running DESeq2 (`DESeq()`).\n2. The `coef` argument must be specified, which should be a single named coefficient from `resultsNames(dds)`.\n3. The `type` argument must be set to `\"apeglm\"`.\n\nApeglm is preferred over the original normal-prior shrinkage for several reasons:\n\n1. **Adaptive shrinkage**: apeglm uses a heavy-tailed Cauchy prior, which produces adaptive shrinkage. Small fold changes (likely noise) are pulled strongly toward zero, while large fold changes (likely real signal) are shrunk only minimally. This is more biologically appropriate than the original normal prior, which applies equal shrinkage pressure regardless of the magnitude of the LFC.\n2. **Biological relevance**: apeglm is designed to preserve the magnitude of large effects, whereas the normal prior can over-shrink them. This makes apeglm more suitable for ranking genes by LFC for visualization (MA plots, volcano plots) or downstream prioritization.\n3. **Efficient computation**: apeglm is faster than the normal-prior method for large datasets.\n\nOverall, apeglm is the recommended default for LFC shrinkage in DESeq2 when you want to rank or visualize genes by effect size, as it provides more accurate and biologically relevant estimates.",
+    "reference": "To use apeglm shrinkage, call `lfcShrink(dds, coef = \"condition_treated_vs_control\", type = \"apeglm\")`. The key requirement is that you must specify the coefficient using the `coef` argument (a name from `resultsNames(dds)`) rather than `contrast`, because apeglm fits a penalized likelihood model around the MLE estimate for that specific coefficient \u2014 it is not designed to handle arbitrary linear combinations of coefficients the way the normal-prior method can. This also means `DESeq()` must have been run first so the MLEs are available. apeglm uses a heavy-tailed Cauchy prior on log fold changes, which produces adaptive shrinkage: small fold changes (likely noise) are pulled strongly toward zero, while large fold changes (likely real signal) are shrunk only minimally. This is more biologically appropriate than the original normal prior, which applies equal shrinkage pressure regardless of the magnitude of the LFC, thereby over-shrinking large effects. apeglm is particularly recommended when you intend to rank genes by LFC for visualization (MA plots, volcano plots) or downstream prioritization, because it yields fold-change estimates that better reflect true effect sizes. The method was introduced by Zhu, Ibrahim, and Love (2019, Bioinformatics). One practical caveat: apeglm is slower than the normal-prior method for large datasets. If speed is critical and shrinkage accuracy is less important, the normal-prior or ashr alternatives are still valid.",
+    "model": "vanilla-3b-rag",
+    "category": "deseq2",
+    "source": "docs-deseq2-vignette",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.811040997505188,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I want to apply apeglm LFC shrinkage. What are the requirements, and why is it preferred over the original normal-prior shrinkage?\n\nA: To use apeglm shrinkage, call `lfcShrink(dds, coef = \"conditio"
+      },
+      {
+        "rank": 2,
+        "score": 0.7318432927131653,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I want to use apeglm for LFC shrinkage. When is it the right choice and why does it have to be applied after running DESeq2 rather than as part of the main fitting?\n\nA: The `apeglm` method is the r"
+      },
+      {
+        "rank": 3,
+        "score": 0.6692863702774048,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: When should I use apeglm shrinkage instead of the older 'normal' prior, and why does lfcShrink() with apeglm require the coef= argument rather than contrast=?\n\nA: apeglm (Zhu et al. 2019, Bioinform"
+      }
+    ]
+  },
+  {
+    "input": "My in vitro RNA-seq experiment has 3 biological replicates of HEK293T cells. Each replicate is split into 6 wells: 3 treated, 3 vehicle. My collaborator says I have n=9 per condition. Is that correct, and how should I model this in DESeq2?",
+    "prediction": "To address your question, let's break down the information provided and clarify the correct interpretation of the number of replicates and the experimental design.\n\nYour experiment has 3 biological replicates of HEK293T cells, with each replicate split into 6 wells: 3 treated and 3 vehicle. This means you have a total of 3 biological replicates, each with 6 wells, resulting in a total of 18 samples (3 replicates x 6 wells per replicate).\n\nHowever, your collaborator states that you have n=9 per condition. This is incorrect. The correct number of samples per condition is 6 (3 treated + 3 vehicle).\n\nTo model this in DESeq2, you should use the following:\n\n1. Create a design formula that accounts for the experimental design:\n```R\ndesign <- modelFormula(c(\"treated\" ~ 1, \"vehicle\" ~ 1, \"condition\" ~ condition, \"replicate\" ~ replicate))\n```\nThis formula specifies that the \"treated\" and \"vehicle\" conditions are categorical variables, and the \"condition\" variable is a factor that indicates the experimental condition. The \"replicate\" variable is a factor that indicates the replicate number.\n\n2. Use the `collapseReplicates` function to combine the counts from technical replicates:\n```R\ncollapseReplicates(dds, design)\n```\nThis will combine the counts from the technical replicates into single columns of the count matrix.\n\n3. Fit the DESeq model using the `DESeq` function:\n```R\ndds <- DESeq(dds, design)\n```\nThis will fit the DESeq model to the data, using the specified design formula and accounting for the experimental design.\n\nNote that you should not use the `droplevels` function to remove levels of a variable that do not have samples in the current DESeqDataSet, as this can lead to incorrect results. Instead, use the design formula to specify the experimental design and the `collapseReplicates` function to combine technical replicates.",
+    "reference": "Your collaborator is describing pseudoreplication. The 3 treated wells and 3 control wells within each biological replicate share the same flask, passage, media batch, and processing day \u2014 they are technical replicates, not independent biological observations. Your true n is 3 biological replicates per condition.\n\nTreating wells as n=9 inflates degrees of freedom and produces p-values that are far too small. In simulation studies, pseudoreplication of this kind can increase false positive rates by 5\u201350-fold depending on within-replicate correlation.\n\nCorrect DESeq2 approach: average or sum (pseudobulk) raw counts across the 3 technical wells within each biological replicate before creating your DESeqDataSet, then model with ~ condition using n=3. Alternatively, include replicate as a blocking factor (~ replicate + condition), but with only 3 biological replicates the variance component for replicate is estimated from 2 degrees of freedom and will be noisy.\n\nWhen technical replicates are worth modeling separately: If wells were split to test a within-batch variable (e.g., two treatment durations), those wells represent a nested sub-experiment and can be analyzed at the well level \u2014 provided the model explicitly accounts for biological replicate as a nesting factor.\n\nCaveat: n=3 biological replicates provides roughly 40\u201355% power at FC=2 in typical RNA-seq. This experiment is underpowered for discovery; plan for n\u22655 per condition in future designs. Results should be treated as hypothesis-generating and validated orthogonally.",
+    "model": "vanilla-3b-rag",
+    "category": "experimental-design",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5641032457351685,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "If you need to subset the columns of a \nDESeqDataSet\n, i.e., when removing certain samples from the analysis, it is possible that all the samples for one or more levels of a variable in the design for"
+      },
+      {
+        "rank": 2,
+        "score": 0.5525009036064148,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "ELIXIR feedback:\n Your feedback matters! Please take our quick user satisfaction survey: \nlink\n\nInput data\n\nWhy un-normalized counts?\n\nAs input, the DESeq2 package expects count data as obtained, e.g."
+      },
+      {
+        "rank": 3,
+        "score": 0.546639084815979,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The DESeq2 model and all the steps taken in the software are described in detail in our publication \n(Love, Huber, and Anders 2014)\n, and we include the formula and descriptions in this section as wel"
+      }
+    ]
+  },
+  {
+    "input": "We have 24 mouse liver samples (8 per treatment arm: control, drug A, drug B) but budget for only 12 RNA-seq libraries. A colleague suggests pooling 2 samples per library to stay within budget. Is pooling reasonable here, or should we redesign?",
+    "prediction": "Based on the provided reference material, here's an answer to the question:\n\nNo, pooling 2 samples per library is not a reasonable solution in this case. The reference material suggests that rarefaction (subsampling each sample to a uniform read depth) is the recommended normalization approach for computing diversity metrics in QIIME 2. This approach ensures that all samples are directly comparable by eliminating the confounding effect of unequal sequencing depth.\n\nPooling samples, on the other hand, can lead to sample loss, which can result in the exclusion of biologically important samples, such as negative controls or low-input clinical samples. In this case, you have 24 mouse liver samples, and pooling 2 samples per library would result in 12 libraries, which is the budget constraint. However, this would mean that 12 samples would be lost, which could compromise the statistical power of your analysis.\n\nAdditionally, the reference material notes that proportional normalization (dividing counts by library size) is not recommended for diversity or differential abundance analyses because it conflates sampling variance with biological signal and violates the compositionality assumption underlying methods like ANCOM.\n\nTherefore, it is recommended to redesign your experimental design to accommodate all 24 samples, rather than pooling them. This will ensure that you have a more complete dataset and can compute diversity metrics using rarefaction, which is the recommended approach in QIIME 2.",
+    "reference": "Pooling is generally discouraged for this setup. Equimolar pooling of 2 samples per library collapses within-group variance \u2014 you lose the ability to estimate biological variability, which is the denominator in every DE test. With 4 pooled libraries per group, DESeq2 and edgeR will see artificially low dispersion, producing overconfident p-values or failing dispersion estimation entirely. The pooled approach can only detect large, highly consistent effects; subtle drug responses will be invisible, and individual-level heterogeneity cannot be recovered post hoc.\n\nBetter alternatives given the budget: (1) Reduce to two arms (control vs. drug A) and sequence 6 individual libraries each \u2014 defensible power for moderate-effect DE. (2) Use 4 libraries per arm across all three groups if three-way comparison is required, accepting lower power for weaker effects. (3) Reserve pooling only for very early feasibility checks where you have no hypothesis-testing goals and simply want a transcript catalog.\n\nFor differential expression inference, individual libraries with at least 3 true biological replicates per group are the minimum defensible design, and 5\u20136 is strongly preferred when per-group sample sizes permit.\n\nCaveat: single-cell RNA-seq pseudobulk aggregation (summing counts across cells per donor) is conceptually distinct from wet-lab pooling \u2014 it retains donor-level replication and is the recommended approach for scRNA-seq DE, not an analogue of the pooling problem described here.",
+    "model": "vanilla-3b-rag",
+    "category": "experimental-design",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.40909111499786377,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Here we perform pre-filtering to keep only rows that have a count of at least 10 for a minimal number of samples. The count of 10 is a reasonable choice for bulk RNA-seq. A recommendation for the mini"
+      },
+      {
+        "rank": 2,
+        "score": 0.3798765242099762,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: Why should I pre-filter low-count genes before running DESeq2, and what threshold does the vignette suggest?\n\nA: Pre-filtering removes genes that have virtually no chance of being called differenti"
+      },
+      {
+        "rank": 3,
+        "score": 0.37079402804374695,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I rarefy my feature table before computing diversity metrics, or use proportional normalization? When does rarefaction fail?\n\nA: Rarefaction \u2014 subsampling each sample to a uniform read depth"
+      }
+    ]
+  },
+  {
+    "input": "I'm re-analyzing a public RNA-seq dataset (GEO, n=60, two conditions) where batch, sex, and age are all recorded in the metadata. A colleague insists I should run SVA on top of these known covariates to catch hidden confounders. Is that warranted, or does it risk over-correcting?",
+    "prediction": "The use of SVA (Supervisir) is a common practice in RNA-seq analysis, especially when dealing with batch effects, but it's not necessarily warranted in this case. Here's why:\n\n1. **Batch effects are already accounted for in DESeq2**: DESeq2 has built-in methods to account for batch effects, such as the `batch` variable in the metadata, which can be used to adjust for batch effects in the analysis (e.g., using the `batchAdjust()` function). This means that SVA is not strictly necessary.\n2. **SVA can introduce additional noise**: SVA can introduce additional noise into the analysis, as it's a regression-based method that estimates the effects of covariates on gene expression. This can lead to over-correcting for batch effects, which can in turn reduce the power to detect true differentially expressed genes.\n3. **SVA is not a substitute for proper normalization**: SVA is not a substitute for proper normalization of the data. DESeq2's normalization methods, such as the TMM (Trimmed Mean of M values) or the TMM+ method, are designed to account for various sources of variation in the data, including batch effects. Using SVA in addition to these methods can lead to over-normalization and reduce the accuracy of the results.\n4. **Independent filtering is sufficient**: As mentioned in the DESeq2 vignette, independent filtering (e.g., using the `results()` function) can already account for batch effects and other sources of variation in the data. This is a more principled approach than SVA, as it uses a data-adaptive threshold to remove genes with low expression or high variability.\n\nIn summary, while SVA can be a useful tool in certain situations, it's not necessary in this case, where batch effects are already accounted for in the metadata and DESeq2's normalization and filtering methods are sufficient. Running SVA in addition to DESeq2 may introduce unnecessary noise and reduce the accuracy of the results.",
+    "reference": "Your colleague's instinct is reasonable but needs to be conditioned on whether unexplained structure actually remains after accounting for known covariates. SVA and RUVSeq are designed for latent variance not captured by recorded metadata \u2014 when batch, sex, and age are fully observed and included in your model (`~ batch + sex + age + condition` in DESeq2 or voom/limma), you've already addressed those sources. Adding SVA on top of complete covariate adjustment risks absorbing real biological signal into surrogate variables, especially when n is modest and the biological effect correlates with any latent structure \u2014 a well-documented failure mode.\n\nThe right workflow is diagnostic first: apply variance-stabilizing transformation, regress out known covariates, then run PCA on the residuals. If leading PCs still show clustering that condition alone doesn't explain, SVA is genuinely warranted and likely capturing RNA quality variation, cell-type composition shifts, or undocumented processing differences.\n\nIf you do run SVA, use the Buja-Eyuboglu permutation method (`num.sv` with `method='be'`) rather than the default Leek-Storey estimator, which tends to overestimate the number of surrogate variables in smaller datasets. Include the estimated SVs as additional covariates rather than regressing them out before modeling.\n\nCaveat: SVA cannot rescue a design where batch is perfectly confounded with condition \u2014 all samples from condition A processed in batch 1, all B in batch 2. No post-hoc correction is valid in that case; only redesigning the experiment helps.",
+    "model": "vanilla-3b-rag",
+    "category": "experimental-design",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.35087111592292786,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Storey, J. 2003. \u201cThe positive false discovery rate: A Bayesian interpretation and the q-value.\u201d \nThe Annals of Statistics\n 31 (6): 2013\u201335.\n\nTibshirani, Robert. 1988. \u201cEstimating Transformations for "
+      },
+      {
+        "rank": 2,
+        "score": 0.34816285967826843,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: Should I filter out low-count genes before running DESeq2? I've seen different thresholds recommended. What does the vignette suggest and why does it matter?\n\nA: Yes, pre-filtering is explicitly re"
+      },
+      {
+        "rank": 3,
+        "score": 0.33697643876075745,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: Why should I pre-filter low-count genes before running DESeq2, and what threshold does the vignette suggest?\n\nA: Pre-filtering removes genes that have virtually no chance of being called differenti"
+      }
+    ]
+  },
+  {
+    "input": "I have matched transcriptomic, proteomic, and metabolomic data from 60 patients (30 cases, 30 controls). I want to find latent factors driving variation across all three omics layers. Should I use MOFA2 or mixOmics (DIABLO)? My primary goal is discovery, not classification.",
+    "prediction": "To address your question, I'll provide a detailed response citing specific tools, parameters, and best practices from the references.\n\nYou're interested in finding latent factors driving variation across multiple omics layers (transcriptomics, proteomics, and metabolomics). Both MOFA2 and mixOmics (DIABLO) are suitable methods for this purpose. However, I'll outline the key differences and provide recommendations.\n\n**MOFA2**\n\nMOFA2 (Multi-omics Factor Analysis) is a method for integrating multiple omics data types to identify latent factors driving variation across different layers (1). MOFA2 uses a multi-task learning approach, where the model is trained on all three omics data types simultaneously. This allows the model to learn shared factors across layers.\n\nTo use MOFA2, you'll need to prepare your data in a specific format. The reference provides an example of how to use MOFA2 with transcriptomic data (2). For your multi-omics dataset, you'll need to follow a similar process:\n\n1. Preprocess your data using tools like `tximport` (3) or `DESeq2` (4) to prepare your count matrices.\n2. Split your data into training and testing sets (e.g., 80% for training and 20% for testing).\n3. Use MOFA2's `moFa2()` function to perform the analysis.\n\n**mixOmics (DIABLO)**\n\nmixOmics is another method for integrating multiple omics data types. It uses a Bayesian approach to identify latent factors driving variation across different layers. mixOmics is particularly useful for discovering new factors, as it doesn't require prior knowledge of the number of factors.\n\nTo use mixOmics, you'll need to prepare your data in a specific format. The reference provides an example of how to use mixOmics with transcriptomic data (5). For your multi-omics dataset, you'll need to follow a similar process:\n\n1. Preprocess your data using tools like `tximport` (3) or `DESeq2` (4) to prepare your count matrices.\n2. Split your data into training and testing sets (e.g., 80% for training and 20% for testing).\n3. Use mixOmics' `mixOmics()` function to perform the analysis.\n\n**Recommendation**\n\nFor your multi-omics dataset, I recommend using MOFA2. MOFA2 is specifically designed for multi-omics data and can handle the integration of transcriptomic, prote",
+    "reference": "For unsupervised discovery of shared latent structure, MOFA2 (Multi-Omics Factor Analysis v2) is the better fit. MOFA2 learns factors that explain variance across omics layers without requiring class labels; factors can be entirely shared, partially shared, or view-specific, which directly answers 'what is co-varying across layers.' It handles missing values per modality gracefully and scales to your sample size without issue. Output factors can then be associated with your case/control labels post-hoc as a second step, preserving the exploratory nature of the discovery phase. DIABLO (from mixOmics) is a supervised multi-block method: it explicitly uses class labels during integration to find components that discriminate groups. This makes it powerful for biomarker panels and classification, but it inflates apparent associations between omics layers and the outcome \u2014 it is not appropriate for unbiased discovery because the latent structure is shaped by the very label you want to predict. When NOT to use MOFA2: if your dataset has severe block-level missingness (e.g., metabolomics missing for 40% of samples), MOFA2's assumption of data missing at random becomes strained. Also, MOFA2 assumes approximately Gaussian, Poisson, or Bernoulli likelihoods per view \u2014 raw count data from RNA-seq should be variance-stabilized or log-normalized before input. For 60 samples, also check that your number of factors is constrained to avoid overfitting; the authors recommend cross-validation or ELBO monitoring to select factor count.",
+    "model": "vanilla-3b-rag",
+    "category": "general",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.3751506805419922,
+        "source": "docs-qiime2",
+        "text_head": "Q: My collaborators use rarefaction, but I've heard it throws away data. When is rarefaction appropriate, and when should I use alternatives like CSS or proportions?\n\nA: Rarefaction (subsampling reads"
+      },
+      {
+        "rank": 2,
+        "score": 0.3507120609283447,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The only case in which there is more than size factor scaling on the counts is when either normalization factors have been provided (e.g.\u00a0from \ncqn\n or \nEDASeq\n), or if \ntximport\n is used and the upst"
+      },
+      {
+        "rank": 3,
+        "score": 0.3436967432498932,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The \nddsTxi\n object here can then be used as \ndds\n in the following analysis steps.\n\nTximeta for import with automatic metadata\n\nAnother Bioconductor package, \ntximeta\n\n(Love et al. 2020)\n, extends \nt"
+      }
+    ]
+  },
+  {
+    "input": "Our group is building reusable genomics pipelines. We have Python-heavy scripts and some R, a SLURM cluster, and occasional AWS jobs. One postdoc knows Nextflow, another prefers Python. What should actually drive our choice between Snakemake, Nextflow, and WDL?",
+    "prediction": "Based on the provided references, here's a comparison of DADA2 and Deblur for denoising 16S amplicon data:\n\n**DADA2**\n\n* Uses a parametric error model learned from the specific sequencing run, making it highly adaptive to run-specific noise patterns.\n* Supports paired-end joining, allowing the recovery of longer amplicons.\n* Requires a sufficient number of reads per sample (QIIME 2 recommends at least 10,000 reads) to accurately parameterize the error model.\n* May require more computational resources and care when combining data from different sequencing runs.\n\n**Deblur**\n\n* Uses a pre-computed, alignment-based error profile derived from PhiX control reads, making it less flexible but more consistent across datasets.\n* Operates on single-end (or already-joined) reads and requires trimming to a fixed uniform length.\n* Can tolerate smaller per-sample depths because its error model is fixed.\n* May be more suitable for multi-study comparisons or single-end V3-V4 data.\n\nConsidering your pipeline setup, I would recommend DADA2 for the following reasons:\n\n1. You have a Python-heavy script, and DADA2 is more Python-friendly, as it can be integrated with existing Python workflows.\n2. You have access to a SLURM cluster, which can be used to run DADA2's computational demands.\n3. You have occasional AWS jobs, which can also be used to run DADA2.\n\nHowever, if you need to combine data from multiple studies or have single-end V3-V4 data, Deblur's consistency might be advantageous.\n\nAs for the workflow management tools, I would recommend Snakemake over Nextflow and WDL for the following reasons:\n\n1. Snakemake is more flexible and adaptable to your existing Python-heavy script and SLURM cluster.\n2. Snakemake has built-in support for parallelization, which can be useful for large-scale amplicon analysis.\n3. Snakemake's workflow management capabilities are more comprehensive, allowing for easier integration with your existing pipeline.\n\nNextflow and WDL are also viable options, but Snakemake's flexibility and adaptability make it a better fit for your pipeline setup.\n\nIn terms of parallelization, you can use the BiocParallel package in R to take advantage of your SLURM cluster and AWS jobs. This package allows for easy parallelization of DESeq, results, and lfcShrink, which can be useful for large-scale amplicon analysis.",
+    "reference": "Three factors dominate the decision: team fluency, cloud requirements, and ecosystem access.\n\nSnakemake is Python-native \u2014 rules are Python with declarative input/output blocks, so Python-fluent teams face minimal ramp-up. It handles SLURM well through profiles and supports per-rule conda and container directives cleanly. Its file-based DAG is intuitive for scientists accustomed to thinking in files. The weakness is cloud-native execution: AWS Batch and GCP support exist via executor plugins, but the ecosystem is less mature and less documented than Nextflow's.\n\nNextflow DSL2 excels when cloud portability is a genuine current requirement, not aspirational. Its channel-based data flow handles fan-out and fan-in naturally, and its executor abstraction switches cleanly between SLURM, AWS Batch, and GCP Batch with a config change. The nf-core community provides over 100 curated, containerized, and publication-ready pipelines \u2014 for standard workflows like RNA-seq or variant calling, forking an nf-core pipeline is faster than building from scratch in any language.\n\nWDL with Cromwell is well-suited for Terra and AnVIL cloud environments and GATK best-practice pipelines. It sees heavy use in consortium-scale projects like TOPMed and ENCODE. Custom pipeline development in WDL is more verbose and local tooling is thinner.\n\nRecommendation: if AWS is a real current need, choose Nextflow and leverage nf-core. If cloud is aspirational and the team is Python-native, Snakemake causes less friction. If a consortium mandates WDL, that overrides team preference.\n\nWhen NOT to switch: migrating a half-finished pipeline mid-project creates reproducibility gaps that are rarely worth the cost.",
+    "model": "vanilla-3b-rag",
+    "category": "general",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.36432623863220215,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm setting up my 16S amplicon pipeline and need to choose between DADA2 and Deblur for denoising. What are the key differences and when should I prefer one over the other?\n\nA: Both DADA2 and Deblu"
+      },
+      {
+        "rank": 2,
+        "score": 0.3609344959259033,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "One can take advantage of parallelized computation. Parallelizing \nDESeq\n, \nresults\n, and \nlfcShrink\n can be easily accomplished by loading the BiocParallel package, and then setting the following arg"
+      },
+      {
+        "rank": 3,
+        "score": 0.3301575481891632,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm trying to decide between DADA2 and Deblur for denoising my 16S amplicon data. Both claim to produce exact sequence variants (ASVs). What are the practical differences, and when should I prefer "
+      }
+    ]
+  },
+  {
+    "input": "Our lab is starting a long-term project involving WGS, RNA-seq, and ChIP-seq pipelines that need to run on both a university SLURM cluster and occasionally on AWS. Most lab members know Python well; one postdoc has Nextflow experience. Which workflow manager should we adopt and why?",
+    "prediction": "Based on the provided references, here's a comparison of DADA2 and Deblur for denoising 16S amplicon data:\n\n**DADA2 vs. Deblur for 16S amplicon denoising**\n\nDADA2 is generally preferred for paired-end 2\u00d7250 bp data from an MiSeq run, as it can leverage read merging to span the full amplicon and handle quality variation common in long MiSeq reads. Deblur, on the other hand, is single-end only in its QIIME 2 implementation, which may not be ideal for 2\u00d7250 bp data.\n\n**Key differences:**\n\n1. **Error modeling:** DADA2 models sequencing error empirically per run, learning error rates from the data itself, while Deblur uses a pre-defined error profile derived from Illumina data.\n2. **Read length:** DADA2 can handle variable-length and paired-end reads natively, while Deblur requires all reads trimmed to the same length via --p-trim-length.\n3. **Computational requirements:** DADA2 is computationally heavier and requires sufficient reads per sample to estimate error rates reliably (typically >10,000 reads).\n\n**Recommendation:**\n\nBased on your specific use case (paired-end 2\u00d7250 bp data from an MiSeq run), DADA2 is the preferred choice for denoising your 16S amplicon data.\n\n**Workflow manager for WGS, RNA-seq, and ChIP-seq pipelines**\n\nConsidering your lab's requirements for running pipelines on both a university SLURM cluster and AWS, I would recommend adopting Nextflow as the workflow manager. Here's why:\n\n1. **Portability:** Nextflow is designed to be highly portable across different computing environments, including clusters and cloud services like AWS.\n2. **Python integration:** As most lab members know Python, Nextflow has excellent integration with Python, allowing for seamless scripting and automation.\n3. **Nextflow experience:** Your postdoc's experience with Nextflow will facilitate the adoption and management of the workflow manager.\n4. **Scalability:** Nextflow is designed to handle large-scale workflows and can scale horizontally, making it suitable for your lab's needs.\n\nOverall, Nextflow offers a flexible, scalable, and Python-friendly workflow manager that can efficiently manage your lab's WGS, RNA-seq, and ChIP-seq pipelines across different computing environments.",
+    "reference": "Given strong Python familiarity, Snakemake is the lowest-friction entry point: its rules are annotated Python, the SLURM executor (--executor slurm as of v8) and AWS integration via the snakemake-executor-plugin-aws-batch are well-maintained, and the Snakemake-wrappers ecosystem covers most standard bioinformatics tools. The file-based dependency model is intuitive for teams thinking in terms of input/output paths.\n\nNextflow is a strong alternative and handles streaming dataflow better \u2014 particularly useful when output filenames aren't predictable at DAG-construction time (e.g., variable-sample demultiplexing). Its nf-core ecosystem is larger than Snakemake-wrappers for curated, publishable pipelines. The tradeoff is that Groovy DSL and channel semantics impose real learning overhead for Python-native teams.\n\nWDL (Cromwell/Terra) is best motivated by a need to share workflows with Broad collaborators, run on Terra, or meet clinical-grade auditability requirements \u2014 it's verbose for exploratory research pipelines.\n\nWhen NOT to choose Snakemake: if the postdoc with Nextflow expertise will be the primary pipeline maintainer, that institutional knowledge often outweighs language preference \u2014 switching costs compound over years of maintenance. Also prefer Nextflow if you plan to contribute pipelines to nf-core, which has far more active community infrastructure and review processes than equivalent Snakemake channels.",
+    "model": "vanilla-3b-rag",
+    "category": "general",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.29386764764785767,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm setting up my 16S amplicon pipeline and need to choose between DADA2 and Deblur for denoising. What are the key differences and when should I prefer one over the other?\n\nA: Both DADA2 and Deblu"
+      },
+      {
+        "rank": 2,
+        "score": 0.24584439396858215,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "One can take advantage of parallelized computation. Parallelizing \nDESeq\n, \nresults\n, and \nlfcShrink\n can be easily accomplished by loading the BiocParallel package, and then setting the following arg"
+      },
+      {
+        "rank": 3,
+        "score": 0.2457604855298996,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I use DADA2 or Deblur for denoising my 16S amplicon data? My reads are 2\u00d7250 bp from an MiSeq run.\n\nA: Both DADA2 and Deblur produce amplicon sequence variants (ASVs) rather than OTUs, elimi"
+      }
+    ]
+  },
+  {
+    "input": "I'm running PERMANOVA with qiime diversity beta-group-significance to compare gut microbiome composition between treatment groups. A colleague told me I need to check for dispersion first. Why, and how do I do this in QIIME 2?",
+    "prediction": "To address your question, you need to check for dispersion first because PERMANOVA (PERMANOVA) is sensitive to differences in within-group dispersion (variance). If one group has much more spread-out samples than another, PERMANOVA can return a significant p-value even when centroids are identical \u2014 a false positive driven entirely by heterogeneous dispersion rather than a true difference in community composition.\n\nTo check for dispersion in QIIME 2, you can run the `qiime diversity beta-group-significance` command with the `--p-method permdisp` option. This will perform the PERMDISP (betadisper) test, which directly assesses whether distances from individual samples to their group centroid differ between groups.\n\nIn other words, PERMDISP tests whether the dispersion (variance) of the microbiome composition differs between groups, which is a critical assumption for PERMANOVA. If PERMDISP is significant, it indicates that one group has more heterogeneous community compositions than another, and your PERMANOVA result may be partly or entirely driven by dispersion rather than a true shift in mean composition.\n\nBy checking for dispersion first, you can ensure that your PERMANOVA result is reliable and interpretable, and you can report both tests together to provide a more comprehensive understanding of the differences between your treatment groups.",
+    "reference": "PERMANOVA tests whether the centroids of groups differ in multivariate space, but it is sensitive to differences in within-group dispersion (variance). If one group has much more spread-out samples than another, PERMANOVA can return a significant p-value even when centroids are identical \u2014 a false positive driven entirely by heterogeneous dispersion rather than a true difference in community composition. This is the dispersion confound. Before interpreting a significant PERMANOVA result, you should run qiime diversity beta-group-significance with --p-method permdisp, which implements the PERMDISP2 (betadisper) test. A significant PERMDISP result means groups differ in dispersion, and your PERMANOVA result may be unreliable or uninterpretable without accounting for this. In practice, both tests are often reported together: if PERMANOVA is significant and PERMDISP is not, you have stronger evidence of a true centroid difference. If both are significant, the PERMANOVA finding is confounded and should be interpreted cautiously \u2014 ideally with visual inspection of ordination plots. Additional PERMANOVA assumptions include exchangeability of samples under the null (approximately met with random assignment or matched designs) and independence of observations; pseudoreplication from repeated measures or nested designs violates this and requires a longitudinal or multilevel approach instead. QIIME 2's beta-group-significance also supports pairwise comparisons across multiple groups and stratification by a covariate, which can help disambiguate confounders.",
+    "model": "vanilla-3b-rag",
+    "category": "microbiome",
+    "source": "docs-qiime2",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.8533764481544495,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm running PERMANOVA with qiime diversity beta-group-significance to compare gut microbiome composition between treatment groups. A colleague told me I need to check for dispersion first. Why, and"
+      },
+      {
+        "rank": 2,
+        "score": 0.7711293697357178,
+        "source": "docs-qiime2",
+        "text_head": "Q: I ran qiime diversity beta-group-significance with PERMANOVA and got a significant p-value. A reviewer asked me to check for differences in beta-dispersion. Why does this matter and how do I do it?"
+      },
+      {
+        "rank": 3,
+        "score": 0.7592260837554932,
+        "source": "docs-qiime2",
+        "text_head": "Q: I want to test whether two treatment groups have significantly different microbiome composition using PERMANOVA in QIIME 2. What assumptions should I verify before trusting the result?\n\nA: PERMANOV"
+      }
+    ]
+  },
+  {
+    "input": "How do I choose truncation lengths for DADA2 (--p-trunc-len-f and --p-trunc-len-r)? What does the interactive quality plot tell me?",
+    "prediction": "To choose truncation lengths for DADA2 (--p-trunc-len-f and --p-trunc-len-r), follow these steps:\n\n1. Run `qiime demux summarize` on your demultiplexed, primer-trimmed reads to generate an interactive quality plot showing median quality scores per position.\n2. Identify the position where the median Phred score drops sustainably below ~25\u201330. This is a heuristic, not a hard rule, and you should examine your specific quality profile rather than applying a fixed cutoff blindly.\n3. For paired-end data, there is a hard geometric constraint: the sum of your truncated forward and reverse lengths must exceed the amplicon length by at least the minimum overlap needed for merging (DADA2's default is 12 bp, but 20+ bp is more reliable in practice).\n4. Consider the expected errors per read (--p-max-ee-f and --p-max-ee-r) and adjust these parameters slightly to recover more reads when quality is borderline without changing the truncation length.\n5. After running DADA2, inspect `denoising-stats.qza` and check if fewer than ~60\u201370% of reads pass denoising and merging. If so, revisit your truncation lengths.\n\nThe interactive quality plot provides information on the quality of your reads, but it's not a direct indicator of truncation lengths. However, it can help you identify the position where the median Phred score drops below ~25\u201330, which is a common heuristic for truncation.\n\nBest practices for truncation lengths:\n\n* For paired-end V4 amplicons (~253 bp), a rough rule is that the sum of trunc-len-f and trunc-len-r should exceed the amplicon length by at least 20 bp to ensure adequate overlap for DADA2's merging step.\n* Aggressive truncation (high quality threshold) discards more signal and shortens reads, while lenient truncation retains low-quality bases that inflate error rates and reduce denoising accuracy.\n* Asymmetric truncation lengths are common for paired-end data, as Illumina 250\u00d72 data typically degrades more on the reverse read.\n\nExample:\n\nFor a 253 bp V4 amplicon sequenced at 2\u00d7250, truncating to 230F/200R gives 177 bp of potential overlap \u2014 more than sufficient. However, if forward quality degrades at position 220 and reverse quality degrades at 180, you may need to adjust the truncation lengths",
+    "reference": "The `qiime demux summarize` command produces an interactive quality plot showing per-position median and quartile Phred scores across all reads. The goal of truncation is to remove the low-quality tails of reads while retaining enough length for forward and reverse reads to overlap and merge. A practical rule: identify the position where the median Phred score drops sustainably below ~25\u201330, and set your truncation there. However, truncation length is constrained by biology: forward and reverse reads must overlap by at least 20 bp (ideally more) after truncation for DADA2 to merge them. For a 253 bp V4 amplicon with 2\u00d7250 bp reads, you have substantial overlap headroom, but for V3-V4 with 2\u00d7300 bp you must be more careful. The default is no truncation (trunc-len = 0), which retains full reads \u2014 this is wrong if read quality drops significantly, as poor-quality bases increase error rates and reduce merging efficiency. A common mistake is setting truncation too aggressively to chase higher quality, then failing to merge because overlap is insufficient. After running DADA2, check the denoising stats artifact: if the 'merged' fraction is below ~70%, insufficient overlap or poor truncation is the likely cause. Iterating on truncation lengths is normal and expected.",
+    "model": "vanilla-3b-rag",
+    "category": "microbiome",
+    "source": "docs-qiime2",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.6637897491455078,
+        "source": "docs-qiime2",
+        "text_head": "Q: How do I choose --p-trunc-len-f and --p-trunc-len-r for DADA2? I've heard I should look at quality plots but I'm not sure how to interpret them or what threshold to use.\n\nA: In QIIME 2, run qiime d"
+      },
+      {
+        "rank": 2,
+        "score": 0.6408324241638184,
+        "source": "docs-qiime2",
+        "text_head": "Q: How do I choose truncation lengths for DADA2 (--p-trunc-len-f and --p-trunc-len-r)? What does the interactive quality plot tell me?\n\nA: The `qiime demux summarize` command produces an interactive q"
+      },
+      {
+        "rank": 3,
+        "score": 0.6233000755310059,
+        "source": "docs-qiime2",
+        "text_head": "Q: How do I choose --p-trunc-len-f and --p-trunc-len-r for DADA2 in QIIME 2? Is there a principled cutoff or is it just trial and error?\n\nA: Choosing truncation lengths for DADA2 starts with running `"
+      }
+    ]
+  },
+  {
+    "input": "We want to do strain-level typing of Clostridioides difficile directly from gut metagenomes (150bp Illumina, ~8M reads/sample) in a hospital transmission study using StrainPhlAn4. Is this feasible for outbreak tracing, and what are the major limitations?",
+    "prediction": "Based on the provided references, I'll address your questions.\n\n**Feasibility of strain-level typing of Clostridioides difficile from gut metagenomes**\n\nYes, it is feasible to perform strain-level typing of Clostridioides difficile directly from gut metagenomes using StrainPhlAn4. StrainPhlAn4 is a tool specifically designed for strain-level typing of C. difficile from metagenomic data (Brennecke et al., 2016).\n\n**Limitations**\n\n1. **Data quality and quantity**: The quality and quantity of the metagenomic data are crucial for accurate strain-level typing. The 150bp Illumina reads may not be sufficient for high-resolution typing, especially if the data is noisy or has low sequencing depth. Higher sequencing depths and better data quality are recommended.\n2. **Computational resources**: StrainPhlAn4 requires significant computational resources, especially for large datasets like 8M reads/sample. This may require powerful computing equipment and potentially a cloud-based infrastructure.\n3. **Phylogenetic tree construction**: StrainPhlAn4 relies on the construction of a phylogenetic tree to infer strain relationships. The quality and resolution of the tree can impact the accuracy of strain-level typing. The reference dataset used for training the model should be representative of the target species and should be well-curated.\n4. **Database updates**: StrainPhlAn4 relies on a database of known C. difficile strains. The database should be regularly updated to ensure that the tool remains effective in identifying novel strains.\n5. **Interpretation of results**: Strain-level typing results require expertise in microbiology, bioinformatics, and statistical analysis. The interpretation of results should be done by a qualified professional to ensure accurate and meaningful conclusions.\n\n**Best practices**\n\n1. **Use a high-quality reference dataset**: Use a well-curated reference dataset for training the StrainPhlAn4 model to ensure accurate strain-level typing.\n2. **Optimize computational resources**: Ensure that computational resources are sufficient to handle the large dataset and perform the necessary phylogenetic tree construction.\n3. **Validate results**: Validate the results using multiple methods, such as whole-genome sequencing or PCR, to confirm the accuracy of strain-level typing.\n4. **Consider using a phylogenetic tree**: Use a phylogenetic tree to infer strain relationships and improve the accuracy of strain-level typing.\n\nReferences:\n\nBrennecke, S. P., et al. (2016). Str",
+    "reference": "StrainPhlAn4 can reconstruct per-sample consensus sequences for C. difficile marker genes, but several factors make it poorly suited as a standalone tool for clinical transmission tracing. First, C. difficile is typically low-abundance in gut metagenomes \u2014 even in CDI patients \u2014 and StrainPhlAn requires sufficient marker-gene coverage to call reliable consensus sequences, generally needing species relative abundance above ~1% and overall sequencing depth above 5M reads. At 8M reads, borderline samples will be excluded entirely. Second, and more fundamentally, 150bp short reads cannot phase heterozygous SNP sites across marker loci. If a patient harbors two co-colonizing strains, StrainPhlAn produces a chimeric consensus rather than two distinct haplotypes, which can generate spurious transmission links or mask real ones. Transmission inference requires resolution at the single-SNP level with full genomic context \u2014 a bar that whole-genome sequencing of cultured isolates meets reliably, and metagenome-derived consensus sequences do not. StrainPhlAn is most appropriate for abundant, well-represented species (>1%) in studies where approximate strain-level relatedness is sufficient, such as longitudinal stability analyses. For hospital outbreak investigation, WGS of isolated colonies remains the gold standard and will give you plasmid content, complete SNP profiles, and defensible transmission clusters.",
+    "model": "vanilla-3b-rag",
+    "category": "microbiome",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.4183688163757324,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The \nddsTxi\n object here can then be used as \ndds\n in the following analysis steps.\n\nTximeta for import with automatic metadata\n\nAnother Bioconductor package, \ntximeta\n\n(Love et al. 2020)\n, extends \nt"
+      },
+      {
+        "rank": 2,
+        "score": 0.36173421144485474,
+        "source": "docs-qiime2",
+        "text_head": "Q: I want to compare gut microbiome community composition between treatment groups. Should I use Bray-Curtis dissimilarity or UniFrac distances, and what is actually being measured differently?\n\nA: Th"
+      },
+      {
+        "rank": 3,
+        "score": 0.33653974533081055,
+        "source": "docs-qiime2",
+        "text_head": "Q: When should I use unweighted UniFrac versus weighted UniFrac versus Bray-Curtis dissimilarity for comparing microbiome composition between treatment groups?\n\nA: The choice of beta diversity metric "
+      }
+    ]
+  },
+  {
+    "input": "I'm running a QIIME 2 (2024.2) analysis of V4 16S amplicons from a clinical cohort. Half the samples were sequenced on one Illumina MiSeq run and half on a second run six months later. A collaborator insists I use Deblur for 'cross-run reproducibility.' Is this a real advantage over DADA2, and are there situations where it actually changes conclusions?",
+    "prediction": "Based on the provided references, here's a detailed comparison of DADA2 and Deblur for denoising 16S amplicon data in QIIME 2:\n\n**Key differences:**\n\n1. **Error modeling:** DADA2 learns a per-run, data-driven error model from the specific sequencing run, making it highly adaptive to sequencing chemistry and run conditions. Deblur uses a pre-computed, static error profile derived from Illumina chemistry, which is less adaptive to run-specific artifacts.\n2. **Read length and direction:** DADA2 can handle variable-length and paired-end reads natively, while Deblur requires single-end reads or pre-joined pairs and trims all reads to a uniform length.\n3. **Reproducibility:** Deblur is more portable across runs, as it uses a pre-defined error profile, but this comes at the cost of less sensitivity to run-specific artifacts.\n4. **Computational requirements:** DADA2 is computationally heavier and requires more reads per sample to estimate error rates reliably (typically >10,000 reads).\n\n**Advantages of DADA2 in your case:**\n\n1. **Paired-end sequencing:** Since your data is 2\u00d7250 bp, DADA2 can leverage read merging to span the full amplicon, which is a significant advantage.\n2. **Variable-quality 3' ends:** DADA2's per-run error modeling can handle the quality variation common in long MiSeq reads, which is beneficial for paired-end data.\n3. **Cross-run analysis:** By running DADA2 per run and then merging the resulting feature tables, you can still analyze both MiSeq and non-MiSeq runs together, which might be more informative than using Deblur.\n\n**When Deblur might be preferred:**\n\n1. **Single-end sequencing:** If your data is single-end, Deblur's static error profile and uniform read length requirement might be more suitable.\n2. **Reproducibility across runs:** If you need strict reproducibility across runs, Deblur's pre-defined error profile can provide a consistent and reliable result.\n\n**Conclusion:**\n\nWhile Deblur's static error profile and uniform read length requirement might provide reproducibility across runs, DADA2's per-run error modeling and ability to handle paired-end reads make it a more suitable choice for your 2\u00d7250 bp MiSeq data. However, if you have single-end data or need strict reproducibility across runs, Deblur might be a better option. Ultimately, the",
+    "reference": "Your collaborator is pointing at a real but often overstated concern. DADA2 learns a per-run error model, which means borderline variants near the error threshold could be resolved differently across runs \u2014 but because ASVs are defined by exact sequences, any identical sequence recovered on both runs will merge trivially in the feature table. The cross-run concern mainly affects low-frequency variants sitting just above the error model cutoff. Deblur uses a pre-trained universal error model and is therefore deterministic across runs for identical sequences. However, Deblur only handles single-end reads, which is a material limitation for paired-end V4 data: you would have to truncate to forward reads only, discarding the quality information from the overlap region and reducing effective read length. DADA2 with paired-end reads typically yields better chimera detection and higher sensitivity. The standard approach for multi-run DADA2 data is to run `dada2 denoise-paired` on each run separately, then merge the resulting feature tables and representative sequences before taxonomy assignment \u2014 QIIME 2's `feature-table merge` handles this correctly. This preserves per-run error modeling while combining ASVs across runs without artifacts. When NOT to use DADA2: runs with fewer than roughly 1,000 reads provide too few sequences to train a reliable error model; in that case, Deblur or pooling shallow runs before denoising is preferable.",
+    "model": "vanilla-3b-rag",
+    "category": "microbiome",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.7451008558273315,
+        "source": "docs-qiime2",
+        "text_head": "Q: When should I use DADA2 versus Deblur for denoising my 16S amplicon data in QIIME 2? What are the practical tradeoffs?\n\nA: Both DADA2 and Deblur generate Amplicon Sequence Variants (ASVs) rather th"
+      },
+      {
+        "rank": 2,
+        "score": 0.7356659173965454,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm setting up my 16S amplicon pipeline and need to choose between DADA2 and Deblur for denoising. What are the key differences and when should I prefer one over the other?\n\nA: Both DADA2 and Deblu"
+      },
+      {
+        "rank": 3,
+        "score": 0.7342574596405029,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I use DADA2 or Deblur for denoising my 16S amplicon data? My reads are 2\u00d7250 bp from an MiSeq run.\n\nA: Both DADA2 and Deblur produce amplicon sequence variants (ASVs) rather than OTUs, elimi"
+      }
+    ]
+  },
+  {
+    "input": "I'm running PERMANOVA (adonis2) to compare gut microbiome beta-diversity between IBD patients (n=18) and healthy controls (n=22) using Bray-Curtis dissimilarity in vegan. The result is significant (p=0.003, R\u00b2=0.08), but a reviewer is asking whether heterogeneous dispersion could explain the result. How do I assess this, and how does it change my interpretation?",
+    "prediction": "To assess whether heterogeneous dispersion could explain the PERMANOVA result, you should run the PERMDISP test (betadisper) in QIIME 2. This test is a permutation-based approach that evaluates the homogeneity of multivariate dispersion between groups. If the PERMDISP test is significant, it indicates that the groups differ in dispersion, which could confound the PERMANOVA result.\n\nIn your case, since the PERMANOVA result is significant (p=0.003, R\u00b2=0.08), you should run the PERMDISP test to determine if dispersion is a confounding factor. If the PERMDISP test is also significant, it suggests that the groups differ in dispersion, and your PERMANOVA result may be unreliable or uninterpretable without accounting for this.\n\nTo visualize the dispersion, you can also use Emperor PCoA plots to check if one group appears more spread out than the other. If one group is more variable, it could be a false positive driven by dispersion rather than a true difference in community composition.\n\nIn this case, since you are using Bray-Curtis dissimilarity, you can run the PERMDISP test using the `--p-method permdisp` option in QIIME 2. This will provide you with a more nuanced understanding of the results and allow you to interpret the PERMANOVA result more accurately.\n\nHere's an example of how you can run the PERMDISP test in QIIME 2:\n\n```bash\nqiime diversity beta-group-significance --p-method permdisp --input-file your_data.qza\n```\n\nIf the PERMDISP test is significant, you can report both the PERMANOVA and PERMDISP results in your publication. This will provide a more comprehensive understanding of the results and allow you to address any potential confounding factors.\n\nIn your case, the reviewer's request to assess heterogeneous dispersion is reasonable, and running the PERMDISP test will provide a more accurate interpretation of the PERMANOVA result.",
+    "reference": "PERMANOVA tests whether group centroids differ in multivariate space but assumes homogeneity of within-group dispersions. If IBD patients have substantially higher beta-diversity spread than controls \u2014 which is biologically plausible \u2014 a significant p-value may reflect dispersion differences rather than centroid shifts, a fundamentally different conclusion. Always accompany PERMANOVA with betadisper() + permutest() in vegan, which formally tests multivariate dispersion homogeneity (analogous to Levene's test). If betadisper is non-significant, you can confidently attribute PERMANOVA significance to group separation. If it is significant, you cannot cleanly separate the two effects \u2014 report both tests, describe the direction of dispersion differences, and consider whether greater within-group variance in IBD is itself a meaningful finding (dysbiosis often manifests as increased variance). PERMDISP2 or distance-to-centroid plots help visualize the issue. Practical caveats: with n=18\u201322, permutations are adequate (~999 permutations standard), but power to detect small R\u00b2 values is limited. Nested designs (e.g., paired samples, subjects within sites) require appropriate strata= arguments to avoid inflating Type I error. adonis2 is preferred over the deprecated adonis for unbalanced group sizes. When NOT to use PERMANOVA: if you have fewer than ~5 samples per group, the permutation distribution is too coarse to produce reliable p-values.",
+    "model": "vanilla-3b-rag",
+    "category": "microbiome",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.691963791847229,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm running PERMANOVA with qiime diversity beta-group-significance to compare gut microbiome composition between treatment groups. A colleague told me I need to check for dispersion first. Why, and"
+      },
+      {
+        "rank": 2,
+        "score": 0.6474636793136597,
+        "source": "docs-qiime2",
+        "text_head": "Q: I want to run PERMANOVA to test whether microbiome composition differs between my treatment groups. Are there assumptions I need to check first?\n\nA: PERMANOVA (implemented in QIIME 2 via `qiime div"
+      },
+      {
+        "rank": 3,
+        "score": 0.6389007568359375,
+        "source": "docs-qiime2",
+        "text_head": "Q: I want to test whether two treatment groups have significantly different microbiome composition using PERMANOVA in QIIME 2. What assumptions should I verify before trusting the result?\n\nA: PERMANOV"
+      }
+    ]
+  },
+  {
+    "input": "After running DESeq2 on my 24-sample dataset (3 conditions \u00d7 8 replicates), I want to make a publication-quality heatmap of the top 100 DE genes. Should I use raw counts, log2(CPM+1), or VST values? What's the practical difference?",
+    "prediction": "Based on the provided reference material, for a dataset of 24 samples (3 conditions \u00d7 8 replicates), you can use `vst()` for the variance-stabilizing transformation (VST) of your raw counts. This is because VST is recommended for datasets with more than roughly 30 samples, and your dataset is close to this threshold.\n\nUsing `vst()` will provide you with VST values that are suitable for PCA, hierarchical clustering, and heatmaps. These values are homoscedastic, meaning they have a constant variance across the mean-count range, which is ideal for these types of analyses.\n\nThe practical difference between using raw counts, log2(CPM+1), and VST values is as follows:\n\n- Raw counts: This is the original data, which may not be homoscedastic and may not be suitable for PCA, hierarchical clustering, or heatmaps.\n- log2(CPM+1): This is a regularized log transformation that corrects for library size effects. It is suitable for small experiments (fewer than ~30 samples) and is recommended for datasets with substantial variation in library sizes. However, it may not be as efficient as VST for larger datasets.\n- VST values: These are derived from the dispersion-mean trend and apply a variance-stabilizing transformation to equalize variance across the mean-count range. They are more efficient than log2(CPM+1) for larger datasets and are the recommended choice for your 24-sample dataset.\n\nTo generate a publication-quality heatmap of the top 100 DE genes, you can use the `vst()` values. You can filter the genes based on the adjusted p-value (padj) and then plot the heatmap using the `vst()` values.\n\nHere's an example code snippet:\n\n```r\n# Filter the top 100 DE genes based on the adjusted p-value (padj)\ntop_100_DE_genes <- resIHW$padj[order(resIHW$padj)[1:100]]\n\n# Select the VST values for the top 100 DE genes\nvst_values <- resIHW$vst[top_100_DE_genes]\n\n# Plot the heatmap\nlibrary(ggplot2)\nggplot() + \n  geom_tile(aes(x = rownames(vst_values), y = rownames(vst_values), fill = vst_values)) + \n  scale_fill_continuous() + \n  labs(x = \"Gene\", y = \"Gene\", fill = \"VST Values\") +",
+    "reference": "Use VST (variance-stabilizing transformation) from DESeq2 for publication figures. Raw counts have strong heteroscedasticity: a gene with mean count 10,000 has far higher absolute variance than one with mean 50, so heatmap distances and clustering are dominated by highly expressed genes regardless of biological relevance. Log2(CPM+1) corrects for library size but does not stabilize variance across the mean-count range \u2014 low-count genes still show inflated variability that can drive spurious clustering. VST applies a data-driven transformation that brings the variance-mean relationship close to constant, making Euclidean distances in heatmaps and PCA biologically interpretable. For datasets with n \u2265 30 samples, VST is preferred over rlog because it is faster; for small n (< 20 samples), rlog is more accurate because it borrows strength across genes. Critical caveat: extract the VST matrix with `assay(vst(dds))`, subset to your DE gene list, and feed that to your heatmap function \u2014 do not rerun DESeq2 on VST values. For quick exploratory plots (not publication), log2(CPM+1) is acceptable. Never use raw counts directly in a heatmap for anything but read-count QC.",
+    "model": "vanilla-3b-rag",
+    "category": "normalization",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.6761032342910767,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I need to run PCA and generate a heatmap of my 80-sample RNA-seq dataset. Should I use vst() or rlog() in DESeq2, and does it matter?\n\nA: For a dataset of 80 samples, `vst()` is the correct choice."
+      },
+      {
+        "rank": 2,
+        "score": 0.6325943470001221,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Ignatiadis, N., Klaus, B., Zaugg, J.B., Huber, W. (2016) Data-driven hypothesis weighting increases detection power in genome-scale multiple testing. \nNature Methods\n, \n13\n:7. \n10.1038/nmeth.3885\n\n# ("
+      },
+      {
+        "rank": 3,
+        "score": 0.5920770168304443,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Data quality assessment by sample clustering and visualization\n\nHeatmap of the count matrix\n\nHeatmap of the sample-to-sample distances\n\nPrincipal component plot of the samples\n\nVariations to the stand"
+      }
+    ]
+  },
+  {
+    "input": "I'm analyzing a 10x Chromium scRNA-seq dataset (~9,000 cells, median ~2,500 UMIs/cell). Some tutorials use Seurat's NormalizeData + ScaleData and others use SCTransform v2. When does SCTransform actually outperform the standard workflow, and are there cases where I should avoid it?",
+    "prediction": "Based on the provided reference material, here's a detailed answer to your question:\n\nSCTransform (Seurat's version of DESeq2's rlog transformation) is a widely used method for normalizing and transforming count data from single-cell RNA-seq (scRNA-seq) experiments. While it's a popular choice, its performance and appropriateness depend on the specific characteristics of your dataset.\n\n**When SCTransform outperforms the standard workflow:**\n\n1. **Small datasets:** SCTransform is generally preferred for small datasets with fewer than ~30 samples (Seurat's recommendation). In your case, with 9,000 cells, SCTransform might be a good choice.\n2. **Low UMIs:** SCTransform is more effective in handling genes with very low or zero counts, which is common in scRNA-seq datasets. This is because it shrinks gene-level variance toward a common trend across samples, making it more suitable for datasets with a wide range of expression levels.\n3. **Exploratory quality control:** When you're performing exploratory quality control, SCTransform's blind=TRUE argument (default) is appropriate. This allows the transformation to estimate dispersion without accounting for the experimental design, which can help identify outliers and quality issues.\n\n**When to avoid SCTransform:**\n\n1. **Large datasets:** For larger datasets (e.g., >30 samples), SCTransform can be computationally expensive and may not scale well. In such cases, vst (variance-stabilizing transformation) might be a better choice (more on this below).\n2. **High UMIs:** SCTransform can amplify variability in genes with high UMIs, which might not be desirable. In your case, with a median of 2,500 UMIs/cell, SCTransform might not be the best choice.\n\n**Comparison to NormalizeData + ScaleData (Seurat's standard workflow):**\n\nBoth methods are suitable for normalizing and scaling count data, but they differ in their approach:\n\n1. **SCTransform (DESeq2's rlog):** SCTransform is a more robust and flexible method that can handle a wider range of expression levels and can adapt to the scale of the entirety of LFCs. It's also more computationally efficient than NormalizeData + ScaleData.\n2. **NormalizeData + ScaleData (Seurat's standard workflow):** This method is more suitable for datasets with a narrower range of expression levels and might not handle genes with",
+    "reference": "SCTransform v2 (using the `glmGamPoi` backend, default in Seurat v5) outperforms the standard log-normalize + scale workflow primarily when library size variation is confounding your biology. The standard workflow normalizes each cell to 10,000 counts then log-transforms and z-scores, but z-scoring does not fully remove the correlation between a gene's expression and total UMI count. This causes sequencing depth to leak into principal components, inflating apparent variation. SCTransform fits a regularized negative binomial regression per gene, treating sequencing depth as a technical covariate, and uses Pearson residuals \u2014 these are approximately variance-stabilized and depth-independent, giving cleaner PCs and better cluster resolution in heterogeneous datasets. Use SCTransform when: cells span a wide UMI depth range (e.g., >5-fold), or when QC metrics (nCount, nFeature) appear as top PCs after standard normalization. Avoid or scrutinize SCTransform when: (1) cells have very low UMI counts (<500/cell), where NB model fitting becomes unstable; (2) you are integrating datasets with systematically different depths where depth may be correlated with real biology you want to preserve; (3) strict reproducibility with legacy pipelines is required. SCTransform v2 is substantially more stable than v1 and should be used if you choose this path.",
+    "model": "vanilla-3b-rag",
+    "category": "normalization",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.38146644830703735,
+        "source": "docs-qiime2",
+        "text_head": "Q: My collaborators use rarefaction, but I've heard it throws away data. When is rarefaction appropriate, and when should I use alternatives like CSS or proportions?\n\nA: Rarefaction (subsampling reads"
+      },
+      {
+        "rank": 2,
+        "score": 0.36010274291038513,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The next two rows point out that \napeglm\n and \nashr\n shrinkage methods help to preserve the size of large LFC, and can be used to compute \ns-values\n. These properties are related. As noted in the \npre"
+      },
+      {
+        "rank": 3,
+        "score": 0.36007159948349,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: What are the trade-offs between vst and rlog for transforming DESeq2 counts before PCA or clustering?\n\nA: Both vst (variance-stabilizing transformation) and rlog (regularized log transformation) tr"
+      }
+    ]
+  },
+  {
+    "input": "I'm starting a new scRNA-seq analysis in Seurat v5 and trying to decide between NormalizeData followed by ScaleData versus SCTransform. The sctransform paper claims better performance but I've heard it can cause issues downstream. What should I actually use and when?",
+    "prediction": "I'll address each question separately, citing specific tools, parameters, and best practices from the references.\n\n**Q: Should I use vst() or rlog() in DESeq2 for PCA and heatmap generation?**\n\nAccording to the DESeq2 vignette, for a dataset of 80 samples, `vst()` is the correct choice. This is because `vst()` is substantially faster computationally and produces results that are virtually equivalent to `rlog()` for larger datasets. Both transformations produce approximately homoscedastic values suitable for PCA, hierarchical clustering, heatmaps, and other distance-based analyses.\n\nReference: DESeq2 vignette, \"Normalization and Transformation\"\n\n**Q: When is rarefaction appropriate, and when should I use alternatives like CSS or proportions?**\n\nRarefaction is appropriate for alpha and beta diversity analyses, as it equalizes sequencing depth across samples. However, it discards real sequencing data and is not suitable for differential abundance analysis. Proportional normalization (relative abundance) is also not suitable for differential abundance analysis, as it assumes the total microbial load is constant across samples.\n\nFor differential abundance analysis, consider using Cumulative Sum Scaling (CSS) or composition-aware methods like ANCOM-BC. CSS normalizes to a sample-specific percentile and can outperform rarefaction for differential abundance.\n\nReference: QIIME 2 documentation, \"Rarefaction\" and \"Normalization\"\n\n**Q: What are the practical differences between DADA2 and Deblur for denoising 16S amplicon data?**\n\nBoth DADA2 and Deblur produce ASVs, but they differ in design. DADA2 uses a parametric error model learned from the specific run, making it highly adaptive to run-specific noise patterns. However, this requires careful joint analysis of data from different sequencing runs. Deblur uses a pre-computed, alignment-based error profile derived from PhiX control reads, which is less flexible but more consistent across datasets.\n\nFor typical single-run V4 datasets with paired-end reads, DADA2 is usually preferred for its sensitivity. For multi-study comparisons or single-end V3-V4 data, Deblur's consistency can be advantageous.\n\nReference: DADA2 documentation, \"Denoising\" and Deblur documentation, \"Normalization\"\n\n**Q: Should I use NormalizeData followed by ScaleData or SCTransform in Seurat v5?**\n\nAccording to the Seurat v5 documentation, SCTransform is generally preferred over NormalizeData followed by ScaleData. SCTransform is a more robust",
+    "reference": "Seurat's NormalizeData applies log1p(counts / library_size \u00d7 10,000), which does not stabilize variance across expression levels. Highly expressed genes retain far greater variance than lowly expressed genes after this transform, so PCA captures abundance differences rather than biologically informative variation.\n\nSCTransform (sctransform v2, default in Seurat v5) fits a regularized negative binomial regression per gene using log10(total UMI) as a covariate and returns Pearson residuals. These residuals have approximately uniform variance across expression levels, improving signal-to-noise in dimensionality reduction. Additional technical covariates\u2014percent mitochondrial reads, cell cycle scores\u2014can be regressed out in the same call, avoiding a separate ScaleData step.\n\nIn practice, SCTransform improves clustering resolution and marker gene recovery for heterogeneous datasets. For relatively homogeneous datasets or datasets with very high sequencing depth, the gains are modest.\n\nWhen NOT to use sctransform residuals: Pearson residuals are not counts and must not be passed to tools expecting count distributions. For differential expression after SCTransform-based clustering, call PrepSCTFindMarkers() to re-normalize using corrected counts stored in the SCT assay's counts layer\u2014skipping this step produces miscalibrated p-values. Trajectory inference methods that require counts (e.g., Monocle 3 with count-based fitting) should use the RNA assay counts slot. SCTransform is also memory- and compute-intensive on datasets exceeding ~150k cells; consider sketch-based workflows in that regime.",
+    "model": "vanilla-3b-rag",
+    "category": "normalization",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.44455742835998535,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I need to run PCA and generate a heatmap of my 80-sample RNA-seq dataset. Should I use vst() or rlog() in DESeq2, and does it matter?\n\nA: For a dataset of 80 samples, `vst()` is the correct choice."
+      },
+      {
+        "rank": 2,
+        "score": 0.43303194642066956,
+        "source": "docs-qiime2",
+        "text_head": "Q: My collaborators use rarefaction, but I've heard it throws away data. When is rarefaction appropriate, and when should I use alternatives like CSS or proportions?\n\nA: Rarefaction (subsampling reads"
+      },
+      {
+        "rank": 3,
+        "score": 0.41348797082901,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm trying to decide between DADA2 and Deblur for denoising my 16S amplicon data. Both claim to produce exact sequence variants (ASVs). What are the practical differences, and when should I prefer "
+      }
+    ]
+  },
+  {
+    "input": "Reasons for extremely low number of DESeq identified differentially expressed genes after RNAseq?\n\nI am fairly new at RNA-sequencing analysis, but I have attempted to analyse the data I obtained from RNA sequencing on my own by following an online EdX class and by basing the majority of the analysis on the recommendations of Azenta in the following guide: A Quick Start Guide to RNA-Seq Data Analysis .\n\nFor context, I am looking at making two different comparisons each time between human A549 cells treated with control siRNA (non-targeted siRNA) and a targeted knockdown using siRNA. I have 3 sequenced replicates for each condition.\n\nAs mentioned I mainly followed the steps recommended by azenta:\n\nFASTQC to look at the quality of the samples (everything seems fine there)\n\nTrimming reads with trimmomatic (ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36)\n\nAligning the reads to the hg19 reference genome with STAR (the relevant files for the genome assembly, fasta and gtf, were retrieved from the gencode database)\n\nCalculate gene hit counts with featureCounts (in R; isGTFAnnotationFile=TRUE, countMultiMappingReads=FALSE, GTF.featureType=\"exon\", largestOverlap=TRUE, GTF.attrType=\"gene_id\")\n\nCompare hit counts between groups using DESeq2 with LFCshrink type Apeglem.\n\nWithout taking fold change into account, by only looking at the p-adjusted value < 0.05, we only identify 19 genes matching this parameter in one comparison and 2 in the other comparison. In each comparison, one of the genes that is identified as being differentially expressed is the one that was knocked down by our siRNA treatment.\n\nWe were expecting to identify much more differentially expressed genes, but since we do identify the knocked down gene, we are unsure whether something is wrong with our pipeline or with the samples? Or whether this could be interpreted as a \"normal\" amount of differentially expressed genes?\n\nI tried different types of LFCshrink normalization which did not significantly alter the results. I also tried to run the easily accessible airway dataset through the DESeq2 pipeline, this dataset did seem to behave normally. I also tried a genome assembly based on files obtained from the UCSC database, which also did not alter the data.\n\nAny guidance or advise would be appreciated to help figure out whether something is wrong with our analysis or not! Thank you for your help.",
+    "prediction": "Based on the provided references, I'll address your question and offer guidance on why you might not be identifying many differentially expressed genes in your RNA-seq analysis.\n\n1.  **Sequencing depth**: The number of reads and sequencing depth can significantly impact the number of differentially expressed genes identified. If your sequencing depth is low, it may not be sufficient to detect subtle changes in gene expression. Consider increasing the sequencing depth or using a different library preparation method.\n\n2.  **Library preparation and sequencing**: The quality of the library preparation and sequencing can also impact the number of differentially expressed genes identified. Check the quality of your library preparation and sequencing data using tools like FASTQC. If issues are found, consider re-running the library preparation and sequencing.\n\n3.  **Normalization and filtering**: DESeq2's independent filtering can inflate type I error rates if not used correctly. If you're using `independentFiltering=FALSE`, you might be losing power. However, if you're using `independentFiltering=TRUE`, you might be inflating type I error rates. Consider using `independentFiltering=TRUE` and adjusting the `alpha` parameter to balance between the two.\n\n4.  **Normalization and scaling**: DESeq2's normalization and scaling can also impact the number of differentially expressed genes identified. Consider using `useT=TRUE`, `minmu=1e-6`, and `minReplicatesForReplace=Inf` to improve normalization and scaling.\n\n5.  **Gene-specific effects**: Some genes may have specific effects that are not captured by the DESeq2 analysis. Consider using alternative methods like differential expression analysis for single-cell RNA-seq data, such as the `scran` package.\n\n6.  **Data sparsity and compositional differences**: Single-cell RNA-seq data can be sparse and have compositional differences between cell types. Consider using pseudo-bulk analysis or alternative methods like differential expression analysis for single-cell RNA-seq data.\n\n7.  **Normalization and transformation**: The normalization and transformation of the data can also impact the number of differentially expressed genes identified. Consider using variance stabilizing transformation (VST) or regularized log transformation to improve normalization and scaling.\n\n8.  **Alternative methods**: Consider using alternative methods like differential expression analysis for single-cell RNA-seq data, such as the `scran` package.\n\n9.  **Data transformations**: Consider using data transformations like log fold change shrinkage for visualization and ranking.\n\n10. **Data transformations",
+    "reference": "Generally, the recommended way of doing such analysis is exploring data by a dimensionality reduction technique such as PCA, e.g. implemented in DESeq2 via `plotPCA`. I personally always also look at MA-plots (`plotMA`). This will inform how samples cluster, and if there is evidence that some unwanted technical variation is present, or that samples are simply not different, or that normalization might be an issue. Without these plots one really cannot help here.\n\nIt is of course possible that there are no DEGs. No difference is not necessarily a technical error.",
+    "model": "vanilla-3b-rag",
+    "category": "rna-seq",
+    "source": "stackexchange-bioinformatics",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.60372394323349,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: DESeq2's results() documentation mentions 'independent filtering' and many genes get NA for padj. What exactly is it doing, and when should I turn it off?\n\nA: Independent filtering is an automatic "
+      },
+      {
+        "rank": 2,
+        "score": 0.5830236673355103,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The DESeq2 developers and collaborating groups have published recommendations for the best use of DESeq2 for single-cell datasets, which have been described first in \nVan den Berge et al. (2018)\n. Def"
+      },
+      {
+        "rank": 3,
+        "score": 0.5725876092910767,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Analyzing RNA-seq data with DESeq2\n\nAnalyzing RNA-seq data with DESeq2\n\nMichael I. Love, Simon Anders, and Wolfgang Huber\n\n11/13/2025\n\nAbstract\n\nA basic task in the analysis of count data from RNA-seq"
+      }
+    ]
+  },
+  {
+    "input": "I'm running a neuronal RNA-seq experiment comparing two conditions (n=4 per group, 80M 150 bp paired-end reads, STAR alignment). I need to detect alternative splicing. Should I use rMATS or SUPPA2, and does my replicate count or read depth change the recommendation?",
+    "prediction": "To detect alternative splicing in your neuronal RNA-seq experiment, I would recommend using STAR (Spliced Transcripts Alignment to a Reference) for alignment and then using rMATS (RNA-seq Mapping Tool for Alternative Splicing) for alternative splicing analysis. Here's why:\n\n1. **Alignment**: STAR is a widely used and well-established tool for aligning RNA-seq data to a reference genome. It's specifically designed for spliced alignments, which is essential for detecting alternative splicing events. Since your reads are 150 bp paired-end, STAR is well-suited for this length. You can use the standard STAR parameters for alignment.\n\n2. **Alternative Splicing Analysis**: rMATS is a popular tool for detecting alternative splicing events. It's designed to work with STAR-aligned data and can handle the complexities of splicing events. rMATS uses a probabilistic approach to identify alternative splicing events, which is more accurate than traditional methods.\n\nRegarding your question about replicate count and read depth, both factors can influence the accuracy of alternative splicing detection. However, the impact of these factors is generally more significant on the detection of alternative exons and exon junctions rather than alternative splicing events.\n\n* **Replicate Count**: A higher number of replicates (e.g., 4 replicates per group) can improve the accuracy of alternative splicing detection, as it provides more robust estimates of splicing events. However, the effect of replicate count on alternative splicing detection is generally smaller compared to other factors like read depth.\n\n* **Read Depth**: Read depth is a critical factor in alternative splicing detection. Higher read depth can improve the accuracy of alternative splicing detection, as it provides more reliable estimates of splicing events. However, the effect of read depth on alternative splicing detection is generally more significant for detecting alternative exons and exon junctions rather than alternative splicing events.\n\nIn your case, since you have 80M 150 bp paired-end reads, a moderate to high read depth is expected. This should provide sufficient information for accurate alternative splicing detection. However, if you have a very low read depth, you may want to consider increasing the number of replicates or using other methods to improve the accuracy of alternative splicing detection.\n\nTo summarize:\n\n* Use STAR for alignment.\n* Use rMATS for alternative splicing analysis.\n* A moderate to high read depth (80M 150 bp paired-end reads) should provide sufficient information for accurate alternative splicing detection.\n* A higher",
+    "reference": "At n=4 per group with 80M 150 bp paired-end reads, both tools are viable but differ fundamentally in what they model.\n\nrMATS operates on aligned BAMs, counting reads that span or skip each of five event types (SE, A5SS, A3SS, MXE, RI) and testing \u0394\u03a8 with a likelihood-ratio framework. Your depth is adequate for moderate-to-high-abundance junctions, but low-coverage events \u2014 where the sum of inclusion and skipping junction counts is fewer than ~10 reads across most samples \u2014 should be filtered from the output post-hoc by thresholding the IJC and SJC columns. rMATS's statistical model degrades noticeably at n=2 per group; n=4 gives reasonable FDR control for expressed events.\n\nSUPPA2 takes transcript-level abundances from Salmon or kallisto and computes per-event PSI, then tests \u0394\u03a8 across replicates using `diffSplice`. It's faster and integrates naturally into quantification pipelines, but it inherits Salmon's deconvolution ambiguity for closely related isoforms and cannot categorize events as granularly as rMATS.\n\nPrefer rMATS when event-type resolution matters for validation or pathway annotation. Prefer SUPPA2 when you're already running Salmon and want exploratory speed. Neither tool reliably detects events where the minor isoform fraction is below ~5% of reads \u2014 for those, long-read sequencing is required. One practical note: all rMATS BAMs must use identical alignment parameters and annotation version to avoid systematic junction-count biases across samples.",
+    "model": "vanilla-3b-rag",
+    "category": "splicing",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5203092098236084,
+        "source": "docs-star-readme",
+        "text_head": "STAR 2.7.11b\n==========\nSpliced Transcripts Alignment to a Reference\n\u00a9 Alexander Dobin, 2009-2024\nhttps://www.ncbi.nlm.nih.gov/pubmed/23104886\n\nAUTHOR/SUPPORT\n==============\nAlex Dobin, dobin@cshl.edu"
+      },
+      {
+        "rank": 2,
+        "score": 0.4889621138572693,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Li, Bo, and Colin N. Dewey. 2011. \u201cRSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome.\u201d \nBMC Bioinformatics\n 12: 323+. \nhttps://doi.org/10.1186/1471-2105-12-"
+      },
+      {
+        "rank": 3,
+        "score": 0.48465967178344727,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I use DADA2 or Deblur for denoising my 16S amplicon data? My reads are 2\u00d7250 bp from an MiSeq run.\n\nA: Both DADA2 and Deblur produce amplicon sequence variants (ASVs) rather than OTUs, elimi"
+      }
+    ]
+  },
+  {
+    "input": "We have 6 control vs 6 disease RNA-seq samples and are interested in changes in splice site choice \u2014 specifically which competing 5\u2032 or 3\u2032 splice sites are being selected differently, not just whether an exon is included. My PI says to use DEXSeq, but I've heard LeafCutter might be better here. When should I prefer one over the other?",
+    "prediction": "For your specific use case, I'd recommend using DEXSeq over DADA2 for denoising your 16S amplicon data. Here's why:\n\n1. **Splice site analysis**: Since you're interested in changes in splice site choice, DEXSeq is specifically designed for this type of analysis. It allows you to identify the 5' and 3' splice sites of exons, which is essential for understanding the differential usage of splice sites between control and disease samples.\n2. **Read-length requirements**: DEXSeq can handle variable-length reads, including paired-end reads, which is suitable for your V4 dataset. DADA2, on the other hand, requires paired-end reads to be joined and trimmed to a fixed uniform length, which might not be ideal for your dataset.\n3. **Error modeling**: DEXSeq uses a more traditional error model, which is less dependent on the specific sequencing run and more consistent across datasets. This makes it easier to combine data from multiple studies.\n4. **Computational efficiency**: DEXSeq is generally more computationally efficient than DADA2, especially for larger datasets.\n\nLeafCutter is a different tool that's primarily designed for metagenomic analysis, and it's not specifically tailored for splice site analysis. While it can be used for various types of analysis, DEXSeq is a more specialized tool that's better suited for your specific use case.\n\nIn summary, if you want to analyze changes in splice site choice between control and disease samples, DEXSeq is the better choice.",
+    "reference": "LeafCutter and DEXSeq address related but distinct questions, and your use case favors LeafCutter. DEXSeq tests whether individual annotated exon bins are differentially used relative to total gene expression \u2014 it's well-suited for cassette exon inclusion/exclusion events tied to a known transcript structure. It cannot detect changes at unannotated splice sites and does not model competition between alternative splice sites explicitly.\n\nLeafCutter quantifies intron excision ratios within 'intron clusters' \u2014 groups of introns sharing at least one splice site \u2014 and tests for shifts in those ratios across conditions. Its key advantages for your goal: it directly models competition between 5\u2032 and 3\u2032 splice site alternatives within a cluster; it operates on splice junction reads rather than exon bins, so it naturally captures novel splice sites without annotation; and because it tests relative ratios within clusters, it is robust to expression-level confounders that would require separate modeling in DEXSeq.\n\nWith 6 vs 6, you should have adequate power for moderate effect sizes, but LeafCutter requires sufficient junction-spanning reads \u2014 aim for \u226550M paired-end reads per sample and confirm junction saturation curves have plateaued.\n\nWhen NOT to use LeafCutter: if your primary question is quantifying inclusion levels of specific annotated cassette exons (e.g., to link findings to a known protein domain), DEXSeq's exon-bin framing and connection to annotated transcript structures is more interpretable. LeafCutter also struggles with single-exon genes and regions with very low intron diversity.",
+    "model": "vanilla-3b-rag",
+    "category": "splicing",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.4082708954811096,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm setting up my 16S amplicon pipeline and need to choose between DADA2 and Deblur for denoising. What are the key differences and when should I prefer one over the other?\n\nA: Both DADA2 and Deblu"
+      },
+      {
+        "rank": 2,
+        "score": 0.4016120433807373,
+        "source": "docs-star-readme",
+        "text_head": "STAR 2.7.11b\n==========\nSpliced Transcripts Alignment to a Reference\n\u00a9 Alexander Dobin, 2009-2024\nhttps://www.ncbi.nlm.nih.gov/pubmed/23104886\n\nAUTHOR/SUPPORT\n==============\nAlex Dobin, dobin@cshl.edu"
+      },
+      {
+        "rank": 3,
+        "score": 0.3987330198287964,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm trying to decide between DADA2 and Deblur for denoising my 16S amplicon data. Both claim to produce exact sequence variants (ASVs). What are the practical differences, and when should I prefer "
+      }
+    ]
+  },
+  {
+    "input": "Beyond mapping rate and gene body coverage, what QC metrics should I prioritize specifically for alternative splicing analyses? I'm using STAR + rMATS on human tissue samples with ~80M paired-end reads each.",
+    "prediction": "For the first question, the recommended approach for rarefaction in QIIME 2 is to use the `--p-sampling-depth` parameter to normalize your feature table. This method is validated in QIIME 2 tutorials and in the microbiome literature, and it eliminates the confounding effect of unequal sequencing depth (Barnes et al., 2012).\n\nFor the second question, when performing alternative splicing analyses, you should prioritize the following QC metrics:\n\n1. **Gene body coverage**: This metric measures the proportion of reads that cover the gene body, which is essential for alternative splicing analysis. A higher gene body coverage indicates better alignment and reduces the risk of false positives.\n2. **Intron retention rate**: This metric measures the proportion of introns that are retained in the spliced transcript. A higher intron retention rate indicates that the splicing process is working correctly.\n3. **Exon retention rate**: This metric measures the proportion of exons that are retained in the spliced transcript. A higher exon retention rate indicates that the splicing process is working correctly.\n4. **Junction coverage**: This metric measures the proportion of reads that cover the junctions between exons and introns. A higher junction coverage indicates that the splicing process is working correctly.\n5. **Differential splicing metrics**: These metrics, such as the proportion of alternative splicing events (ASEs) and the proportion of alternative splicing events per gene, can provide insights into the splicing patterns in your samples.\n\nIt's also essential to evaluate the quality of your sequencing data using metrics such as:\n\n1. **Phred scores**: This metric measures the quality of the sequencing data. A higher phred score indicates better quality.\n2. **GC content**: This metric measures the proportion of G and C bases in your sequencing data. A higher GC content can indicate better sequencing quality.\n\nFor your specific use case, using STAR + rMATS on human tissue samples with ~80M paired-end reads each, you may also want to prioritize metrics such as:\n\n1. **Mapping rate**: This metric measures the proportion of reads that are properly mapped to the reference genome. A higher mapping rate indicates better alignment quality.\n2. **Gene body coverage**: This metric measures the proportion of reads that cover the gene body. A higher gene body coverage indicates better alignment quality.\n\nBy prioritizing these metrics, you can ensure that your data is of high quality and suitable for alternative splicing analysis.\n\nReferences:\n\nBarnes, M. A",
+    "reference": "Four checks are especially informative for splicing-focused pipelines:\n\n**Junction saturation (RSeQC junction_saturation.py):** Downsample BAMs incrementally and plot novel vs known junctions detected. If the known-junction curve hasn't plateaued near your actual sequencing depth, some samples may be underpowered for reliable PSI estimation. Samples that diverge from the group trend here are candidates for exclusion or depth top-up.\n\n**Inner distance distribution (inner_distance.py):** Bimodal distributions or unusual shifts suggest library prep problems \u2014 excessive RNA degradation or aberrant size selection \u2014 that cause non-random read placement near splice junctions and bias PSI estimates.\n\n**SJ.out.tab non-canonical fraction:** Calculate the percentage of junctions with undefined or non-GT-AG motifs per sample. Healthy human samples should be >98% GT-AG. Outliers with elevated non-canonical rates indicate misalignment or a strand-specificity mismatch; confirm --soloStrand or --rnaStrandedness parameters are correct.\n\n**rMATS event coverage audit:** After running rMATS, inspect the proportion of tested events filtered out for insufficient junction read coverage (the 'filtered' output files). A high exclusion rate often means read length is too short for reliable exon-flanking junction spanning \u2014 rMATS requires reads to span into both flanking exons, so a 75 bp library against complex exon structures can silently drop many events.\n\nWhen not to over-weight saturation: for deeply sequenced samples (>150M reads) targeting abundant, well-spliced transcripts, saturation is rarely the bottleneck; focus instead on batch effects and RIN consistency across samples.",
+    "model": "vanilla-3b-rag",
+    "category": "splicing",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5162334442138672,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I rarefy my feature table before computing diversity metrics, or use proportional normalization? When does rarefaction fail?\n\nA: Rarefaction \u2014 subsampling each sample to a uniform read depth"
+      },
+      {
+        "rank": 2,
+        "score": 0.5142605304718018,
+        "source": "docs-star-readme",
+        "text_head": "STAR 2.7.11b\n==========\nSpliced Transcripts Alignment to a Reference\n\u00a9 Alexander Dobin, 2009-2024\nhttps://www.ncbi.nlm.nih.gov/pubmed/23104886\n\nAUTHOR/SUPPORT\n==============\nAlex Dobin, dobin@cshl.edu"
+      },
+      {
+        "rank": 3,
+        "score": 0.49919652938842773,
+        "source": "docs-qiime2",
+        "text_head": "Q: How do I choose --p-trunc-len-f and --p-trunc-len-r for DADA2 in QIIME 2? Is there a principled cutoff or is it just trial and error?\n\nA: Choosing truncation lengths for DADA2 starts with running `"
+      }
+    ]
+  },
+  {
+    "input": "For a genome-wide methylation study (~850,000 CpG sites, n=48 cases and 52 controls), I'm debating between Bonferroni, Benjamini-Hochberg FDR, and Bonferroni-Holm correction. The goal is to identify candidate loci for a follow-up wet-lab experiment. Which should I use and why?",
+    "prediction": "To answer your question, I'll provide an overview of each method and their characteristics, then recommend the most suitable approach for your genome-wide methylation study.\n\n1. **Bonferroni correction**: This method controls the family-wise error rate (FWER) by dividing the alpha level (usually 0.05) by the number of tests (i.e., the number of CpG sites). However, this approach is conservative and can lead to overly stringent p-values, especially when dealing with a large number of tests.\n\n2. **Benjamini-Hochberg (BH) FDR**: This method controls the false discovery rate (FDR) by ranking p-values and then applying a threshold based on the proportion of false positives expected under the null hypothesis. BH is more conservative than Bonferroni but can be more conservative than other methods like Holm.\n\n3. **Bonferroni-Holm correction**: This method combines the Bonferroni and Holm corrections. It controls the FWER by first applying the Bonferroni correction to the p-values and then applying the Holm correction to the resulting adjusted p-values. This approach is more conservative than BH but can be more conservative than Bonferroni.\n\nFor a genome-wide methylation study with ~850,000 CpG sites and 100 samples (48 cases and 52 controls), I would recommend using the **Benjamini-Hochberg (BH) FDR**. Here's why:\n\n*   With a large number of tests (850,000), the Bonferroni correction would result in very conservative p-values, which may lead to a high number of false negatives.\n*   The BH FDR is a more balanced approach that controls the FDR while being more conservative than Bonferroni.\n*   The Holm correction is more conservative than BH, but it can be more conservative than BH, which may lead to a higher number of false negatives.\n*   The Bonferroni-Holm correction is more conservative than BH, but it may be too conservative for this study.\n\nOverall, the BH FDR is a good balance between controlling the FDR and being conservative, making it a suitable choice for your genome-wide methylation study.\n\nHere's a code example using the `stats` package in R:\n\n```r\n# Load necessary libraries\nlibrary(stats)\n\n# Define the p-values\np_values <-...  # Load your p-values here\n\n# Calculate the BH FDR\nbh_fdr <- BH(p_values,",
+    "reference": "For discovery of candidates in a genome-wide screen with follow-up validation planned, Benjamini-Hochberg (BH) FDR is the standard choice. FWER methods like Bonferroni or Holm control the probability of any false positive across the test family\u2014appropriate when each false positive has severe consequences (e.g., a clinical diagnostic) or when the family is small and well-defined. At 850K CpGs, the Bonferroni threshold (~5.9\u00d710\u207b\u2078) is extremely conservative and will miss most true associations at this sample size.\n\nBH-FDR controls the expected proportion of false discoveries among rejected hypotheses. It assumes tests are independent or satisfy positive regression dependency (PRDS), which approximately holds for CpGs on different chromosomes but may be violated for correlated probes in the same region. For arbitrary dependence structures, Benjamini-Yekutieli (BY) correction is valid but substantially more conservative.\n\nA practical approach is BH at FDR<0.05 as the primary list, with a secondary exploratory list at FDR<0.20 explicitly labeled as unconfirmed. Avoid uncorrected p-values in genome-wide screens\u2014inflated false discovery rates make replication nearly impossible to interpret.\n\nKey caveat: BH at 5% still permits ~43,000 false positives if all 850K nulls are true, so effect size reporting and biological replication remain essential even after FDR control. FDR is a rate, not a guarantee per locus.",
+    "model": "vanilla-3b-rag",
+    "category": "statistics",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.3709526062011719,
+        "source": "docs-qiime2",
+        "text_head": "Q: I'm setting up my 16S amplicon pipeline and need to choose between DADA2 and Deblur for denoising. What are the key differences and when should I prefer one over the other?\n\nA: Both DADA2 and Deblu"
+      },
+      {
+        "rank": 2,
+        "score": 0.3678239583969116,
+        "source": "docs-qiime2",
+        "text_head": "Q: Should I use DADA2 or Deblur for denoising my 16S amplicon data? My reads are 2\u00d7250 bp from an MiSeq run.\n\nA: Both DADA2 and Deblur produce amplicon sequence variants (ASVs) rather than OTUs, elimi"
+      },
+      {
+        "rank": 3,
+        "score": 0.3633694052696228,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: Why should I pre-filter low-count genes before running DESeq2, and what threshold does the vignette suggest?\n\nA: Pre-filtering removes genes that have virtually no chance of being called differenti"
+      }
+    ]
+  },
+  {
+    "input": "After running DESeq2 on my RNA-seq data (n=4 per group, 3 pairwise contrasts), I plotted the p-value histogram for each contrast and one of them looks roughly uniform with a slight anti-conservative spike near 0, while the other two have the expected L-shape. What does the uniform one mean and should I be worried?",
+    "prediction": "Based on the provided reference material, a uniform p-value histogram for a contrast suggests that the dispersion estimation process in DESeq2 has not effectively captured the underlying variance structure of the data. This can be due to several reasons:\n\n1. **Inadequate dispersion estimation**: The uniform p-value histogram may indicate that the dispersion estimation process has not accurately captured the variance structure of the data. This could be due to various factors such as poor sequencing library preparation, inadequate normalization, or insufficient sample size.\n2. **Inadequate shrinkage**: The uniform p-value histogram may also suggest that the shrinkage process in DESeq2 has not effectively reduced the variance of the dispersion estimates. This could be due to insufficient sample size or inadequate model specification.\n3. **Outlier detection**: The uniform p-value histogram may indicate that the outlier detection process in DESeq2 has not effectively identified genes with high dispersion. This could be due to the presence of rare, technical or experimental artifacts that are not properly accounted for in the model.\n\nHowever, it's essential to note that a uniform p-value histogram does not necessarily mean that the results are incorrect or that you should be worried. It's possible that the uniformity is due to the small sample size (n=4 per group) and the limited number of replicates (3 pairwise contrasts).\n\nTo address this issue, you can try the following:\n\n1. **Increase the sample size**: If possible, consider increasing the sample size to improve the reliability of the dispersion estimation and outlier detection.\n2. **Improve model specification**: Review your experimental design and model specification to ensure that it accurately captures the underlying variance structure of the data.\n3. **Check for technical artifacts**: Verify that your sequencing library preparation and data processing pipeline are robust and have not introduced any technical artifacts that could be affecting the results.\n4. **Visualize the data**: In addition to the p-value histogram, visualize the dispersion estimates and outlier detection results to gain a better understanding of the data and identify potential issues.\n\nIt's also worth noting that the `plotDispEsts()` diagnostic plot can provide additional insights into the dispersion estimation process. In a healthy plot, you should see a cloud of black dots (gene-wise MLEs) that decreases from upper-left to lower-right, a red trend line running through the center of that cloud, and blue dots (final MAP estimates) tightly hugging the trend line. If the uniform p-value histogram is due to inadequate shrinkage, you may want to check the `plotDispEsts()`",
+    "reference": "A uniform p-value histogram (flat across [0,1] with a modest spike near 0) tells you that most genes are null for that contrast \u2014 there is essentially no differential signal. The spike near zero represents the small fraction of truly differentially expressed genes. This is not a QC failure; it is biologically meaningful: that particular comparison may simply not have much signal given your experimental conditions and sample size.\n\nThe L-shaped histograms in your other contrasts are the expected healthy pattern: a large mass near 0 from true positives riding atop a flat null component.\n\nWhat you should worry about instead: (1) A histogram that spikes near 1 or is bimodal suggests model misspecification \u2014 check for batch effects, outliers, or an inappropriate normalization. (2) A strongly anti-conservative distribution (mass shifted left of uniform) can indicate an inflated dispersion estimate or confounded design. (3) With only n=4 per group, the dispersion shrinkage in DESeq2 is doing heavy lifting; inspect your dispersion plot to confirm estimates are stable. For the low-signal contrast, BH-adjusted p-values will be poorly powered \u2014 consider reporting the raw effect sizes with confidence intervals rather than calling hits. Tools like `qvalue` can also estimate pi0 (the null fraction) formally, but with n=4 the estimate will be noisy.",
+    "model": "vanilla-3b-rag",
+    "category": "statistics",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5482770204544067,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: How does DESeq2 estimate dispersion, and what should I look for in the plotDispEsts() diagnostic plot?\n\nA: DESeq2 estimates dispersion in three steps. First, it computes a gene-wise maximum likelih"
+      },
+      {
+        "rank": 2,
+        "score": 0.5268039703369141,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: How does DESeq2's dispersion estimation work, and what should I look for in a plotDispEsts() diagnostic plot?\n\nA: DESeq2 estimates dispersion in three stages. First, it computes a gene-wise maximum"
+      },
+      {
+        "rank": 3,
+        "score": 0.5011115074157715,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "RNA-seq data sometimes contain isolated instances of very large counts that are apparently unrelated to the experimental or study design, and which may be considered outliers. There are many reasons w"
+      }
+    ]
+  },
+  {
+    "input": "In a clinical transcriptomics study I dichotomized continuous BMI into obese vs. non-obese at BMI=30 to include it as a covariate in my DESeq2 model. A reviewer is asking me to treat BMI as continuous. Does it really matter for a covariate, not for the main effect?",
+    "prediction": "I'll address each of your questions based on the provided reference material.\n\n1. **Including continuous covariates in the design formula:**\n\nYou can include continuous covariates in the design formula in the same way as factorial covariates. To extract results for the continuous covariate, you can specify the `name` argument. However, it's recommended to cut the continuous covariate into a factor defined over a small number of bins (e.g., 3-5) to control for the average effect of each group, regardless of the trend over the continuous covariate. In R, you can convert numeric vectors into factors using the `cut` function.\n\n2. **Likelihood ratio test and p-values for removed variables:**\n\nThe `results` function in DESeq2 only provides p-values for the comparisons specified in the design formula. To obtain p-values for all variables/levels removed in the reduced design, you would need to perform a likelihood ratio test (LRT) and extract the p-values from the output. However, the reference material does not provide specific guidance on how to do this.\n\n3. **Using DESeq2 with paired samples:**\n\nYes, you can use DESeq2 to analyze paired samples. To do so, you should use a multi-factor design that includes the sample information as a term in the design formula. The condition of interest should be specified at the end of the design formula, e.g., `~ subject + condition`.\n\n4. **Running samples from all groups together or splitting into pairs:**\n\nIt's recommended to run samples from all groups together and then use the `contrast` argument of the `results` function to extract comparisons of interest after fitting the model using DESeq2.\n\n5. **Using TPM values instead of raw counts:**\n\nYou should always provide DESeq2 with raw, un-normalized integer counts, not TPM, FPKM, or any other pre-normalized values. DESeq2's core statistical model is a negative binomial (NB) distribution fit to each gene, which is only well-defined for non-negative integer data. TPM and FPKM values are continuous and typically non-integer, so the likelihood is undefined for them. Additionally, TPM introduces a compositional constraint that can distort fold-change estimates.\n\n6. **Including continuous covariates in a clinical transcriptomics study:**\n\nIn this case, it's not necessary to treat BMI as continuous. Since you've dichotomized BMI into obese vs. non-obese at BMI=30,",
+    "reference": "Yes, it matters even for a covariate, and the reviewer is correct. Dichotomizing a continuous variable discards information about variation within each bin \u2014 two subjects at BMI 30.1 and BMI 45 are treated identically, even though their transcriptomic profiles likely differ substantially. This information loss reduces the precision of the BMI coefficient estimate, which in turn leaves more residual variance in the model. More residual variance means larger standard errors for your primary contrast of interest, lower effective power, and potentially biased effect estimates if BMI has a non-uniform relationship with expression across the range.\n\nThe statistical literature is clear on this: MacCallum et al. (2002) and others showed that median-splitting a continuous predictor is equivalent to discarding roughly 20% of your sample. Using BMI=30 as a threshold also introduces an arbitrary breakpoint that may not reflect the biological dose-response.\n\nIn DESeq2, adding a continuous covariate is straightforward: `~ BMI_continuous + condition`. If you're concerned about non-linearity, you can add a spline term or check residual plots. The continuous form requires no binning decision and is more robust to outliers than a hard threshold.\n\nCaveat: if your sample is heavily clustered at extreme BMI values with a sparse middle range, a linear term may be a poor fit and a sensitivity analysis with restricted cubic splines is warranted. But even then, the answer is a more flexible continuous model, not dichotomization.",
+    "model": "vanilla-3b-rag",
+    "category": "statistics",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.5534183382987976,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "As a speed concern with fitting very large models, note that each additional level of a factor in the design formula adds another parameter to the GLM which is fit by DESeq2. Users might consider firs"
+      },
+      {
+        "rank": 2,
+        "score": 0.4042232632637024,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "The only case in which there is more than size factor scaling on the counts is when either normalization factors have been provided (e.g.\u00a0from \ncqn\n or \nEDASeq\n), or if \ntximport\n is used and the upst"
+      },
+      {
+        "rank": 3,
+        "score": 0.37695854902267456,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: My colleague suggested I feed TPM values into DESeq2 instead of raw counts because TPM corrects for gene length differences. Is this okay?\n\nA: You should always provide DESeq2 with raw, un-normaliz"
+      }
+    ]
+  },
+  {
+    "input": "I have an RNA-seq experiment with 3 conditions (control, drug A, drug B) and I'm running DESeq2. Should I correct for multiple testing across all three pairwise contrasts together, or run FDR correction within each contrast separately? My collaborator says to pool everything, but that seems wrong.",
+    "prediction": "To answer your question, let's break down the best practices for multiple testing correction in DESeq2.\n\nFirstly, the `results()` function in DESeq2 provides two mechanisms for extracting specific comparisons: `contrast = c('condition', 'B', 'A')` and `name = 'condition_B_vs_A'`. The former allows for arbitrary pairwise comparisons among levels of a factor, regardless of the reference level during model fitting, giving you full flexibility to extract any pairwise comparison from a single fitted model without releveling and rerunning.\n\nFor multiple testing correction, you have two options: either pool everything together or run FDR correction within each contrast separately. The latter approach is recommended because it allows you to control the overall FDR for each individual contrast, which is crucial when comparing multiple pairwise contrasts.\n\nThe vignette suggests that DESeq2's independent filtering step will additionally remove low-count genes from the multiple testing burden using a data-adaptive threshold. This means that pre-filtering is a coarse, upstream step that speeds up computation and reduces memory use, but it's not necessary for controlling FDR.\n\nIn your case, since you have three pairwise contrasts (control vs. drug A, control vs. drug B, and drug A vs. drug B), running FDR correction within each contrast separately is the recommended approach. This will allow you to control the FDR for each individual contrast, which is essential when comparing multiple pairwise contrasts.\n\nHere's an example of how you can run FDR correction within each contrast separately:\n```R\n# Run DESeq2\nres_A <- results(dds, contrast = c('condition', 'A', 'B'))\n\n# Run FDR correction within each contrast separately\nres_A$padj_A <- padj(res_A$padj, res_A$contrast)\nres_B <- results(dds, contrast = c('condition', 'B', 'A'))\nres_B$padj_B <- padj(res_B$padj, res_B$contrast)\nres_AB <- results(dds, contrast = c('condition', 'A', 'B'))\nres_AB$padj_AB <- padj(res_AB$padj, res_AB$contrast)\n```\nNote that you can also use the `ashr` package, which accepts contrast vectors and can be used for FDR correction within each contrast separately.\n\nIn summary, running FDR correction within each contrast separately is the recommended approach when comparing multiple pairwise contrasts. This will allow you to control the FDR for each individual contrast, which",
+    "reference": "Your instinct is correct \u2014 pooling contrasts for FDR correction is almost always wrong. DESeq2 already applies Benjamini-Hochberg (BH) correction per contrast internally, and the q-value for a gene in the 'drug A vs control' contrast should reflect the number of hypotheses tested within that comparison, not inflated by an unrelated 'drug B vs control' test. Pooling would dilute your power: genes that are significant in one contrast but not others would have their ranks worsened by the additional noise.\n\nThe legitimate case for a joint correction arises when you define a single biological question spanning contrasts \u2014 for example, 'is this gene DE in any condition?' \u2014 and you want family-wise error control over that combined claim. In that framing, using results from a likelihood-ratio test (DESeq2's `test='LRT'`) with a reduced model is cleaner than pooling p-values post-hoc.\n\nOne genuine caveat: if you run many exploratory contrasts and cherry-pick the most significant, per-contrast FDR no longer protects the experiment-level error rate. In that case, consider reporting which contrasts were pre-specified versus exploratory. Never correct across contrasts just to make results look more conservative \u2014 it destroys power without a principled justification.",
+    "model": "vanilla-3b-rag",
+    "category": "statistics",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.57923424243927,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I have three treatment groups and need all pairwise comparisons from a single DESeq2 fit. How do I correctly specify contrasts in results()?\n\nA: DESeq2's `results()` function provides two mechanism"
+      },
+      {
+        "rank": 2,
+        "score": 0.5702776908874512,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I have an RNA-seq experiment with two conditions (treated vs. control) collected across three batches. Should my design formula be ~condition, ~batch+condition, or ~batch*condition?\n\nA: The right c"
+      },
+      {
+        "rank": 3,
+        "score": 0.5679381489753723,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: Why should I pre-filter low-count genes before running DESeq2, and what threshold does the vignette suggest?\n\nA: Pre-filtering removes genes that have virtually no chance of being called differenti"
+      }
+    ]
+  },
+  {
+    "input": "I have an RNA-seq experiment with 6 conditions (2 genotypes \u00d7 3 timepoints, n=3 biological replicates each). I'm running DESeq2 and plan to test 15 pairwise contrasts. Should I correct for multiple testing across all contrasts jointly, or is per-contrast BH adjustment acceptable? Does DESeq2 do this automatically?",
+    "prediction": "To answer your questions, I'll provide specific tools, parameters, and best practices from the references.\n\n1. **Correctly specifying contrasts in results()**\n\nFor pairwise comparisons among levels of a factor, use `contrast = c('condition', 'B', 'A')`, which returns log2(B / A). This approach works regardless of which level was set as the reference during model fitting, giving you full flexibility to extract any pairwise comparison from a single fitted model without releveling and rerunning.\n\n   ```r\nresults(dds, contrast = c('condition', 'B', 'A'))\n```\n\n   Alternatively, you can use `name = 'condition_B_vs_A'` to reference a specific named coefficient from `resultsNames(dds)` and only works if that exact comparison is a fitted coefficient \u2014 which depends on the reference level.\n\n   ```r\nresults(dds, name = 'condition_B_vs_A')\n```\n\n   For multi-group designs with k groups, loop over all desired `contrast=` calls to obtain all pairwise results; each call to `results()` performs its own independent filtering and BH correction, so if you plan to combine results and control the overall FDR you should be aware that the padj values are not jointly calibrated.\n\n2. **Design formula for RNA-seq experiment**\n\nFor an RNA-seq experiment with two conditions (treated vs. control) collected across three batches, the right choice depends on whether you expect batch to interact with treatment effect.\n\n   - For most experiments, `~condition + batch` (additive) is appropriate: it tells DESeq2 to estimate a batch coefficient and a condition coefficient independently, effectively controlling for batch while still testing the condition effect across all samples.\n   - An interaction model, `~batch + condition + batch:condition` (or equivalently `~batch*condition`) tests whether the treatment effect itself differs between batches. This is rarely the primary biological question; it's more useful for diagnosing whether your batches are so confounded with condition that the additive assumption fails.\n\n   ```r\ndesign <- modelFormula(~ condition + batch)\n```\n\n3. **Calculating contrasts for a DESeqDataSet object**\n\nContrasts can be calculated for a DESeqDataSet object for which the GLM coefficients have already been fit using the Wald test steps (DESeq with test=\"Wald\" or using nbinomWaldTest). The vector of coefficients \u03b2 is left multiplied by the contrast vector c to form the numerator of the test statistic. The denominator",
+    "reference": "DESeq2 applies BH correction independently within each contrast \u2014 it does not jointly correct across contrasts. Whether per-contrast adjustment is acceptable depends on how you frame your inference goal.\n\nPer-contrast BH is the standard practice when each contrast addresses a distinct biological question (e.g., 'what is DE between WT day1 and WT day3'). The family-wise error rate (FWER) is not controlled across all 15 contrasts, but the FDR within each is. This is what most published workflows do and is appropriate when readers interpret each contrast on its own terms.\n\nIf your primary goal is a single list of genes that are DE under *any* comparison \u2014 for example, feeding into a downstream pathway analysis \u2014 you should be more conservative. One option is to test an omnibus LRT (likelihood ratio test) across the full model versus a reduced model; this gives a single well-calibrated p-value per gene for the global null and avoids the multiplicity problem entirely. DESeq2 supports this via `test='LRT'`.\n\nWhat you should not do: run 15 contrasts, pool all resulting p-values into one vector, and BH-correct the pool. The null distributions differ across contrasts (different effect sizes, different baselines), so a pooled correction is neither conservative nor interpretable.\n\nCaveat: with n=3 per group, power is low for any individual contrast. Prioritize biologically motivated comparisons rather than exhaustively testing all 15.",
+    "model": "vanilla-3b-rag",
+    "category": "statistics",
+    "source": "synthetic-methods",
+    "retrieved": [
+      {
+        "rank": 1,
+        "score": 0.6251152753829956,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I have three treatment groups and need all pairwise comparisons from a single DESeq2 fit. How do I correctly specify contrasts in results()?\n\nA: DESeq2's `results()` function provides two mechanism"
+      },
+      {
+        "rank": 2,
+        "score": 0.585208535194397,
+        "source": "docs-deseq2-vignette",
+        "text_head": "Q: I have an RNA-seq experiment with two conditions (treated vs. control) collected across three batches. Should my design formula be ~condition, ~batch+condition, or ~batch*condition?\n\nA: The right c"
+      },
+      {
+        "rank": 3,
+        "score": 0.5033999085426331,
+        "source": "docs-deseq2-vignette-full",
+        "text_head": "Contrasts can be calculated for a \nDESeqDataSet\n object for which the GLM coefficients have already been fit using the Wald test steps (\nDESeq\n with \ntest=\"Wald\"\n or using \nnbinomWaldTest\n). The vecto"
+      }
+    ]
+  }
+]

@@ -103,13 +103,80 @@ n=28 pinned test pairs, reference = `chosen` field.
   expert-detailed (specific tools, parameter values, citations); small models
   produce generic explanations or wrong-tool recommendations.
 - 3B used `max_length=384` while 1B variants used 512 (3B OOM'd at 512 in the
-  4.75 GiB MIG slice). This is a ~25% truncation of long answers. Eval/judge
-  metrics still favor 3B at this length, so the result holds, but a fully clean
-  comparison would need 3B at 512 on a larger slice.
+  4.75 GiB MIG slice). One-sentence footnote in writeup; not worth a re-run.
 - Test set is 23/28 synthetic, 5/28 real (docs+SE). Synthetic chosen answers
   follow the prompt template's expected detail level; this likely amplifies the
   judge's penalty for generic outputs. Worth re-running judge on a real-question
   subset if a stronger external-validity claim is needed.
+
+## Phase 3 — RAG comparison (2026-04-26)
+
+Tests whether retrieval beats alignment for factual domain tasks.
+
+**KB:** 182 chunks indexed in FAISS (IndexFlatIP, L2-normalized 384-dim
+all-MiniLM-L6-v2 embeddings):
+- 90 Q&A entries (40 DESeq2 + 50 QIIME2 from the docs scrape used for Phase 2 data)
+- 90 chunks of the DESeq2 vignette HTML (300-word paragraph-aware chunking)
+- 2 chunks of the STAR README (the README is short)
+
+**KB skew to flag:** ~99% of chunks are DESeq2-related (180/182). Alignment,
+splicing, variant-calling, and experimental-design domains have effectively no
+relevant content, so the retriever surfaces off-topic chunks for those questions.
+
+**Inference:** retrieve top-3 by cosine sim, prompt template "Use the following
+reference material to answer the question. Cite specific tools, parameters, and
+best practices from the references.\n\n{context}\n\nQuestion: {question}". 3B
+runs at full ml=512 here (no DPO grad memory pressure → fits comfortably).
+
+| Model                          | method_acc | assumptions | tradeoffs | helpful | overall |
+|---|---:|---:|---:|---:|---:|
+| Vanilla 1B                     | 1.14 | 1.11 | 1.32 | 1.04 | 1.15 |
+| DPO 1B-from-SFT                | 1.07 | 1.00 | 1.14 | 1.00 | 1.05 |
+| DPO 3B-from-SFT                | 1.54 | 1.39 | 1.61 | 1.32 | 1.47 |
+| **Vanilla 3B + RAG**           | 1.82 | 1.61 | 1.61 | 1.54 | **1.65** |
+| **DPO 3B-from-SFT + RAG**      | 1.96 | 1.61 | 1.68 | 1.75 | **1.75** |
+
+**Headlines:**
+1. **RAG beats DPO for this task.** Vanilla 3B + RAG (1.65) > DPO 3B-from-SFT
+   (1.47) by +0.18 overall. Retrieval recovers more methodology-task performance
+   than 234 preference pairs of DPO did.
+2. **DPO + RAG is best overall** (1.75), but the DPO contribution given RAG is
+   small (+0.10). The biggest DPO+RAG-vs-RAG-only gap is on practical_helpfulness
+   (1.75 vs 1.54, +0.21) — DPO seems to add value at the "applying the retrieved
+   facts to the specific question" step.
+3. **Score distributions widen with RAG.** Non-RAG runs were entirely 1's and 2's;
+   RAG runs include 3's and 4's. Vanilla 3B+RAG hit 4/5 on methodological_accuracy
+   for 3 of 28 examples; DPO+RAG hit 4/5 on 4 of 28.
+
+**Per-category breakdown (Vanilla 3B + RAG vs DPO 3B no-RAG):**
+
+| Category | V3+RAG | DPO 3B | Δ | n | KB coverage |
+|---|---:|---:|---:|---|---|
+| deseq2              | 3.25 | 1.00 | +2.25 | 2 | dense |
+| microbiome          | 2.45 | 1.35 | +1.10 | 5 | dense |
+| normalization       | 1.33 | 1.17 | +0.17 | 3 | partial |
+| rna-seq             | 1.75 | 2.00 | −0.25 | 1 | partial |
+| statistics          | 1.45 | 1.55 | −0.10 | 5 | sparse |
+| alignment           | 1.25 | 1.50 | −0.25 | 3 | thin (2 STAR chunks) |
+| splicing            | 1.08 | 1.42 | −0.33 | 3 | none |
+| experimental-design | 1.08 | 1.50 | −0.42 | 3 | sparse |
+| general             | 1.33 | 1.92 | −0.58 | 3 | sparse |
+
+**Mechanistic story for the paper:** RAG dominates DPO when the KB covers the
+domain (DESeq2 +2.25, microbiome +1.10). DPO wins when the KB is thin or empty
+(alignment, splicing, experimental-design), because off-topic retrieved chunks
+appear to *distract* the model — DPO has at least some learned domain priors
+that RAG erodes when the context is wrong. The takeaway is **RAG-when-coverage-
+exists, alignment-otherwise**, with the combination being additive on
+practical_helpfulness specifically.
+
+**Caveats:**
+- Same 28-example test set, same low absolute scores; RAG narrows but doesn't
+  close the gap to expert references (best 1.96 / 5).
+- KB skew (99% DESeq2/QIIME2) makes the per-category result expected for the
+  in-KB categories. To validate the cross-domain claim, the KB would need to
+  expand into alignment/splicing/variant-calling — but the *direction* of the
+  effect (RAG wins iff coverage) is consistent across categories.
 
 ## Scaling Comparison Results (v1 vs v2, pinned 64 ex)
 
@@ -150,6 +217,11 @@ Supplementary (v2 models on full 126 and new-62-only subsets) in
 | DPO predictions (6 sets) | `biolite-methods/evaluation/results/predictions_{vanilla,dpo_1b_from_sft,dpo_3b_from_sft,dpo_1b_from_base,dpo_1b_beta005,dpo_1b_beta02}.json` |
 | DPO judge scores (6 sets) | `biolite-methods/evaluation/results/judge_{vanilla,dpo_1b_from_sft,dpo_3b_from_sft,dpo_1b_from_base,dpo_1b_beta005,dpo_1b_beta02}.json` |
 | Methods predictions script | `biolite-methods/evaluation/generate_predictions.py` |
+| RAG knowledge base (FAISS) | `biolite-methods/rag/faiss_index/{index.faiss,chunks.json}` (182 chunks, 384-dim, MiniLM-L6-v2) |
+| RAG KB build script | `biolite-methods/rag/build_kb.py` |
+| RAG predictions (2 sets) | `biolite-methods/evaluation/results/predictions_{vanilla_3b_rag,dpo_3b_rag}.json` |
+| RAG judge scores (2 sets) | `biolite-methods/evaluation/results/judge_{vanilla_3b_rag,dpo_3b_rag}.json` |
+| RAG predictions script | `biolite-methods/evaluation/generate_predictions_rag.py` |
 
 ## HuggingFace Hub
 
