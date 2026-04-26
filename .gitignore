@@ -15,6 +15,10 @@ data/splits/
 !biolite-interpret/evaluation/results/*.json
 !biolite-methods/evaluation/results/*.json
 !biolite-methods/rag/faiss_index/*.json
+!biolite-interpret/evaluation/human_eval/*.json
+
+# Human eval spreadsheets — sent to evaluators, not tracked in repo
+*.xlsx
 
 # Training artifacts
 checkpoints/
