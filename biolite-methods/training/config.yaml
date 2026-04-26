@@ -20,6 +20,7 @@ lora:
 dpo:
   num_train_epochs: 2
   per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
   gradient_accumulation_steps: 8
   learning_rate: 5.0e-5
   lr_scheduler_type: "cosine"
@@ -30,6 +31,7 @@ dpo:
   logging_steps: 5
   eval_steps: 50
   save_steps: 50
+  eval_accumulation_steps: 4
   max_length: 512       # conservative for 4.8GB; increase after profiling
   max_prompt_length: 256
 

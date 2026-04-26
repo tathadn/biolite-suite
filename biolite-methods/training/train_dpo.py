@@ -99,6 +99,7 @@ def main():
         output_dir=output_dir,
         num_train_epochs=cfg["dpo"]["num_train_epochs"],
         per_device_train_batch_size=cfg["dpo"]["per_device_train_batch_size"],
+        per_device_eval_batch_size=cfg["dpo"]["per_device_eval_batch_size"],
         gradient_accumulation_steps=cfg["dpo"]["gradient_accumulation_steps"],
         learning_rate=cfg["dpo"]["learning_rate"],
         lr_scheduler_type=cfg["dpo"]["lr_scheduler_type"],
@@ -110,13 +111,13 @@ def main():
         logging_steps=cfg["dpo"]["logging_steps"],
         eval_strategy="steps",
         eval_steps=cfg["dpo"]["eval_steps"],
+        eval_accumulation_steps=cfg["dpo"]["eval_accumulation_steps"],
         save_strategy="steps",
         save_steps=cfg["dpo"]["save_steps"],
         load_best_model_at_end=True,
         gradient_checkpointing=True,
         optim="paged_adamw_8bit",
         max_length=max_length,
-        max_prompt_length=cfg["dpo"]["max_prompt_length"],
         report_to="wandb",
         run_name=run_name,
     )
@@ -131,14 +132,14 @@ def main():
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         peft_config=lora_config,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         # ref_model=None shares base weights (only LoRA diff)
     )
 
     # Log GPU info
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
-        mem_gb = torch.cuda.get_device_properties(0).total_mem / 1e9
+        mem_gb = torch.cuda.get_device_properties(0).total_memory / 1e9
         print(f"GPU Memory: {mem_gb:.2f} GB")
 
     trainer.train()
