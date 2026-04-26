@@ -27,7 +27,7 @@
 
 ### Phase 2 DPO training — completed 2026-04-25
 - [x] 5 DPO runs (1B-from-SFT, 3B-from-SFT, 1B-from-base ablation, β=0.05, β=0.20)
-- [ ] DPO eval with judge rubric on 28-ex pinned methods test set + vanilla baseline
+- [x] DPO eval with judge rubric on 28-ex pinned methods test set + vanilla baseline (2026-04-26)
 
 ## Phase 2 DPO Training Results (2026-04-25)
 
@@ -60,6 +60,56 @@
 - TRL 0.29.1 moved the `concatenated_forward` hook into `_compute_loss`. The
   `Fp32LogitsDPOTrainer` rewrite wraps `model.forward` directly and now guards
   the upcast on `model.training` so eval uses bf16 logits (saves ~840 MB).
+- Saved DPO `adapter_config.json` records `base_model_name_or_path` as the bare
+  Llama Instruct repo, even when the trainer was started with the SFT adapter
+  repo. Naively `PeftModel.from_pretrained(adapter)` would silently drop the SFT
+  contribution — `generate_predictions.py` overrides `--base_model` explicitly so
+  the SFT-init runs are loaded as `(base + interpret-LoRA + DPO-LoRA)` to match
+  training-time policy. Document this when publishing to HF (or merge-and-upload).
+
+## Phase 2 DPO Judge Eval (2026-04-26)
+
+Sonnet judge, methods rubric (4 criteria 1–5: methodological_accuracy,
+assumption_awareness, tradeoff_discussion, practical_helpfulness),
+n=28 pinned test pairs, reference = `chosen` field.
+
+| Model | method_acc | assumptions | tradeoffs | helpful | overall |
+|---|---:|---:|---:|---:|---:|
+| Vanilla Llama-3.2-1B-Instruct          | 1.14 | 1.11 | 1.32 | 1.04 | **1.15** |
+| DPO 1B-from-SFT (β=0.10)               | 1.07 | 1.00 | 1.14 | 1.00 | 1.05 |
+| DPO 3B-from-SFT (β=0.10, ml=384)       | 1.54 | 1.39 | 1.61 | 1.32 | **1.47** |
+| DPO 1B-from-base (β=0.10)              | 1.14 | 1.00 | 1.11 | 1.04 | 1.07 |
+| DPO 1B β=0.05 (suppl)                  | 1.00 | 1.00 | 1.14 | 1.00 | 1.03 |
+| DPO 1B β=0.20 (suppl)                  | 1.14 | 1.00 | 1.14 | 1.07 | 1.09 |
+
+**Headlines (publishable):**
+1. **Scale wins.** 3B-from-SFT scores 1.47 overall, +0.32 vs vanilla. Distribution
+   shifts from "all 1's" (1B variants) to roughly half 1's / half 2's across all
+   four criteria. Robust across train metrics, eval metrics, and judge scores.
+2. **DPO at 1B underperforms vanilla.** 1B-from-SFT 1.05, 1B-from-base 1.07, vs
+   vanilla 1.15. With 234 mostly-synthetic preference pairs, DPO sharpens the
+   trained chosen/rejected boundary but doesn't add capability — and can amplify
+   wrong-tool hallucinations (spot-check: 1B-from-SFT recommends `bcftools` for
+   strand inference on idx 0).
+3. **β has near-zero effect on judge scores at 1B.** β ∈ {0.05, 0.10, 0.20} →
+   overall {1.03, 1.05, 1.09}. Faint monotonic uptick but β=0.20 still loses to
+   vanilla. Confirms the eval-accuracy plateau (all βs hit 0.929 eval acc).
+4. **SFT-init ≈ base-init at 1B for DPO** (1.05 vs 1.07). Same as the train/eval
+   metric finding. Interpret-SFT prior is invisible after DPO at this capacity.
+
+**Caveats to disclose in writeup:**
+- Absolute scores are low across the board (best 1.47 / 5). Even 3B is below the
+  rubric's "mostly correct" threshold. The reference answers in the test set are
+  expert-detailed (specific tools, parameter values, citations); small models
+  produce generic explanations or wrong-tool recommendations.
+- 3B used `max_length=384` while 1B variants used 512 (3B OOM'd at 512 in the
+  4.75 GiB MIG slice). This is a ~25% truncation of long answers. Eval/judge
+  metrics still favor 3B at this length, so the result holds, but a fully clean
+  comparison would need 3B at 512 on a larger slice.
+- Test set is 23/28 synthetic, 5/28 real (docs+SE). Synthetic chosen answers
+  follow the prompt template's expected detail level; this likely amplifies the
+  judge's penalty for generic outputs. Worth re-running judge on a real-question
+  subset if a stronger external-validity claim is needed.
 
 ## Scaling Comparison Results (v1 vs v2, pinned 64 ex)
 
@@ -97,6 +147,9 @@ Supplementary (v2 models on full 126 and new-62-only subsets) in
 | Methods data scripts | `biolite-methods/data/scripts/{extract_from_docs,generate_synthetic_methods,generate_rejects,quality_control,merge_and_split_preferences,upload_to_hf}.py` |
 | DPO adapters (5 runs) | `biolite-methods/training/checkpoints/biolite-methods-dpo-methods-dpo-{1b-from-sft,3b-from-sft,1b-from-base,1b-beta005,1b-beta02}/` |
 | DPO training logs | `biolite-methods/training/logs/dpo-{1b-from-sft,3b-from-sft,1b-from-base,1b-beta005,1b-beta02}.log` |
+| DPO predictions (6 sets) | `biolite-methods/evaluation/results/predictions_{vanilla,dpo_1b_from_sft,dpo_3b_from_sft,dpo_1b_from_base,dpo_1b_beta005,dpo_1b_beta02}.json` |
+| DPO judge scores (6 sets) | `biolite-methods/evaluation/results/judge_{vanilla,dpo_1b_from_sft,dpo_3b_from_sft,dpo_1b_from_base,dpo_1b_beta005,dpo_1b_beta02}.json` |
+| Methods predictions script | `biolite-methods/evaluation/generate_predictions.py` |
 
 ## HuggingFace Hub
 

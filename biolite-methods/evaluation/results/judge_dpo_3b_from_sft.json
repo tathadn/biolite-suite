@@ -1,0 +1,645 @@
+{
+  "rubric": "methods",
+  "model_used_as_judge": "sonnet",
+  "n_evaluated": 28,
+  "aggregates": {
+    "methodological_accuracy": {
+      "mean": 1.54,
+      "std": 0.51,
+      "n": 28
+    },
+    "assumption_awareness": {
+      "mean": 1.39,
+      "std": 0.5,
+      "n": 28
+    },
+    "tradeoff_discussion": {
+      "mean": 1.61,
+      "std": 0.5,
+      "n": 28
+    },
+    "practical_helpfulness": {
+      "mean": 1.32,
+      "std": 0.48,
+      "n": 28
+    }
+  },
+  "individual_results": [
+    {
+      "index": 0,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Recommends wrong tools entirely. The standard approach (RSeQC infer_experiment.py) is never mentioned. The featureCounts command shown is malformed with nonsensical flags. 'samtools count' with a -m flag doesn't exist. kallisto quant doesn't accept BAM input this way. The -s flag semantics for featureCounts are described incoherently with contradictory bullet points."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Completely misses the core diagnostic clue: the user already observed ~half expected counts, which is a classic stranded-library-run-unstranded symptom. No mention of dUTP protocols, FFPE degradation ambiguity, or dense gene model complications that affect strand inference."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "Purports to compare methods but the comparisons are fabricated and meaningless. No actual trade-offs between tools are discussed. Salmon's --libType A auto-detection is not mentioned. The consequences section conflates strandedness with UTR biology, which is a category error."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Actively harmful: following the provided commands would produce errors or wrong results. The -s flag values for featureCounts (0/1/2) are never correctly explained. No concrete diagnostic workflow is given. A user following this advice would be worse off than before asking."
+        }
+      }
+    },
+    {
+      "index": 1,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Reverses the primary vs top-level distinction (claims top-level is 'more recent but less QC'd' and primary is 'older but more QC'd' \u2014 the opposite is true). Fails to explain the key bug: alt contigs in top-level/full assemblies cause silent multi-mapping artifacts. 'GENCODE' acronym expansion ('Generalized eNsemble') is fabricated. Recommends outdated GENCODE v28/v29 instead of current v47. Truncated response never explains the FASTA/GTF chromosome naming mismatch issue, which is the most common silent failure mode."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Does not mention chromosome naming consistency between FASTA and GTF (the most critical practical assumption). Does not address GRCh37 vs GRCh38 choice. Ignores assumptions about dataset size, species, or downstream tools. Vaguely references 'smaller datasets' for full assemblies without any mechanistic basis."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Attempts to compare assembly types and annotation sources but the comparisons are factually wrong or superficial. Does not explain the actual tradeoffs (alt contig multi-mapping, silent count distortion at MHC/BRCA1, chromosome name format differences). The Ensembl vs GENCODE comparison omits the only meaningful distinction: chr-prefix naming convention and its downstream consequences."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "Provides a concrete recommendation (primary assembly + GENCODE) which is directionally correct, but the version numbers are outdated (v28/v29 vs current v47), the response is truncated mid-sentence, the rationale given for the recommendation is wrong, and the 'ENST database' tip is nonsensical. A user following this advice would get the right files but for the wrong reasons, and would miss the critical validation step of checking chromosome name consistency."
+        }
+      }
+    },
+    {
+      "index": 2,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Contains several errors: claims quasi-mapping is 'less accurate' and alignment is 'more accurate for short reads' \u2014 this contradicts current benchmarks showing decoy-aware quasi-mapping is essentially equivalent to alignment-mode Salmon. Conflates STAR alignment with Salmon alignment mode. States alignment is 'required for gene expression quantification' which is false; quasi-mapping is itself a quantification method. Never addresses the decoy index's critical role in accuracy. The output is cut off mid-sentence and never completed."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Ignores virtually all problem-specific context provided: the decoy-aware index specification, Gencode v44 (well-annotated reference making decoy especially effective), PE 100bp reads (standard short reads where both methods perform well), and n=24 (adequate sample size, no special quantification concerns). Does not discuss whether a BAM is needed downstream, which is the key practical assumption driving the choice."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists superficial pros/cons but mischaracterizes the core trade-off. Omits the most important distinction: that the BAM requirement for downstream tools (variant calling, splicing analysis, RSeQC, featureCounts, IGV) is the primary reason to prefer STAR+Salmon alignment mode \u2014 not accuracy. The 'hybrid approach' is incomplete (response is truncated) and conceptually confused."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Gives no actionable guidance specific to this experimental setup. Fails to address the PI's concern directly with evidence (benchmark citations like Soneson et al.). Does not mention --decoys flag construction, --validateMappings, or when alignment mode adds clear value. The response is truncated and never reaches a concrete recommendation. A researcher reading this would be no closer to making an informed decision."
+        }
+      }
+    },
+    {
+      "index": 3,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response fundamentally misidentifies apeglm as a 'generalized linear fractional regression' package for proportion data \u2014 it is actually a DESeq2 shrinkage estimator for RNA-seq LFCs using an adaptive heavy-tailed prior. None of the stated reasons for using apeglm are correct, the explanation for coef= is fabricated, and the code example uses non-existent functions (lfcFit) with wrong syntax. The response is actively misleading."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "No relevant assumptions are acknowledged: the RNA-seq / DESeq2 context is entirely absent, the statistical properties of the Cauchy vs normal prior are never discussed, and the requirement that coef= must map to a single identifiable coefficient in the model matrix is not mentioned."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "There is no substantive comparison between apeglm and the normal prior. The core tradeoff \u2014 heavy-tailed prior preserving large LFCs vs symmetric normal prior over-shrinking them \u2014 is completely missing. The ashr alternative supporting contrast= is not mentioned at all."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The code example references non-existent functions and would not run. The guidance given (use apeglm for 'large datasets' or 'non-informative priors') is incorrect and would mislead a practitioner. A user following this advice would be unable to correctly apply apeglm shrinkage in DESeq2."
+        }
+      }
+    },
+    {
+      "index": 4,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Fundamentally wrong throughout. 'LFC' is Log Fold Change, not 'Least Favorable Case.' apeglm in this context is DESeq2's shrinkage estimator called via `lfcShrink(dds, coef=..., type='apeglm')`, not a standalone GLM package. The listed requirements (response variable, predictor matrix, link function) are generic GLM boilerplate with no relevance to RNA-seq differential expression. The mtcars example is completely inappropriate. The Cauchy prior \u2014 the defining feature of apeglm \u2014 is never mentioned. Claims apeglm is computationally faster than normal-prior, which is the opposite of reality."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Ignores all actual requirements: that DESeq() must be run first (MLEs must be available), that apeglm requires specifying a coefficient via `coef` from `resultsNames(dds)` rather than a `contrast` (because it fits penalized likelihood around a single coefficient MLE), and that the negative binomial count model underlies the whole framework. None of the listed 'requirements' apply to the real use case."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "Attempts a comparison but every stated reason is incorrect or fabricated. The actual advantage \u2014 adaptive shrinkage from a heavy-tailed Cauchy prior that protects large LFCs from over-shrinkage while pulling small LFCs toward zero \u2014 is entirely absent. The stated advantage of 'computational efficiency' is factually wrong (apeglm is slower). No mention of ashr as an alternative, or the practical guidance about when normal-prior suffices."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Provides zero actionable guidance for an RNA-seq analyst. The correct workflow (`lfcShrink`, `resultsNames`, `coef` vs `contrast` distinction, MA-plot use case) is completely missing. The code example using a continuous automotive dataset would mislead a user trying to apply this to differential expression data. A practitioner following this output would be unable to perform apeglm shrinkage in DESeq2."
+        }
+      }
+    },
+    {
+      "index": 5,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response contradicts itself \u2014 first correctly states n=3 biological replicates, then concludes n=18 total replicates. It fails to identify pseudoreplication, invents a non-existent `makeDesignMatrix` function, and mischaracterizes k=6 conditions. The core statistical error (treating wells as independent) is never addressed."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Completely fails to identify the central assumption violation: that wells within the same biological replicate are not independent. No mention of pseudoreplication, within-replicate correlation, inflated degrees of freedom, or the distinction between technical and biological replicates."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "Offers only one flawed recommendation with no alternatives. Does not discuss pseudobulk aggregation, blocking factors, nested designs, or the power implications of n=3. The single mention of 'nested design' is vague and unactionable."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The R code provided (`makeDesignMatrix`) does not exist in DESeq2 or any standard Bioconductor package. The advice would lead the user to run an anti-conservative analysis with severely inflated false positive rates, making it actively harmful rather than merely unhelpful."
+        }
+      }
+    },
+    {
+      "index": 6,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Fails to identify the core statistical problem: pooling destroys biological replicate variance, making dispersion estimation in DESeq2/edgeR invalid and producing overconfident p-values. Instead presents pooling as a reasonable option with generic pros/cons, which is misleading for hypothesis-testing DE analysis."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Does not address the critical assumption that biological replicates must remain independent for valid DE inference. Misframes 'increased sample size' as a benefit of pooling when the opposite is true statistically \u2014 pooled libraries reduce effective n for variance estimation."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Offers a symmetric pros/cons framing that implies pooling is sometimes acceptable for this use case, which is incorrect. The reference correctly identifies that pooling is only defensible for feasibility/transcript-catalog work, not DE hypothesis testing. The response's 'when to pool' guidance (small effect sizes) is actually backwards."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The redesign suggestions are vague and incomplete \u2014 the first option is incoherent (reducing to 6-8 libraries from 12 doesn't align with the constraint). Critically, the response is cut off and never delivers concrete actionable alternatives (e.g., two-arm design with 6 individual libraries each, or 4 libraries per arm across three groups)."
+        }
+      }
+    },
+    {
+      "index": 7,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Misspells SVA ('Supervisir'), incorrectly frames it as a 'batch effect removal' tool rather than a latent factor method, conflates SVA with ComBat, and suggests age is an 'unaccounted covariate' when the question explicitly states age is recorded. Misses the critical point that SVA is warranted only when unexplained structure remains after known covariates are included."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Fails to address the core assumption question: whether unexplained structure actually remains after adjusting for batch, sex, and age. Does not mention the confounding-with-condition failure mode, the modest-n consideration, or the risk of SVs absorbing true biological signal when covariates are correlated with latent structure."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists generic pros/cons of over-correction but lacks substantive comparison. Does not discuss the diagnostic-first workflow (PCA on residuals), does not compare num.sv estimation methods (BE vs Leek-Storey), and does not address the critical case of perfect confounding between batch and condition."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Advice is vague and partially incorrect \u2014 recommending SVA 'as a sanity check' and combining it with ComBat conflates two different correction paradigms. No actionable guidance on how to decide whether SVA is warranted, which num.sv method to use, or how to incorporate SVs into the model. The truncated final sentence further reduces utility."
+        }
+      }
+    },
+    {
+      "index": 8,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Recommendation direction (MOFA2) is correct, but mechanistic descriptions are substantially wrong. MOFA2 does not use a two-stage factor-then-PLS-regression approach; it is a Bayesian factor analysis model using variational inference to jointly learn shared/view-specific factors. Critically, the model never identifies that DIABLO is a supervised method that uses class labels during integration \u2014 the single most important reason to avoid it for discovery \u2014 instead mischaracterizing it as using GCCA or NMF."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Nearly all relevant assumptions are absent. No mention of DIABLO's supervised nature inflating label-omics associations, MOFA2's per-view likelihood requirements (Gaussian/Poisson/Bernoulli), the need to variance-stabilize raw RNA-seq counts before input, missing data handling, or overfitting risk with only 60 samples requiring factor-count regularization."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "A comparison structure is present but built on incorrect method descriptions. The fundamental supervised-vs-unsupervised axis \u2014 which is the decisive tradeoff for a discovery goal \u2014 is entirely missing. The listed 'key differences' (specificity, integration method, factor extraction order) are either wrong or peripheral to the actual decision."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The correct tool is recommended, but the response is cut off mid-sentence, provides no preprocessing guidance (e.g., log-normalize RNA-seq), gives no advice on selecting factor count to avoid overfitting at n=60, and does not suggest the standard practice of post-hoc label association to preserve exploratory integrity. Actionable specifics tied to the user's actual constraints are absent."
+        }
+      }
+    },
+    {
+      "index": 9,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Contains a significant factual error: WDL is described as 'often used in conjunction with other tools, like Snakemake or Nextflow,' which is incorrect \u2014 WDL is a standalone workflow language. Nextflow's language is Groovy-based DSL, not 'similar to Python.' The claim that all three have equal reproducibility support ignores meaningful differences. nf-core ecosystem is never mentioned."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Treats the team's stated constraints (Python-heavy scripts, SLURM, AWS, mixed team expertise) as a checklist rather than engaging with the tension between them. Does not surface the key implicit assumption that cloud usage is aspirational vs. current, nor warns about mid-project migration costs. The postdoc preference conflict is acknowledged only superficially."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists three tools with bullet-point characterizations but the comparisons are shallow and partly wrong (e.g., framing WDL as the 'modularity' pick is misleading). No discussion of executor abstraction, DSL maturity, container support differences, or the nf-core ecosystem advantage. The response is cut off mid-sentence, leaving the WDL recommendation incomplete."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The advice does not engage with the group's specific combination of SLURM + AWS + mixed expertise in a meaningful way. No mention of nf-core pipelines, SLURM profiles, or the concrete cost of switching tools mid-pipeline. The recommendation matrix is generic enough to apply to any lab and is truncated, providing no actionable guidance on the AWS integration question that is central to the decision."
+        }
+      }
+    },
+    {
+      "index": 10,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Nextflow does not use Python to define workflows \u2014 it uses Groovy-based DSL2, a critical factual error given the team's Python background. The claim about 'Python integration' is misleading and reverses a key disadvantage. 'nextflow-plot' is not a real Nextflow tool. The recommendation itself is defensible but the stated reasons are largely inaccurate."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "The response does not interrogate who will maintain the pipelines long-term, whether nf-core adoption is a goal, or whether the Nextflow postdoc's tenure is stable \u2014 all assumptions that materially affect the recommendation. It accepts the postdoc's experience as a straightforward win without noting that Python-native team members will face a real DSL learning curve."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Snakemake is dismissed in a single sentence with no substantive comparison. WDL is not mentioned. The response does not discuss Snakemake's Python-native rule syntax, file-based dependency model, or its SLURM/AWS executor plugins \u2014 all directly relevant to the stated constraints. No genuine tradeoff analysis is offered."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The advice is not actionable: no mention of nf-core, snakemake-wrappers, specific executor configuration (e.g., --executor slurm, AWS Batch plugin), or the maintenance cost of onboarding a Python team to Groovy DSL2. The response is cut off mid-sentence, and the bulleted reasons contain factual errors that would mislead a lab making a multi-year infrastructure decision."
+        }
+      }
+    },
+    {
+      "index": 11,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response is fundamentally wrong. It invents non-existent QIIME 2 APIs (Disperser class, qiime2 --disp flag) and mischaracterizes dispersion as 'clumping' rather than the actual concern: within-group variance heterogeneity confounding PERMANOVA centroids. The correct tool is `qiime diversity beta-group-significance --p-method permdisp` (PERMDISP2/betadisper), which is never mentioned."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Fails to explain why dispersion matters for PERMANOVA \u2014 the core issue that heterogeneous within-group dispersion can produce false-positive centroid differences is never articulated. No mention of other PERMANOVA assumptions (exchangeability, independence, pseudoreplication)."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "No meaningful trade-off discussion. The fabricated filtering approach (removing high-dispersion samples) is not a legitimate analytical strategy. The reference answer's guidance on jointly interpreting PERMANOVA and PERMDISP results is entirely absent."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Actively harmful: a user following this advice would run fabricated Python code that errors immediately, use a nonexistent CLI flag, and potentially discard samples based on a misunderstood metric. The actual QIIME 2 command needed (`--p-method permdisp`) is never given."
+        }
+      }
+    },
+    {
+      "index": 12,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Multiple critical errors: describes the quality plot x-axis as 'read number' rather than position along the read; references 'plotQualityScores' from R/DADA2 instead of the correct QIIME 2 'qiime demux summarize' workflow; completely omits the essential overlap constraint that governs truncation choice; mischaracterizes what truncation parameters do (says they 'reduce number of reads' rather than trimming read ends)."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Ignores the central biological assumption: forward and reverse reads must overlap sufficiently after truncation to merge. Makes no mention of amplicon length, expected overlap, or how primer/amplicon choice constrains valid truncation lengths. These are the primary assumptions that drive truncation decisions in practice."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists three 'methods' but they are not genuine alternatives \u2014 truncation is always position-based from the quality plot; a fixed read-length threshold is not a valid strategy. The real tradeoff (quality vs. overlap length vs. merge success rate) is entirely absent."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The advice is not actionable in a QIIME 2 context: points to the wrong tool (R DADA2 vs. QIIME 2 artifact pipeline), gives no guidance on Phred score thresholds for truncation (~25-30), omits the post-run diagnostic check (denoising stats, merged fraction), and the code snippet is truncated and irrelevant to the QIIME 2 workflow most users are running."
+        }
+      }
+    },
+    {
+      "index": 13,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Contains a significant factual error: StrainPhlAn4 is designed for short Illumina reads (typically 100-150bp), not 200-500bp as claimed. Misses the most critical limitation \u2014 chimeric consensus formation when co-colonizing strains are present \u2014 and fails to address C. difficile low-abundance in gut metagenomes. The characterization of StrainPhlAn4 as 'not a strain-assignment tool' is vague and misleading."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Does not address the key assumption about C. difficile relative abundance thresholds required for reliable marker-gene reconstruction. Ignores the assumption that patients harbor single strains (co-colonization problem). Mentions data quality generically but misses the species-abundance floor and its practical impact on sample dropout rates."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "Cuts off mid-sentence and never completes the alternatives discussion. No substantive comparison between metagenome-based approaches and WGS of isolates, which is the gold standard for hospital outbreak tracing. Does not weigh StrainPhlAn4's appropriate use cases (longitudinal stability, abundant species) against its unsuitability for clinical transmission inference."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "Advice is generic and not specific to the constraints given (hospital transmission study, 150bp reads, 8M reads/sample, C. difficile). Does not tell the user what coverage/abundance thresholds to expect, what fraction of samples will likely fail QC, or that WGS of cultured isolates is the actionable recommendation for outbreak tracing. Response is incomplete."
+        }
+      }
+    },
+    {
+      "index": 14,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Misses the most critical technical point: Deblur is single-end only, making it a poor fit for paired-end V4 data. Fails to explain DADA2's per-run error model as the actual mechanism behind the cross-run concern. Claims DADA2 'provides metrics like sequence coverage, richness, and diversity' which is not a distinguishing denoising feature. Generic noise/artifact framing is superficial."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Completely ignores the paired-end nature of the data, which is the single most important assumption to check before recommending Deblur. Does not address the multi-run DADA2 workflow, the read depth threshold for reliable error model training, or the ASV exact-sequence matching property that mitigates the cross-run concern."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists bullet points for each tool but the comparisons are vague and inaccurate (e.g., 'DADA2 provides more information'). The actual tradeoff \u2014 universal vs. per-run error model, single-end vs. paired-end, sensitivity vs. determinism \u2014 is never articulated. The response is cut off mid-sentence, leaving the Deblur recommendation incomplete."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Provides no actionable guidance for the user's actual situation: two MiSeq runs, paired-end V4, QIIME 2 2024.2. Does not mention the correct multi-run DADA2 workflow (denoise per run, then merge feature tables), does not advise against Deblur given paired-end data, and the response is truncated. A user following this output would not know what to do."
+        }
+      }
+    },
+    {
+      "index": 15,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Never mentions betadisper() or permutest(), which are the correct vegan tools for this exact problem. Instead invents non-existent functions ('Dispersional Heterogeneity Test', 'Dispersional Variability Analysis' / DVA in vegan) \u2014 these do not exist. Core methodology is fabricated."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Recognizes that dispersion heterogeneity can inflate Type I error in PERMANOVA, which is the relevant concern. But misses the biological plausibility angle (IBD dysbiosis as increased variance), does not connect to PERMANOVA's specific homogeneity-of-dispersion assumption, and conflates vague terms ('dispersional heterogeneity' vs 'dispersional variability') without meaningful distinction."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "No discussion of what to do when betadisper IS significant (report both, interpret direction, treat variance itself as a finding). No mention of the ambiguity when both centroid shift and dispersion differences coexist. No alternatives or nuanced interpretation paths offered."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The answer is actively harmful: it recommends tools that do not exist in vegan, provides no runnable code or correct function names, and leaves the user unable to answer the reviewer's question. Omits all study-specific guidance (n=18/22, adonis2 vs adonis, permutation count, strata= for nested designs)."
+        }
+      }
+    },
+    {
+      "index": 16,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Correctly recommends VST but mischaracterizes reasons: calls it a solution for 'zero-inflation' (incorrect \u2014 that's rlog's strength) and fails to explain heteroscedasticity as the core problem. Does not mention rlog or the sample-size guidance (n<20 rlog, n\u226530 VST). Raw counts advice is misleading ('small number of genes' is not a valid use case for heatmaps)."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Ignores all key assumptions: heteroscedasticity of count data, library size differences, the mean-variance relationship, and the critical distinction between sample size regimes for VST vs rlog. No mention that log2(CPM+1) still fails to stabilize variance across the count range."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists the three options but the decision criteria are nearly identical for log2(CPM+1) and VST ('wide range of expression values', 'mix of low and high-expression genes'), making the comparison practically useless. Does not address computational cost in a meaningful way or explain why raw counts are inappropriate for publication heatmaps."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Response is cut off mid-sentence ('ggpl'), providing no actual code or workflow. Omits the critical implementation detail of using `assay(vst(dds))` to extract the matrix. The decision guidelines are circular and non-discriminating, offering no actionable specificity for the user's concrete 24-sample, 3-condition setup."
+        }
+      }
+    },
+    {
+      "index": 17,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Fundamentally wrong on multiple points. SCTransform is not a 'format' \u2014 it's a variance-stabilization method using regularized negative binomial regression. The output claiming SCTransform is for 'small datasets' inverts reality. The claim that large gene counts (>20,000) or large cell counts (>10,000) make it unsuitable is fabricated and contradicts actual usage. No mention of Pearson residuals, depth confounding, or the NB model that defines SCTransform's actual mechanism."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Completely ignores the core statistical assumptions: that sequencing depth is a technical covariate, that the negative binomial model requires sufficient UMIs for stable fitting, and that depth variation range drives when SCTransform helps. The 'SCT format' framing is invented and substitutes for any real assumption discussion."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "The comparison table and discussion are based on fabricated criteria (speed, cell count thresholds, 'SCT format'). The actual tradeoff \u2014 depth-confounded PCs vs. Pearson residuals, stability at low UMI counts, integration scenarios \u2014 is entirely absent. The response does not address what the user actually asked: when does SCTransform *outperform* standard workflow."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Directly misleading for the user's actual dataset (~9,000 cells, ~2,500 UMIs/cell). The advice would steer them toward standard normalization based on false premises. No actionable diagnostics (e.g., check if nCount appears in top PCs), no mention of SCTransform v2 vs v1, no guidance relevant to their specific UMI depth or cell count."
+        }
+      }
+    },
+    {
+      "index": 18,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response is fundamentally wrong about what both methods do. NormalizeData does not scale to 0-1 or subtract mean/divide by SD \u2014 that is ScaleData. SCTransform does not 'add a constant to shift data' \u2014 it fits regularized negative binomial regression and returns Pearson residuals. The characterization of SCTransform as shifting to 'typical ranges for data types (0 for continuous, 1 for binary)' is nonsensical. Critical practical warnings (PrepSCTFindMarkers requirement, residuals incompatibility with count-based tools) are entirely absent."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "No awareness of the core assumption motivating SCTransform: that NormalizeData fails to stabilize variance across expression levels, causing PCA to capture abundance differences. No mention of negative binomial count models, technical covariate regression, or the assumption that Pearson residuals have uniform variance. The response invents irrelevant distinctions (categorical vs. binary vs. continuous data) that have no bearing on scRNA-seq methodology."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "The stated trade-offs are fabricated. The real trade-offs \u2014 variance stabilization vs. count preservation, clustering quality vs. DE workflow complexity, computational cost at scale, trajectory inference compatibility \u2014 are entirely absent. The response instead discusses nonexistent distinctions between 'basic' and 'advanced' analysis with no methodological basis."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Actively harmful guidance. The recommendation to use NormalizeData for clustering and SCTransform only for 'machine learning/regression' inverts best practices. The code example running both sequentially (NormalizeData then SCTransform) is incorrect \u2014 these are alternative pipelines, not sequential steps. Missing all critical practical constraints: PrepSCTFindMarkers for DE, RNA assay for trajectory methods, sketch workflows for >150k cells."
+        }
+      }
+    },
+    {
+      "index": 19,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "The response contains several inaccuracies: it incorrectly frames a knockdown gene being absent from DEGs as a 'false positive/false discovery problem,' conflates biological interpretation with technical troubleshooting, and suggests nonsensical LFCshrink options ('mean' or 'median' method' do not exist in DESeq2). Critically, it omits the most important diagnostic step recommended in the reference: PCA and MA-plots to assess sample clustering, normalization, and variance structure before drawing conclusions."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "The response fails to challenge the core assumption that a low DEG count is necessarily a problem \u2014 the reference explicitly notes that few or no DEGs may reflect true biology. It does not address whether the pipeline assumptions (hg19 vs GRCh38, featureCounts overlap mode, siRNA knockdown efficiency expectations) are appropriate or how to evaluate them systematically."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "While the response vaguely mentions trying different genome assemblies or LFCshrink methods, it does not provide substantive comparison of trade-offs (e.g., hg19 vs GRCh38 annotation completeness, apeglm vs ashr vs normal shrinkage behavior). The suggestion to switch shrinkage methods lacks mechanistic reasoning and the alternative options named are incorrect."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "Advice is generic and partially incorrect. The response is cut off mid-sentence, never completing the visualization suggestion. It misses the most actionable first steps (plotPCA, plotMA, examining dispersion estimates, checking size factors) that would immediately reveal whether the issue is biological, technical, or normalization-related. The qRT-PCR/Western blot suggestion is valid but premature without first diagnosing the computational pipeline."
+        }
+      }
+    },
+    {
+      "index": 20,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Several factual errors: SUPPA2 does support RI and all five major event types, not just a subset; the read depth guidance is inverted (SUPPA2 is not better for low depth \u2014 it's depth-agnostic since it works from transcript quantification, not junction counts); the STAR '--splicing' flag suggestion is fabricated. The model also misses that SUPPA2 requires transcript-level quantification (Salmon/kallisto), a fundamental architectural difference."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Ignores the key assumption that SUPPA2 requires a separate quantification step (Salmon/kallisto), which is critical given the user is using STAR alignment. Misframes replicate count guidance \u2014 n=4 is not a reason to prefer rMATS over SUPPA2 in reality. Does not discuss low-coverage event filtering needs or isoform deconvolution ambiguity."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Attempts a comparison but the tradeoffs described are largely inaccurate or superficial. Misses the most important tradeoff: BAM-based junction counting (rMATS) vs. transcript-abundance-based PSI (SUPPA2). The speed/memory framing is secondary and the event-type resolution advantage of rMATS for downstream validation is not mentioned."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The recommendation is cut off mid-sentence, reducing utility. The depth thresholds given (10M vs 20M) are fabricated and misleading. No mention of post-hoc IJC/SJC count filtering for rMATS, no guidance on ensuring consistent alignment parameters, and the STAR flag suggestion is incorrect. Actionable specifics are missing or wrong."
+        }
+      }
+    },
+    {
+      "index": 21,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response fundamentally mischaracterizes both tools. LeafCutter is described as being 'better for common events' and 'less sensitive to rare events like alternative 5\u2032/3\u2032 splice sites' \u2014 the exact opposite of reality. LeafCutter's intron-cluster/junction-ratio approach is precisely designed to detect alternative splice site competition including novel sites. DEXSeq is incorrectly framed as superior for alternative 5\u2032/3\u2032 splice sites when it actually operates on annotated exon bins and cannot detect unannotated splice sites. The response also wrongly describes LeafCutter as 'differential exon expression.'"
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "No awareness of the key assumptions relevant to this dataset: DEXSeq's dependence on annotated transcript structure, LeafCutter's requirement for sufficient junction-spanning reads, the distinction between exon-bin usage vs. intron excision ratio modeling, or the expression-level confounding issue that makes DEXSeq less suited for splice site competition questions. The 6v6 sample size and sequencing depth considerations are entirely absent."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "The response attempts a structured comparison with headers and bullet points, giving a superficial appearance of balance. However, the actual tradeoffs described are either fabricated or inverted. The one marginally valid point is that LeafCutter is computationally lighter, but the core mechanistic distinctions (exon bins vs. intron clusters, annotation-dependence, ratio modeling) are never mentioned."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The recommendation is directly counterproductive: it steers the user away from LeafCutter for their stated goal (alternative 5\u2032/3\u2032 splice site competition) and toward DEXSeq, which is the wrong tool for that question. No actionable guidance on read depth, junction saturation, or when DEXSeq's exon-bin framing would genuinely be preferable. The response also appears truncated mid-sentence."
+        }
+      }
+    },
+    {
+      "index": 22,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response is substantially incorrect throughout. `--outfmt 6` is a BLAST flag, not a STAR or rMATS option \u2014 it's cited repeatedly and nonsensically as the source for nearly every metric. The 'intron retention' point is inverted (aiming for >80% retention is wrong; retention is a splicing event to detect, not a QC filter). None of the four genuinely important AS-specific QC checks (junction saturation, inner distance distribution, SJ.out.tab non-canonical fraction, rMATS coverage filtering audit) are mentioned."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "No AS-specific assumptions are discussed: strand-specificity settings, read length constraints on junction spanning, RIN consistency across tissue samples, or depth adequacy for PSI estimation are all absent. The response treats this like generic RNA-seq QC with no awareness of what makes splicing analyses distinct."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "No trade-offs are discussed. There is no comparison of tools (e.g., RSeQC vs. QoRTs vs. manual SJ.out.tab inspection), no mention of when certain metrics matter more or less (e.g., saturation analysis at high depth), and no acknowledgment of competing priorities between sensitivity and stringency in the rMATS filtering step."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The advice is not actionable and would actively mislead a user. Fabricated flags, inverted biological logic, and generic thresholds (e.g., '10-100x depth') that are irrelevant to splicing QC make this response unhelpful for the stated STAR + rMATS human tissue context. Following this guidance would leave real QC failure modes (non-canonical junction spikes, inner distance bimodality, rMATS event dropout) completely undetected."
+        }
+      }
+    },
+    {
+      "index": 23,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "The fundamental recommendation (BH FDR) is correct, but the comparison contains critical errors: BH-FDR is described as 'more conservative than Bonferroni,' which is the opposite of true. Bonferroni-Holm is called 'more conservative than BH and Bonferroni, but less conservative than BH'\u2014a self-contradictory statement. The abbreviation 'BH' is used for both Benjamini-Hochberg and Bonferroni-Holm interchangeably, creating confusion throughout. The claim that BH 'can be sensitive to the order of the tests' is incorrect in the standard formulation."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "The model correctly flags the independence assumption for BH but misses the key nuance: BH is valid under PRDS (positive regression dependency), which is the relevant condition for genomic data. It does not address the CpG correlation structure (probes in the same region violate independence), does not mention Benjamini-Yekutieli as the valid alternative under arbitrary dependence, and adds an incorrect claim about test ordering sensitivity."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "An attempt at comparison is made but the conservatism ordering is inverted (BH-FDR labeled more conservative than Bonferroni), the bullet-point guidance is internally contradictory, and the discovery-vs-validation framing from the question is never addressed. No mention of the ~5.9\u00d710\u207b\u2078 Bonferroni threshold to concretize the power problem, no discussion of effect size reporting, and no mention of BY correction as a principled option under dependence."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The output is truncated mid-sentence. The suggestion to use 'FDR > 0.1' as a threshold is stated as a relaxation but without context this is misleading. The advice to apply a raw p-value threshold of 0.05 and then apply BH is not standard practice. No specific thresholds (e.g., FDR < 0.05 primary, FDR < 0.20 exploratory) are recommended, the sample size constraint is not factored in, and the critical point that FDR is a rate\u2014not a per-locus guarantee\u2014is absent."
+        }
+      }
+    },
+    {
+      "index": 24,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "The response fundamentally misinterprets a uniform p-value histogram \u2014 it conflates 'uniform distribution' with 'no rejections' rather than correctly identifying it as indicating a mostly-null contrast with a small true signal. It incorrectly states DESeq2 uses a t-test (it uses a Wald test with NB dispersion modeling), and incorrectly flags non-normality as a concern. The anti-conservative spike near zero \u2014 a key diagnostic feature the user specifically mentioned \u2014 is never addressed. The suggestion to switch to Wilcoxon for RNA-seq count data is inappropriate."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "Fails to mention DESeq2's actual statistical framework (negative binomial model, dispersion shrinkage), ignores the critical n=4 constraint and its impact on dispersion estimation, and does not discuss the assumptions relevant to interpreting p-value histograms (e.g., independence of null p-values under correct model specification). Instead invokes irrelevant normality assumptions from t-tests."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Mentions adjusting p-value thresholds and using alternative tests, but the alternatives offered (Wilcoxon, changing alpha) are either inappropriate for this context or trivially obvious. No discussion of reporting effect sizes vs. calling hits, no mention of pi0 estimation, no comparison of what different histogram shapes imply diagnostically. The contrast between the uniform and L-shaped histograms \u2014 central to the question \u2014 is never substantively explored."
+        },
+        "practical_helpfulness": {
+          "score": 2,
+          "justification": "The advice to 'check the data' and 'plot the data' is generic. The response does not reassure the user that a uniform histogram is not a QC failure, which is the most practically important message. It omits actionable steps specific to this situation: inspecting the dispersion plot, examining the specific contrast design, using qvalue/pi0 estimation, or reporting confidence intervals instead of adjusted p-values for the low-signal contrast. The response may cause unnecessary concern or lead the user toward inappropriate remediation."
+        }
+      }
+    },
+    {
+      "index": 25,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "The response entirely misses the core issue: whether dichotomization vs. continuous BMI matters. Instead it pivots to centering/scaling advice, which is tangential. It never addresses information loss from dichotomization, statistical power reduction, or the biometric literature on median-splitting. The framing 'does it matter for a covariate vs. main effect' is also not meaningfully addressed \u2014 the response conflates covariate vs. main effect with centering vs. not centering, which is a different distinction entirely."
+        },
+        "assumption_awareness": {
+          "score": 1,
+          "justification": "No relevant assumptions are discussed: no mention of linearity of BMI-expression relationship, no acknowledgment that BMI=30 is an arbitrary biological threshold, no discussion of sample distribution (clustering at extremes), and no mention of how residual variance from covariate misspecification affects the primary contrast. The centering/scaling content is not wrong in isolation but is irrelevant to the actual question."
+        },
+        "tradeoff_discussion": {
+          "score": 1,
+          "justification": "The response discusses centering vs. scaling, which is not the tradeoff the question asks about. The actual tradeoff \u2014 dichotomized vs. continuous covariate, including information loss, power implications, and non-linearity handling \u2014 is never mentioned. No comparison of linear term vs. spline vs. binning is offered."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The response does not answer the user's question and would likely mislead them into ignoring the reviewer's valid criticism. No DESeq2 formula syntax is provided for the continuous case, no guidance on handling non-linearity, and the response cuts off mid-sentence. A user following this advice would remain unequipped to respond to the reviewer."
+        }
+      }
+    },
+    {
+      "index": 26,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 2,
+          "justification": "Fails to give a clear correct answer: DESeq2 applies BH correction per contrast internally, so pooling is wrong. Instead, the response hedges and even calls pooling 'a good approach.' The 'alternative approach' of using different p-value thresholds for per-contrast vs. pooled correction is unprincipled and misleading. No mention of LRT as the correct method for joint testing. The code snippet is broken and irrelevant."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Does not discuss DESeq2's internal FDR correction mechanism, which is the central assumption that determines the right answer. Ignores the distinction between pre-specified and exploratory contrasts, which the reference correctly identifies as the one legitimate reason to consider experiment-level correction."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Mentions both pooling and per-contrast approaches but presents them as roughly equivalent options, which is inaccurate. The key tradeoff \u2014 power loss from pooling vs. experiment-level error control \u2014 is not correctly characterized. The 'alternative approach' is fabricated and lacks any methodological basis."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "Gives contradictory and confusing guidance that would leave the user unable to make a decision. The broken R code adds noise without value. The bulleted questions at the end are generic. The user asked a specific, answerable question and received no actionable resolution."
+        }
+      }
+    },
+    {
+      "index": 27,
+      "model": "methods-dpo-3b-from-sft",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 1,
+          "justification": "Multiple critical errors: fabricates a non-existent `adjust()` function in DESeq2; incorrectly computes '105 tests' from unrelated factors (replicates don't multiply test count); claims DESeq2 doesn't do automatic correction when it does apply per-contrast BH internally; misframes the question entirely by treating joint vs. per-contrast as simply 'more vs. less conservative' without understanding FDR vs. FWER; omits the LRT approach which is the correct answer for the omnibus question."
+        },
+        "assumption_awareness": {
+          "score": 2,
+          "justification": "Mentions correlated tests superficially but draws the wrong conclusion (correlation argues against naive pooling, not against per-contrast BH). Ignores the critical assumption about inference goal (per-gene per-contrast vs. a single DE gene list), ignores the low-power n=3 constraint, and does not address that pooling p-values across contrasts with different null distributions is invalid."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Presents a per-contrast vs. joint framing and bullet-points when to use each, but the criteria given (number of tests, correlation) are not the actual drivers of the choice. Misses the key tradeoff: distinct biological questions per contrast (per-contrast BH fine) vs. single global gene list (LRT preferred). The 'what not to do' case \u2014 pooling all p-values \u2014 is not flagged at all."
+        },
+        "practical_helpfulness": {
+          "score": 1,
+          "justification": "The code example uses a fabricated function and would fail immediately. Advice to use joint correction across all contrasts is contrary to standard practice and not actionable. The n=3 power limitation is not mentioned. No guidance on the LRT alternative, no mention of DESeq2's actual `test='LRT'` argument, and no concrete recommendation tied to the user's specific 2\u00d73 factorial design."
+        }
+      }
+    }
+  ]
+}
