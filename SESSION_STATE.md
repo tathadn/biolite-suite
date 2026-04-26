@@ -25,9 +25,41 @@
 - [x] Merge + 85/5/10 split: **276 unique pairs** → train 234 / val 14 / test 28. SHA1 pinning in `v1_preference_test_keys.json`. Leakage self-check OK.
 - [x] Upload `tathadn/biolite-methods-preferences` to HuggingFace (3 splits + manifest + pinning file)
 
-### Next up (DPO phase)
-- [ ] DPO training on `tathadn/biolite-methods-preferences` (train 234, val 14) — 1B and 3B variants
-- [ ] DPO eval with judge rubric against `biolite-interpret-{1b,3b}` v2 on pinned methods test set
+### Phase 2 DPO training — completed 2026-04-25
+- [x] 5 DPO runs (1B-from-SFT, 3B-from-SFT, 1B-from-base ablation, β=0.05, β=0.20)
+- [ ] DPO eval with judge rubric on 28-ex pinned methods test set + vanilla baseline
+
+## Phase 2 DPO Training Results (2026-04-25)
+
+5 runs × 60 optimizer steps (2 epochs × 234 ex / 8 effective batch). All used QLoRA
+(r=16, α=32, paged_adamw_8bit, bf16 + Fp32LogitsDPOTrainer for NaN-safe gradients).
+
+| Run | β | Init | max_len | Train loss | Train margin | Eval loss | Eval margin | Eval acc | Peak GB | Wall time |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1b-from-sft     | 0.10 | interpret-1b           | 512 | 0.033 | 6.27 | 0.0811 | 5.17 | 0.929 | 3.54 | 6:00  |
+| 3b-from-sft     | 0.10 | interpret-3b           | 384 | 0.057 | 4.63 | **0.0273** | 4.60 | **1.000** | 4.30 | 12:30 |
+| 1b-from-base    | 0.10 | Llama-3.2-1B-Instruct  | 512 | 0.034 | 6.22 | 0.0792 | 5.10 | 0.929 | 3.54 | 6:00  |
+| 1b-beta005      | 0.05 | interpret-1b           | 512 | 0.079 | 4.03 | 0.1132 | 3.53 | 0.929 | 3.54 | 6:00  |
+| 1b-beta02       | 0.20 | interpret-1b           | 512 | 0.019 | 9.29 | 0.0687 | 6.97 | 0.929 | 3.54 | 6:00  |
+
+**Key findings:**
+- **SFT-init ≈ base-init for DPO at 1B** (within noise across all 7 metrics). At this dataset
+  scale (234 pairs), the contrastive DPO signal dominates over any prior the SFT adapter
+  encoded. Reinforces the Phase 1.5 "1B is capacity-bound" headline.
+- **β scales margin magnitude but not eval accuracy** (4.03 → 6.27 → 9.29 across
+  β ∈ {0.05, 0.1, 0.2}); all three hit the same 0.929 eval acc on val n=14.
+  Eval loss is best at β=0.20 (0.0687); judge eval will determine downstream winner.
+- **3B advantages on eval** (lower eval_loss 0.027 vs 0.081, perfect 1.000 acc) are real
+  but partially confounded by `max_length=384` truncation — 3B couldn't fit at 512 in
+  the 4.75 GiB MIG slice (paged-adamw-8bit illegal-address at first optimizer.step()).
+
+**Operational notes added this run:**
+- Default `per_device_eval_batch_size=8` × DPO chosen+rejected concat × seq=512 ×
+  vocab=128k overflowed the eval upcast on 4.75 GiB. Fix: explicit
+  `per_device_eval_batch_size=1` + `eval_accumulation_steps=4`.
+- TRL 0.29.1 moved the `concatenated_forward` hook into `_compute_loss`. The
+  `Fp32LogitsDPOTrainer` rewrite wraps `model.forward` directly and now guards
+  the upcast on `model.training` so eval uses bf16 logits (saves ~840 MB).
 
 ## Scaling Comparison Results (v1 vs v2, pinned 64 ex)
 
@@ -63,6 +95,8 @@ Supplementary (v2 models on full 126 and new-62-only subsets) in
 | Split pinning | `biolite-methods/data/splits/v1_preference_test_keys.json` (SHA1 anchors) |
 | HF methods dataset | `tathadn/biolite-methods-preferences` |
 | Methods data scripts | `biolite-methods/data/scripts/{extract_from_docs,generate_synthetic_methods,generate_rejects,quality_control,merge_and_split_preferences,upload_to_hf}.py` |
+| DPO adapters (5 runs) | `biolite-methods/training/checkpoints/biolite-methods-dpo-methods-dpo-{1b-from-sft,3b-from-sft,1b-from-base,1b-beta005,1b-beta02}/` |
+| DPO training logs | `biolite-methods/training/logs/dpo-{1b-from-sft,3b-from-sft,1b-from-base,1b-beta005,1b-beta02}.log` |
 
 ## HuggingFace Hub
 
