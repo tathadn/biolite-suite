@@ -1,0 +1,399 @@
+{
+  "n_comparisons": 7,
+  "n_tests": 32,
+  "n_significant": 11,
+  "alpha": 0.05,
+  "test": "Wilcoxon signed-rank (paired, two-sided)",
+  "comparisons": [
+    {
+      "phase": "phase1",
+      "comparison": "baseline-1B vs FT-1B-v2",
+      "file_a": "judge_baseline.json",
+      "space_a": "pinned_64",
+      "file_b": "judge_finetuned_1b_v2.json",
+      "space_b": "full_126",
+      "results": {
+        "biological_accuracy": {
+          "n": 63,
+          "median_a": 1,
+          "median_b": 2,
+          "mean_a": 1.952,
+          "mean_b": 2.159,
+          "statistic": 290.5,
+          "pvalue": 0.35188893939746857,
+          "significant": false
+        },
+        "completeness": {
+          "n": 63,
+          "median_a": 1,
+          "median_b": 2,
+          "mean_a": 1.73,
+          "mean_b": 1.921,
+          "statistic": 432.5,
+          "pvalue": 0.3280556852053934,
+          "significant": false
+        },
+        "clarity": {
+          "n": 63,
+          "median_a": 3,
+          "median_b": 3,
+          "mean_a": 2.714,
+          "mean_b": 3.206,
+          "statistic": 309.0,
+          "pvalue": 0.00958207719418523,
+          "significant": true
+        },
+        "overall": {
+          "n": 63,
+          "median_a": 1.6666666666666667,
+          "median_b": 2,
+          "mean_a": 2.132,
+          "mean_b": 2.429,
+          "statistic": 603.0,
+          "pvalue": 0.0754084423224284,
+          "significant": false
+        }
+      }
+    },
+    {
+      "phase": "phase1",
+      "comparison": "FT-1B-v2 vs FT-3B-v2",
+      "file_a": "judge_finetuned_1b_v2.json",
+      "space_a": "full_126",
+      "file_b": "judge_finetuned_3b_v2.json",
+      "space_b": "full_126",
+      "results": {
+        "biological_accuracy": {
+          "n": 64,
+          "median_a": 2.0,
+          "median_b": 3.0,
+          "mean_a": 2.156,
+          "mean_b": 2.781,
+          "statistic": 71.5,
+          "pvalue": 3.849325270022349e-05,
+          "significant": true
+        },
+        "completeness": {
+          "n": 64,
+          "median_a": 2.0,
+          "median_b": 2.5,
+          "mean_a": 1.922,
+          "mean_b": 2.312,
+          "statistic": 22.0,
+          "pvalue": 4.5585884061299154e-05,
+          "significant": true
+        },
+        "clarity": {
+          "n": 64,
+          "median_a": 3.0,
+          "median_b": 4.0,
+          "mean_a": 3.203,
+          "mean_b": 3.969,
+          "statistic": 12.0,
+          "pvalue": 1.7193011678454031e-07,
+          "significant": true
+        },
+        "overall": {
+          "n": 64,
+          "median_a": 2.0,
+          "median_b": 3.0,
+          "mean_a": 2.427,
+          "mean_b": 3.021,
+          "statistic": 56.5,
+          "pvalue": 2.940012433356982e-07,
+          "significant": true
+        }
+      }
+    },
+    {
+      "phase": "phase1",
+      "comparison": "FT-3B-v1 (640) vs FT-3B-v2 (1262)",
+      "file_a": "judge_finetuned_3b.json",
+      "space_a": "pinned_64",
+      "file_b": "judge_finetuned_3b_v2.json",
+      "space_b": "full_126",
+      "results": {
+        "biological_accuracy": {
+          "n": 64,
+          "median_a": 2.0,
+          "median_b": 3.0,
+          "mean_a": 2.531,
+          "mean_b": 2.781,
+          "statistic": 613.0,
+          "pvalue": 0.257469410464351,
+          "significant": false
+        },
+        "completeness": {
+          "n": 64,
+          "median_a": 2.0,
+          "median_b": 2.5,
+          "mean_a": 2.203,
+          "mean_b": 2.312,
+          "statistic": 636.5,
+          "pvalue": 0.6262756309854423,
+          "significant": false
+        },
+        "clarity": {
+          "n": 64,
+          "median_a": 4.0,
+          "median_b": 4.0,
+          "mean_a": 3.734,
+          "mean_b": 3.969,
+          "statistic": 531.5,
+          "pvalue": 0.13117918892425168,
+          "significant": false
+        },
+        "overall": {
+          "n": 64,
+          "median_a": 2.6666666666666665,
+          "median_b": 3.0,
+          "mean_a": 2.823,
+          "mean_b": 3.021,
+          "statistic": 785.0,
+          "pvalue": 0.2485716843806468,
+          "significant": false
+        }
+      }
+    },
+    {
+      "phase": "phase2",
+      "comparison": "vanilla-1B vs DPO-1B-from-SFT",
+      "file_a": "judge_vanilla.json",
+      "space_a": "28",
+      "file_b": "judge_dpo_1b_from_sft.json",
+      "space_b": "28",
+      "results": {
+        "methodological_accuracy": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.143,
+          "mean_b": 1.071,
+          "statistic": 7.0,
+          "pvalue": 0.4142161782425253,
+          "significant": false
+        },
+        "assumption_awareness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.107,
+          "mean_b": 1,
+          "statistic": 0.0,
+          "pvalue": 0.0832645166635504,
+          "significant": false
+        },
+        "tradeoff_discussion": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.321,
+          "mean_b": 1.143,
+          "statistic": 4.0,
+          "pvalue": 0.05878172135535886,
+          "significant": false
+        },
+        "practical_helpfulness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.036,
+          "mean_b": 1,
+          "statistic": 0.0,
+          "pvalue": 0.31731050786291415,
+          "significant": false
+        },
+        "overall": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.152,
+          "mean_b": 1.054,
+          "statistic": 7.0,
+          "pvalue": 0.03198726691866416,
+          "significant": true
+        }
+      }
+    },
+    {
+      "phase": "phase2",
+      "comparison": "DPO-1B-from-SFT vs DPO-3B-from-SFT",
+      "file_a": "judge_dpo_1b_from_sft.json",
+      "space_a": "28",
+      "file_b": "judge_dpo_3b_from_sft.json",
+      "space_b": "28",
+      "results": {
+        "methodological_accuracy": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 2.0,
+          "mean_a": 1.071,
+          "mean_b": 1.536,
+          "statistic": 0.0,
+          "pvalue": 0.0003114909767673833,
+          "significant": true
+        },
+        "assumption_awareness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1,
+          "mean_b": 1.393,
+          "statistic": 0.0,
+          "pvalue": 0.0009111188771537128,
+          "significant": true
+        },
+        "tradeoff_discussion": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 2.0,
+          "mean_a": 1.143,
+          "mean_b": 1.607,
+          "statistic": 0.0,
+          "pvalue": 0.0003114909767673833,
+          "significant": true
+        },
+        "practical_helpfulness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1,
+          "mean_b": 1.321,
+          "statistic": 0.0,
+          "pvalue": 0.0026997960632601866,
+          "significant": true
+        },
+        "overall": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.5,
+          "mean_a": 1.054,
+          "mean_b": 1.464,
+          "statistic": 0.0,
+          "pvalue": 0.00017502284689518928,
+          "significant": true
+        }
+      }
+    },
+    {
+      "phase": "phase2",
+      "comparison": "DPO-3B-from-SFT vs vanilla-3B+RAG",
+      "file_a": "judge_dpo_3b_from_sft.json",
+      "space_a": "28",
+      "file_b": "judge_vanilla_3b_rag.json",
+      "space_b": "28",
+      "results": {
+        "methodological_accuracy": {
+          "n": 28,
+          "median_a": 2.0,
+          "median_b": 2.0,
+          "mean_a": 1.536,
+          "mean_b": 1.821,
+          "statistic": 30.0,
+          "pvalue": 0.25986335172649777,
+          "significant": false
+        },
+        "assumption_awareness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.5,
+          "mean_a": 1.393,
+          "mean_b": 1.607,
+          "statistic": 27.5,
+          "pvalue": 0.18406848750477078,
+          "significant": false
+        },
+        "tradeoff_discussion": {
+          "n": 28,
+          "median_a": 2.0,
+          "median_b": 1.0,
+          "mean_a": 1.607,
+          "mean_b": 1.607,
+          "statistic": 57.0,
+          "pvalue": 0.8536505342874641,
+          "significant": false
+        },
+        "practical_helpfulness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 1.0,
+          "mean_a": 1.321,
+          "mean_b": 1.536,
+          "statistic": 42.0,
+          "pvalue": 0.28377195719583115,
+          "significant": false
+        },
+        "overall": {
+          "n": 28,
+          "median_a": 1.5,
+          "median_b": 1.375,
+          "mean_a": 1.464,
+          "mean_b": 1.643,
+          "statistic": 106.5,
+          "pvalue": 0.7519591664445963,
+          "significant": false
+        }
+      }
+    },
+    {
+      "phase": "phase2",
+      "comparison": "vanilla-3B+RAG vs DPO-3B+RAG",
+      "file_a": "judge_vanilla_3b_rag.json",
+      "space_a": "28",
+      "file_b": "judge_dpo_3b_rag.json",
+      "space_b": "28",
+      "results": {
+        "methodological_accuracy": {
+          "n": 28,
+          "median_a": 2.0,
+          "median_b": 2.0,
+          "mean_a": 1.821,
+          "mean_b": 1.964,
+          "statistic": 16.5,
+          "pvalue": 0.2059032107320684,
+          "significant": false
+        },
+        "assumption_awareness": {
+          "n": 28,
+          "median_a": 1.5,
+          "median_b": 1.0,
+          "mean_a": 1.607,
+          "mean_b": 1.607,
+          "statistic": 27.5,
+          "pvalue": 1.0,
+          "significant": false
+        },
+        "tradeoff_discussion": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 2.0,
+          "mean_a": 1.607,
+          "mean_b": 1.679,
+          "statistic": 27.5,
+          "pvalue": 0.5929800980174267,
+          "significant": false
+        },
+        "practical_helpfulness": {
+          "n": 28,
+          "median_a": 1.0,
+          "median_b": 2.0,
+          "mean_a": 1.536,
+          "mean_b": 1.75,
+          "statistic": 11.0,
+          "pvalue": 0.057779571123597245,
+          "significant": false
+        },
+        "overall": {
+          "n": 28,
+          "median_a": 1.375,
+          "median_b": 1.625,
+          "mean_a": 1.643,
+          "mean_b": 1.75,
+          "statistic": 74.0,
+          "pvalue": 0.23870477956454916,
+          "significant": false
+        }
+      }
+    }
+  ]
+}

@@ -194,6 +194,102 @@ practical_helpfulness specifically.
 Supplementary (v2 models on full 126 and new-62-only subsets) in
 `biolite-interpret/evaluation/results/scaling_comparison_summary.json`.
 
+## Final experiments — upper bounds, few-shot baseline, statistical tests (2026-04-27)
+
+### Phase 1 — interpret rubric (pinned 64 ex)
+
+| Model | bio_acc | completeness | clarity | n |
+|---|---|---|---|---|
+| Baseline 1B           | 1.95 | 1.73 | 2.71 | 63/64 |
+| FT 1B @ v2            | 2.16 | 1.92 | 3.20 | 64 |
+| FT 3B @ v2            | 2.78 | 2.31 | 3.97 | 64 |
+| **3B 3-shot (NEW)**   | 2.57 | 2.21 | 3.40 | 63/64 |
+| **Claude Sonnet (NEW)** | 4.08 | 2.97 | 4.70 | 64 |
+| **Claude Opus (NEW)** | **4.17** | **3.08** | 4.67 | 64 |
+
+### Phase 2 — methods rubric (28 ex)
+
+| Model | method_acc | assumptions | tradeoffs | helpful | n |
+|---|---|---|---|---|---|
+| Vanilla 1B            | 1.14 | 1.11 | 1.32 | 1.04 | 28 |
+| DPO 1B-from-SFT       | 1.07 | 1.00 | 1.14 | 1.00 | 28 |
+| DPO 3B-from-SFT       | 1.54 | 1.39 | 1.61 | 1.32 | 28 |
+| Vanilla 3B + RAG      | 1.82 | 1.61 | 1.61 | 1.54 | 28 |
+| DPO 3B + RAG          | 1.96 | 1.61 | 1.68 | 1.75 | 28 |
+| **Claude Sonnet (NEW)** | 4.46 | 3.46 | **4.11** | **4.32** | 28 |
+| **Claude Opus (NEW)** | **4.57** | **3.54** | 4.07 | 4.29 | 28 |
+
+**Headlines:**
+1. **Few-shot 3B beats FT 1B@v2 on bio_acc and completeness** (2.57 vs 2.16,
+   2.21 vs 1.92). 1B is so capacity-bound that 3 in-context demonstrations on a
+   3B base outscore LoRA-SFT of the 1B on 1,262 examples. FT 3B still wins
+   overall, so SFT adds value but only at sufficient capacity.
+2. **Claude (both Sonnet and Opus) is ~+1.4 above the best fine-tuned model on
+   bio_acc and ~+0.7 on clarity in Phase 1; ~+2.5 above the best DPO+RAG model
+   across all four Phase 2 criteria.** Confirms substantial upper-bound
+   headroom — the local task is far from saturated.
+3. **Self-evaluation bias is small.** Sonnet (judging itself) and Opus (judged
+   by Sonnet) differ by ≤0.12 on every criterion in both phases, with Opus
+   actually scoring slightly higher on bio_acc, completeness,
+   methodological_accuracy, and assumption_awareness. The judge is not
+   meaningfully favoring Sonnet — supports llm-as-judge robustness.
+4. **Completeness lags accuracy/clarity for Claude** (Phase 1: comp 2.97/3.08
+   vs bio_acc 4.08/4.17, clarity 4.70/4.67). Claude gives accurate, well-written
+   answers but doesn't always enumerate the specific genes/pathways the rubric
+   rewards — opportunity for fine-tuning to recover even with API-strength
+   models in the loop (e.g., distillation or targeted SFT on long-form
+   completeness).
+
+### Statistical significance (Wilcoxon signed-rank, paired)
+
+| Comparison (Phase 1, pinned 64) | bio_acc | completeness | clarity | overall |
+|---|:---:|:---:|:---:|:---:|
+| baseline-1B vs FT-1B-v2         | 0.35 | 0.33 | **0.010** | 0.075 |
+| FT-1B-v2 vs FT-3B-v2            | **<0.001** | **<0.001** | **<0.001** | **<0.001** |
+| FT-3B-v1 (640) vs FT-3B-v2 (1262) | 0.26 | 0.63 | 0.13 | 0.25 |
+
+| Comparison (Phase 2, n=28)       | method_acc | assumptions | tradeoffs | helpful | overall |
+|---|:---:|:---:|:---:|:---:|:---:|
+| vanilla-1B vs DPO-1B-from-SFT    | 0.41 | 0.083 | 0.059 | 0.32 | **0.032** |
+| DPO-1B vs DPO-3B (both from-SFT) | **<0.001** | **<0.001** | **<0.001** | **0.003** | **<0.001** |
+| DPO-3B-from-SFT vs vanilla-3B+RAG | 0.26 | 0.18 | 0.85 | 0.28 | 0.75 |
+| vanilla-3B+RAG vs DPO-3B+RAG     | 0.21 | 1.00 | 0.59 | 0.058 | 0.24 |
+
+11/32 tests significant at p<0.05 (raw, no Bonferroni). **Significant
+effects:** capacity scaling at 1B→3B (both SFT and DPO, all criteria), DPO at
+1B significantly *worsens* overall vs vanilla (consistent with the
+capacity-bound headline), and FT-1B-v2 improves clarity over baseline. Data
+scaling at 3B (640→1262), DPO-vs-RAG, and RAG-vs-DPO+RAG are NOT significant
+at n=64/n=28 — directionally consistent with the means but the effect sizes
+need a larger test set to confirm. Full p-value matrix:
+`biolite-interpret/evaluation/results/statistical_tests.json`.
+
+### Methodological footnotes
+
+- **Claude predictions ran from a clean working directory** (`/tmp/claude_clean_dir`)
+  with `--tools "" --max-turns 1` so the project's CLAUDE.md / auto-memory does
+  not prime the model toward project-aware answers. Phase 1 was rerun from
+  scratch under this protocol after the first run produced 5 contaminated
+  responses ("biolite", "your project", etc.). Phase 2 Sonnet was project-cwd
+  in the first run — substring scan of the resulting predictions found 0 hits
+  for `\bbiolite\b`, `\byour project\b`, etc., and Phase 2 Opus uses clean cwd,
+  so the existing Phase 2 Sonnet file is kept as-is.
+- **Opus refused 1 Phase 1 prompt under its Usage Policy classifier** (idx 48,
+  glaucoma in African American population). Five retries from clean dir all
+  rc=1 with `API Error ... Usage Policy`. Sonnet handled the same prompt
+  cleanly (6063-char answer). The empty Opus prediction was scored 1/1/1 by
+  the judge with the justification "Model output is empty" — included in the
+  Opus phase-1 mean (slight downward drag of ~0.05 across criteria).
+- **Self-evaluation bias caveat (Zheng et al. 2023).** llm_judge.py uses Sonnet
+  as the judge throughout the pipeline, including for Sonnet's own predictions.
+  The Sonnet-vs-Opus comparison above (same judge scoring both, Opus is
+  bias-independent) puts an empirical bound on the bias size: ≤0.12 across all
+  criteria. Acknowledge in writeup; do not attempt to correct.
+- **Few-shot demos:** 3 train examples sampled with `random.Random(42).sample`,
+  indices `[228, 51, 563]`. Mix is enrichment_interpretation, de_interpretation,
+  de_interpretation. Reproducible from `seed=42` flag in
+  `generate_predictions_fewshot.py`.
+
 ## Artifacts & Locations
 
 | Artifact | Path |
@@ -222,6 +318,13 @@ Supplementary (v2 models on full 126 and new-62-only subsets) in
 | RAG predictions (2 sets) | `biolite-methods/evaluation/results/predictions_{vanilla_3b_rag,dpo_3b_rag}.json` |
 | RAG judge scores (2 sets) | `biolite-methods/evaluation/results/judge_{vanilla_3b_rag,dpo_3b_rag}.json` |
 | RAG predictions script | `biolite-methods/evaluation/generate_predictions_rag.py` |
+| Claude upper-bound predictions | `biolite-{interpret,methods}/evaluation/results/predictions_claude_{sonnet,opus}.json` |
+| Claude upper-bound judges | `biolite-{interpret,methods}/evaluation/results/judge_claude_{sonnet,opus}.json` |
+| 3B 3-shot predictions + judge | `biolite-interpret/evaluation/results/{predictions_3b_fewshot,judge_3b_fewshot}.json` |
+| Claude / few-shot scripts | `biolite-interpret/evaluation/{generate_claude_predictions,generate_predictions_fewshot}.py` |
+| Statistical tests script + output | `biolite-interpret/evaluation/{statistical_tests.py,results/statistical_tests.json}` |
+| Phase-4 summary table generator | `biolite-interpret/evaluation/summarize_phase4.py` |
+| Judge / Opus runner scripts | `biolite-interpret/evaluation/{run_judge_all.sh,run_opus_predictions.sh}` |
 
 ## HuggingFace Hub
 
@@ -261,3 +364,13 @@ git log --oneline -10
    OVERCONFIDENT rejects are legitimately verbose. SE pairs recovered from
    16 → 23; docs pairs filter 74 → 31 (docs drops are all `too_similar`, a
    known artifact of reference-answer-derived Q&A).
+
+6. **Claude upper-bound predictions run from a clean cwd with `--tools ""`** —
+   `generate_claude_predictions.py` invokes `claude -p` from
+   `/tmp/claude_clean_dir` so the project's CLAUDE.md / auto-memory does not
+   prime the model toward project-aware tool calls. The first Phase 1 Sonnet
+   run (project cwd) produced 5 contaminated responses ("biolite", "your
+   project", etc.); the rerun under the clean-cwd protocol is what's reported.
+   Phase 2 Sonnet was project-cwd in the first run, but a substring scan found
+   0 contamination hits and that file is kept as-is. Future Claude-as-baseline
+   runs should follow the clean-cwd protocol.

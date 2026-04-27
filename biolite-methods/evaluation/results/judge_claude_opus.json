@@ -1,0 +1,645 @@
+{
+  "rubric": "methods",
+  "model_used_as_judge": "sonnet",
+  "n_evaluated": 28,
+  "aggregates": {
+    "methodological_accuracy": {
+      "mean": 4.57,
+      "std": 0.5,
+      "n": 28
+    },
+    "assumption_awareness": {
+      "mean": 3.54,
+      "std": 0.64,
+      "n": 28
+    },
+    "tradeoff_discussion": {
+      "mean": 4.07,
+      "std": 0.9,
+      "n": 28
+    },
+    "practical_helpfulness": {
+      "mean": 4.29,
+      "std": 0.71,
+      "n": 28
+    }
+  },
+  "individual_results": [
+    {
+      "index": 0,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Core methodology is correct: infer_experiment.py, RSeQC, featureCounts -s flag mapping. The interpretation table is accurate. Minor issue: the consequence framing slightly misattributes the ~half-counts symptom \u2014 running unstranded on a stranded library (not wrong direction) is the more likely cause, and the reference confirms this. The model buries the correct explanation. Salmon auto-detection (--libType A) is omitted entirely."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions the common TruSeq reverse-stranded foot-gun and notes the paired-end notation difference. However, it omits key caveats from the reference: degraded libraries (FFPE), dense/overlapping gene model organisms, and the practical threshold of ~1M reads being sufficient for infer_experiment.py. No mention of contacting the sequencing facility as a fallback."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Offers three cross-validation approaches (how_are_we_stranded_here, IGV, featureCounts subset test) which adds useful breadth. However, it does not discuss Salmon --libType A as an alternative quantification path, and the comparison between running all three -s modes as a validation strategy is practical but not explained in terms of what the count differences reveal."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable: provides the exact command, an interpretation table, three independent verification methods, and ties the symptom (half counts) to a specific misconfiguration. The featureCounts multi-s test on a subset is a concrete debugging step. Loses one point for the truncated final sentence (response cuts off mid-paragraph) and for not addressing Salmon as an alternative for users who may still be upstream of quantification."
+        }
+      }
+    },
+    {
+      "index": 1,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly recommends primary assembly + GENCODE comprehensive GTF, accurately explains why alt contigs cause silent multi-mapping artifacts in non-alt-aware aligners, and correctly distinguishes GENCODE vs Ensembl naming conventions and their failure modes."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Acknowledges the HLA/immune loci exception and directs to specialized tools, mentions the basic vs comprehensive GTF distinction, and notes that alt contigs suit DNA alt-aware workflows. Missing explicit note about GRCh37 legacy use cases that the reference answer flags."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Substantively compares primary vs top-level vs full assemblies with concrete failure modes, contrasts GENCODE vs Ensembl with chromosome naming specifics, and distinguishes comprehensive vs basic GTF. Also introduces decoy-aware indexing for salmon/kallisto as an additional layer."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Actionable and specific: names exact aligners affected (STAR, HISAT2, salmon, kallisto), names specialized HLA tools (arcasHLA, OptiType), flags the exact silent failure mode (%MT QC breakage), and gives concrete 'mix and match is the #1 cause' guidance that directly maps to common mistakes."
+        }
+      }
+    },
+    {
+      "index": 2,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies that selective alignment with decoy-aware index closes the historical accuracy gap, cites Srivastava et al. 2020, properly explains the mechanism (genomic background reads siphoned to decoys), and flags --validateMappings as now default. Technically accurate throughout."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions the decoy requirement and historical context, but does not flag the critical caveat that quasi-mapping produces no BAM output \u2014 meaning downstream tools requiring alignment coordinates (GATK, featureCounts, RSeQC, IGV) cannot use this workflow. The reference answer treats this as a primary decision factor; the model only begins addressing it in the truncated 'When STAR \u2192 Salmon alignment mode actually wins' section."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Starts a 'when alignment mode wins' section but the output is cut off mid-sentence, so the comparison is incomplete. Speed advantage of quasi-mapping is implied but not quantified. Does not mention BAM-dependency for variant calling, splicing analysis, or QC tools as the reference answer does."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Provides complete, copy-pasteable bash commands for both index construction and quantification, correctly includes --gencode flag for Gencode FASTA headers, recommends --gcBias/--seqBias with justification, and explains --numBootstraps for downstream compatibility with fishpond/sleuth. Highly actionable for the stated n=24 PE 100bp setup."
+        }
+      }
+    },
+    {
+      "index": 3,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies apeglm's Cauchy prior, explains why normal over-shrinks large LFCs, accurately describes the coef= requirement as tied to single-coefficient GLM refitting, and correctly points to ashr as the contrast=-compatible alternative."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Covers the key assumptions: normal prior's symmetric Gaussian with thin tails, apeglm's empirical prior scale estimation per-coefficient, and the MLE-holding mechanic. Misses explicitly noting that apeglm assumes the comparison maps to a single identifiable model coefficient, though this is implied by the coef= explanation."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Substantively compares apeglm vs normal (bias, tail behavior, effect preservation), gives a clear use case for retaining normal (backwards compatibility, old analyses), and introduces ashr as a third option with its specific advantage (contrast= support), matching the reference's recommendation structure."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable guidance on when to switch methods, explicit mention of resultsNames(dds) workflow is absent (unlike the reference), but the coef= vs contrast= distinction and the refactoring/releveling suggestion are concrete and directly applicable. Response is cut off mid-sentence in the final section, which mildly reduces completeness."
+        }
+      }
+    },
+    {
+      "index": 4,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Core mechanics are correct: coef vs contrast requirement, relevel workflow, DESeq() prerequisite, heavy-tailed prior behavior. Minor issue: attributes the benchmark paper to 'B\u00e9nidir/Anders/Love (2018)' \u2014 the actual apeglm paper is Zhu, Ibrahim, and Love (2019, Bioinformatics). The claim that 'apeglm has been the default since DESeq2 1.18' is also imprecise; ashr is the default in current versions, not apeglm."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Correctly identifies the coef-only constraint and explains why (single coefficient penalized likelihood), covers the refitting-vs-post-hoc distinction, and notes the betaPrior interaction issue. Misses the reference answer's important practical caveat about apeglm being slower on large datasets, and does not mention the ranking/visualization use-case as a motivating assumption for choosing apeglm."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Explains apeglm advantages over normal-prior shrinkage in reasonable depth (bias on large effects, calibration, design compatibility, s-values). However, does not substantively compare against ashr, which is the other major alternative in lfcShrink and is relevant when arbitrary contrasts are needed. The speed tradeoff is entirely absent."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Structured, stepwise requirements with runnable code examples make this immediately actionable. The relevel workflow and resultsNames usage are concrete and correct. The response is cut off mid-sentence ('If you need contrast-bas'), losing whatever contrast-workaround guidance was coming, which is a real practical gap. Otherwise highly usable."
+        }
+      }
+    },
+    {
+      "index": 5,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies pseudoreplication and the true n=3. The collapseReplicates approach is valid and the paired design rationale is sound. However, it presents only the sum/collapse route and omits the equally valid option of averaging counts (pseudobulk mean), and the explicit warning against mixed models, while broadly true for DESeq2, lacks nuance about lme4/glmmTMB alternatives that exist."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions inflated degrees of freedom and overconfidence due to low technical variance, and notes the paired structure correctly. Misses key caveats from the reference: dispersion estimation instability with only 2 df for the blocking factor, the power limitation of n=3 (~40-55% at FC=2), and the important carve-out for when wells represent a nested sub-experiment rather than pure technical replication."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Mentions the biolrep blocking factor as an alternative to simple averaging and correctly frames it as a paired analysis. However, it does not discuss the cost: noisy replicate variance estimates with only 3 biological replicates. The reference's point about the nested sub-experiment scenario (wells testing a within-batch variable) is entirely absent, leaving a meaningful design alternative unexplored."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Provides runnable DESeq2 code with collapseReplicates, explicit contrast syntax, and a clear column schema \u2014 more immediately actionable than the reference. Loses a point for omitting the power warning (n=3 is underpowered for discovery) which is critical practical context for how the user should interpret and report results."
+        }
+      }
+    },
+    {
+      "index": 6,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies variance compression as the core problem, accurately describes how pooling affects DESeq2/edgeR dispersion estimates, and correctly notes that RNA yield differences cause unequal contribution per sample \u2014 a subtle but real technical point absent from the reference."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Acknowledges conditions under which pooling is defensible (low within-group variance, mean-expression-only questions, genuine budget hard stops) and notes mouse-specific variability sources (microbiome, cage effects). Misses the reference's important scRNA-seq pseudobulk caveat, which clarifies a common conceptual conflation."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Offers four concrete redesign options with explicit power/cost tradeoffs: dropping an arm for n=6, keeping all arms at n=4, reducing depth to fit more libraries, and switching to cheaper 3'-tag protocols. This exceeds the reference in actionable breadth."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Highly actionable \u2014 names specific protocols (QuantSeq, BRB-seq, Smart-3SEQ), gives a read-depth rule of thumb (10\u201320M), and suggests banking unused samples. Docked one point because the response is cut off mid-sentence on the 3'-tag option, leaving that recommendation incomplete."
+        }
+      }
+    },
+    {
+      "index": 7,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies the critical mod/mod0 specification requirement, accurately distinguishes svaseq from sva for count data, correctly notes 'be' vs 'leek' estimator behavior, and appropriately recommends RUVseq as a cross-check. No factual errors."
+        },
+        "assumption_awareness": {
+          "score": 5,
+          "justification": "Explicitly covers collinearity between SVs and condition, degrees-of-freedom costs in modest n=60 designs, imbalanced condition-batch confounding, and the diagnostic-first principle before invoking SVA. Matches reference answer's key caveats including the perfect confounding failure case implicitly via the correlation check."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Substantively compares SVA vs no-SVA, 'be' vs 'leek' estimator conservatism, and SVA vs RUVseq \u2014 with concrete decision criteria (residual PC structure, SV-condition correlation threshold ~0.3) rather than vague hedging. Recommends reporting both DE result sets, which is the gold-standard transparency practice."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Provides a concrete 4-step workflow specific to the user's design (n=60, two conditions, known covariates), gives an actionable correlation threshold (>0.3) as a yellow flag, and specifies exact R function arguments (mod/mod0 formulas). Directly addresses the colleague disagreement with a decision rule rather than deferring."
+        }
+      }
+    },
+    {
+      "index": 8,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies MOFA2 as unsupervised/discovery-oriented and DIABLO as supervised/discriminative; accurately explains that DIABLO optimizes for class separation rather than unbiased variance decomposition. No factual errors."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions overfitting risk with n=60 and recommends subsampling for factor stability, but misses key MOFA2 assumptions: likelihood choices per view (Gaussian vs. Poisson), the need to variance-stabilize raw RNA-seq counts before input, and the missing-at-random assumption for incomplete blocks."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Provides a substantive head-to-head comparison: explains the mechanistic reason DIABLO conflates biology with the label, notes the post-hoc association step as a feature rather than a limitation, and suggests a practical two-stage workflow (MOFA2 then DIABLO) with clear rationale for each."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable and tailored to the stated goal and sample size; the two-stage recommendation is concrete. Loses one point for not specifying how to perform factor count selection (ELBO monitoring, cross-validation) or the RNA-seq normalization requirement, both of which a practitioner would immediately need."
+        }
+      }
+    },
+    {
+      "index": 9,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "All three tools are characterized correctly: Snakemake's Python-native strength and weaker cloud story, Nextflow's portability and nf-core ecosystem, WDL's Terra/Cromwell/GATK niche. No factual errors; appropriate caveats on cloud maturity and community size."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Correctly identifies the key latent assumption that personnel stability matters ('who maintains it long-term'), and flags that AWS use being 'occasional' vs. growing changes the calculus. Misses the container/reproducibility dimension and doesn't probe whether AWS is current or aspirational, which the reference answer treats as decisive."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Substantive head-to-head comparison across portability, learning curve, community ecosystem, and maintenance burden. The consume-vs-author framing adds a dimension absent from the reference and is genuinely useful. WDL is correctly scoped without dismissal."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Directly maps the group's stated constraints (Python-heavy, SLURM, AWS occasional, split postdoc expertise) to conditional recommendations. The 2am debugging point and nf-core pipeline count are concrete. The closing heuristic question is actionable and decision-forcing."
+        }
+      }
+    },
+    {
+      "index": 10,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "All tool claims are accurate: nf-core/sarek, nf-core/rnaseq, nf-core/chipseq exist and cover the stated assays; Nextflow's SLURM and AWS Batch executors are correctly described; Apptainer/Singularity distinction for HPC vs Docker for AWS is correct; Fusion filesystem and Seqera Platform are real features."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Correctly weights the postdoc expertise and nf-core pipeline coverage as decisive factors, and explicitly states the counter-scenario where Snakemake would win. Misses the assumption that the postdoc will remain at the lab long-term \u2014 institutional knowledge is fragile \u2014 and doesn't flag that nf-core pipelines may be over-engineered for smaller labs starting out."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides a substantive Snakemake counter-argument grounded in Python familiarity, and correctly identifies the Groovy/DSL2 learning curve as a real cost. Omits WDL/Cromwell entirely, which the reference answer correctly flags as relevant when Broad/Terra collaboration or clinical auditability is a future concern. The comparison is binary where the reference answer triangulates three options."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Adoption recommendations are concrete and sequenced: run a specific nf-core pipeline on SLURM first, then re-run on AWS Batch to validate portability \u2014 this is exactly the right validation strategy. Naming specific pipelines (nf-core/rnaseq, nf-core/sarek) and the postdoc mentorship role gives the lab an actionable starting point rather than generic advice."
+        }
+      }
+    },
+    {
+      "index": 11,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies PERMANOVA's sensitivity to dispersion, accurately describes PERMDISP2 as the appropriate test, provides correct QIIME 2 command with right flags, and the interpretation table is methodologically sound."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Covers the dispersion assumption well but omits other PERMANOVA assumptions noted in the reference: exchangeability under the null, independence of observations, and pseudoreplication issues from repeated measures or nested designs."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "The 2x2 interpretation table effectively covers all outcome combinations with actionable guidance. Mentions ordination plots as a supplement. Lacks discussion of metric choice tradeoffs (e.g., weighted vs. unweighted UniFrac) beyond a brief practical tip."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Provides a complete, copy-paste-ready QIIME 2 command using realistic file paths, includes --p-pairwise flag, and the interpretation table gives clear next steps for each result combination. Highly actionable for the stated use case."
+        }
+      }
+    },
+    {
+      "index": 12,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Core advice is correct: use quality plots to find drop points, ensure overlap, check denoising stats. The overlap formula is expressed correctly in principle but the worked example (f+r \u2265 amplicon+12) uses 12 bp minimum while reference and best practice specify \u226520 bp minimum \u2014 a meaningful understatement that could lead to failed merges."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions amplicon length dependence and that reverse reads degrade faster, but doesn't flag the key assumption that default trunc-len=0 (no truncation) is the wrong starting point \u2014 a common pitfall highlighted in the reference. Doesn't discuss variable-length inserts or run-specific quality variation."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Briefly notes the tension between quality and overlap (truncate aggressively \u2192 low merge rate), and mentions trim-left as an alternative for 5' issues. Does not discuss the tradeoff of retaining low-quality bases vs. losing reads entirely, or when to accept Q25 vs. insisting on Q30."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Highly actionable: step-by-step workflow, concrete Q-score thresholds, worked numeric examples for two common amplicons (V3-V4, V4), explicit diagnostic check (% merged <70% \u2192 re-truncate), and pointer to view.qiime2.org. Format is clear and easy to follow at the bench."
+        }
+      }
+    },
+    {
+      "index": 13,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies marker coverage limitations, SNP resolution gap vs. WGS isolate standard (cites Eyre 2013 appropriately), and accessory genome blindness. Misses the critical mixed-strain/chimeric consensus problem flagged in the reference \u2014 that two co-colonizing strains produce a chimeric output rather than two haplotypes, which is a distinct and important failure mode for transmission inference, not just a sensitivity issue."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Addresses abundance/dropout and marker breadth thresholds well. Does not surface the phasing limitation (inability to resolve co-colonization), which the reference identifies as a fundamental assumption violation. Also does not question whether 8M reads is adequate in the context of community complexity, or the assumption that symptomatic vs. carrier samples differ systematically in usable marker depth."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Mentions WGS of isolates as the gold standard and notes StrainPhlAn is better for ruling transmission out than in \u2014 useful asymmetric framing. However, does not substantively compare hybrid approaches (e.g., culture-then-WGS vs. culture-free), nor discuss whether metagenomic assembly or read-based SNP callers could partially mitigate limitations. Reference answer is more explicit about when StrainPhlAn IS appropriate (longitudinal stability, abundant species)."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable on several fronts: references the specific --breadth_thres 80 parameter, estimates realistic read counts mapping to markers, and gives concrete guidance on which sample types will fail QC. The output is truncated (ends mid-sentence on point 3), losing whatever practical recommendations followed, which limits its completeness for a practitioner. Still more operationally specific than the reference answer on QC parameters."
+        }
+      }
+    },
+    {
+      "index": 14,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly explains DADA2 per-run error modeling vs Deblur's fixed profile, the merge workflow, and Deblur's single-end limitation. Misses the critical point that Deblur requires single-end reads, which is a major constraint for paired-end V4 data \u2014 only briefly implies it rather than stating it clearly. Also omits the reference answer's key caveat about DADA2 needing ~1,000+ reads to train a reliable error model."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Acknowledges multi-run DADA2 assumptions and notes Deblur's read-format requirements. Does not address the assumption that the user's runs have sufficient read depth for DADA2 error model training, nor explicitly flag that using Deblur on paired-end V4 data forces truncation to forward-only reads with real quality loss."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides a substantive comparison: Deblur's deterministic behavior vs DADA2's adaptive error model, Deblur's dropped reads and deprecated development status, and scenarios where Deblur's determinism is defensible (low-biomass, rare taxa). The response is cut off mid-sentence on batch effects, losing a potentially important point, but the overall comparison is well-structured."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Gives specific QIIME 2 commands (`denoise-paired`, `feature-table merge`, `feature-table merge-seqs`) and a clear recommendation to use DADA2 with the multi-run merge workflow. The truncated ending slightly undermines actionability. Omits the shallow-run pooling strategy mentioned in the reference, which would be directly applicable to clinical cohorts with variable sequencing depth."
+        }
+      }
+    },
+    {
+      "index": 15,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies PERMANOVA sensitivity to both centroids and dispersion, recommends betadisper/permutest with median (more robust than centroid), and the interpretation matrix is accurate. Cites Zaneveld 2017 correctly for Anna Karenina principle."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Covers the key dispersion assumption and flags unbalanced design as amplifying concern. Missing: no mention of strata= for nested/paired designs, permutation count adequacy for this sample size, or the Type I error inflation caveat from the reference answer."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "The interpretation matrix is a strong structured comparison of outcome combinations. However, the response is cut off mid-sentence before completing the 'what to do' section, so the full trade-off discussion (reporting both, acknowledging biological meaning of dispersion) is only partially delivered."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Immediately runnable R code with correct function calls (betadisper, permutest, boxplot, TukeyHSD), set.seed for reproducibility, and inline comments tied to the user's specific variables. Contextualizes IBD dispersion as biologically expected, directly addressing the reviewer concern."
+        }
+      }
+    },
+    {
+      "index": 16,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly recommends VST, accurately explains heteroscedasticity in raw counts, mean-variance dependence in log2(CPM+1), and the stabilization VST provides. The blind=FALSE guidance is correct post-DE. Minor: claims DESeq2 authors recommend VST for n>~30 but applies it for n=24 anyway, which is fine practically but slightly imprecise."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Correctly notes that clustering assumes comparable variance across features, and that blind=FALSE is appropriate after DE analysis. Mentions rlog as an alternative for small n but doesn't explicitly state the n<20 threshold where rlog's shrinkage is meaningfully superior. Misses the caveat against re-running DESeq2 on VST values."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Provides a structured comparison table covering all three options with distinct failure modes. Gives concrete intuition for low-count gene behavior and clustering impact. VST vs rlog trade-off is addressed with sample-size guidance, matching the reference answer's framing."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Includes a directly runnable pheatmap code block with row-centering, Z-score option, annotation, and color palette \u2014 all specific to the user's 3-condition setup. The response is actionable without requiring further lookup. The output appears truncated ('Row-ce') but the code block itself is complete and usable."
+        }
+      }
+    },
+    {
+      "index": 17,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies NB regression, Pearson residuals, and depth-dependent variance issues. Accurately flags DE method compatibility concern. Misses the specific mechanism (depth leaking into PCs via z-score failure) that the reference highlights, and doesn't mention glmGamPoi backend or the v1\u2192v2 stability improvement, which are practically important."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions UMI count instability for small datasets and downstream tool assumptions, but omits the key diagnostic heuristic (check if nCount/nFeature appear as top PCs) and the nuanced case where depth correlates with real biology during integration \u2014 a meaningful blind spot."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides a genuine two-sided comparison with concrete scenarios for each path. The integration point is well-handled. Slightly penalized for not discussing the case where SCTransform may obscure biology-correlated depth differences, which the reference flags as a distinct failure mode."
+        },
+        "practical_helpfulness": {
+          "score": 3,
+          "justification": "Advice is organized and reasonably specific, but the response is truncated mid-sentence (cut off at 'RNA'), losing the DE workflow guidance which is one of the most actionable points for a user running this dataset. The >5-fold UMI range threshold from the reference \u2014 a concrete decision rule \u2014 is absent."
+        }
+      }
+    },
+    {
+      "index": 18,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Core recommendations are correct: vst.flavor='v2', PrepSCTFindMarkers() requirement, and DE on RNA assay. However, the model omits the key mechanistic reason SCTransform works (regularized negative binomial regression stabilizing variance across expression levels), which the reference covers precisely. The claim that log-normalization is fine for most cases is somewhat misleading given SCTransform's documented improvements."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions that Pearson residuals aren't a count distribution and flags trajectory/DE tool incompatibilities, but lacks the reference's precision: no mention that residuals must not be passed to count-distribution tools, no explanation of why (distributional mismatch), and the memory threshold given (>200k) is looser than the reference's ~150k."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides a genuine comparative discussion: lists specific scenarios favoring each approach, flags integration methods (Harmony, scVI) where SCTransform adds little value, and identifies concrete downstream pitfalls. Less rigorous than the reference on the mechanistic basis of tradeoffs but covers practical dimensions the reference omits."
+        },
+        "practical_helpfulness": {
+          "score": 3,
+          "justification": "Actionable advice with named functions and flags, but the concrete recommendation is truncated (cut off mid-sentence at 'Start with `N'). The framing of standard pipeline as the safe default may discourage SCTransform in cases where it would clearly help (heterogeneous datasets), and sketch-based workflows for large datasets\u2014a key practical tip from the reference\u2014are absent."
+        }
+      }
+    },
+    {
+      "index": 19,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "All recommended diagnostics (plotPCA, plotDispEsts, p-value histogram) are correct and well-established DESeq2 tools. Biological explanations (KD efficiency, timepoint, off-target effects) are accurate. No incorrect tools or methods suggested."
+        },
+        "assumption_awareness": {
+          "score": 5,
+          "justification": "Explicitly addresses the key assumption that few DEGs may be biologically real, not just a technical failure\u2014matching the reference answer's core point. Also flags n=3 power limitations, batch effects, and siRNA off-target confounding as assumption violations worth checking."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Separates biological vs. technical explanations clearly and prioritizes diagnostics in a logical order. Does not deeply compare alternative analysis strategies (e.g., relaxing alpha, different normalizations, alternative callers), but the structured dichotomy is substantive."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Highly actionable: provides exact R function calls (plotPCA(vst(dds)), plotDispEsts(dds), hist(res$pvalue)), explains what each output pattern means diagnostically, and ties each recommendation directly to the user's n=3 experimental design."
+        }
+      }
+    },
+    {
+      "index": 20,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies rMATS as the primary recommendation given STAR BAMs and the experimental design, accurately describes event types and statistical framework. Misses the critical practical caveat about filtering low-coverage events by IJC/SJC thresholds, and omits the requirement for identical alignment parameters across BAMs \u2014 both are production-level details that affect result validity."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Addresses the n=4 and 80M depth assumptions explicitly and correctly concludes they favor rMATS. Does not flag the ~5% minor-isoform detection floor, the deconvolution ambiguity issue for closely related isoforms in SUPPA2, or the annotation-version consistency requirement for rMATS \u2014 all of which are non-obvious assumptions that could mislead a practitioner."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides a substantive comparison: rMATS for junction/event-level resolution vs. SUPPA2 for transcript-quantification pipelines. Correctly notes SUPPA2's weakness on microexons. The comparison is directionally sound but omits the speed/scalability axis (SUPPA2 is substantially faster at scale) and does not mention that SUPPA2's diffSplice is more conservative on low-expressed events beyond a brief mention."
+        },
+        "practical_helpfulness": {
+          "score": 3,
+          "justification": "Actionable in recommending rMATS with SUPPA2 as secondary sanity check, and the neuronal-biology context (NOVA/PTBP targets, microexons) adds domain relevance. However, it omits the most operationally critical guidance: post-hoc filtering of low-count events via IJC+SJC thresholds and the requirement for consistent alignment parameters \u2014 omissions that would cause real problems in a production run."
+        }
+      }
+    },
+    {
+      "index": 21,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies LeafCutter's intron-cluster/ratio model as the right fit for competing splice site choice, accurately characterizes DEXSeq's bin-centric annotation-bound limitations, and correctly notes annotation-freedom as critical for novel/cryptic sites in disease contexts."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions annotation dependency and dispersion estimation for 6v6, but omits the critical junction read depth requirement (reference flags \u226550M PE reads and saturation curves), and does not flag LeafCutter's weakness with low intron diversity or single-exon genes."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Provides a substantive three-way comparison (LeafCutter, DEXSeq, rMATS), gives explicit conditions under which each is preferred, and correctly positions rMATS as complementary for PSI/event-typed output \u2014 going beyond the binary framing the question implies."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable: names specific tools, explains why for this dataset, and suggests a multi-tool strategy with a clear primary/secondary role. Loses one point for omitting read-depth guidance and junction saturation checks that are practically important at this sample size."
+        }
+      }
+    },
+    {
+      "index": 22,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly identifies STAR SJ.out.tab metrics, canonical motif fractions, RIN thresholds, and rMATS's reliance on uniquely-mapped reads. Overhang and multi-mapping guidance is sound. Misses the rMATS event-level coverage audit (filtered output files) and doesn't flag strand-specificity misconfiguration as a root cause of non-canonical spikes \u2014 both in the reference. Response was truncated, so junction saturation was introduced but not completed."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Acknowledges RIN sensitivity, insert size ideals, and duplication bias in rMATS's likelihood model \u2014 reasonable contextual awareness. Does not flag the assumption that 80M reads is sufficient depth (reference notes saturation can still be a concern), nor does it mention that rMATS requires reads spanning into both flanking exons, which can silently drop events depending on read length."
+        },
+        "tradeoff_discussion": {
+          "score": 2,
+          "justification": "Lists metrics in parallel without comparing their relative priority or when one supersedes another. The reference explicitly notes when not to over-weight saturation (>150M reads, abundant transcripts). The model output provides no analogous guidance on when a metric becomes less relevant, reducing decision utility for the user."
+        },
+        "practical_helpfulness": {
+          "score": 3,
+          "justification": "Provides concrete thresholds (RIN \u2265 7, >85% annotated junctions, >10% rRNA cutoff, insert size 250\u2013400 bp) that are actionable. However, the response is truncated mid-sentence on junction saturation \u2014 a key metric the reference prioritizes first \u2014 leaving an incomplete recommendation. The rMATS filtered-output audit, which directly diagnoses under-powered events in this exact pipeline, is absent."
+        }
+      }
+    },
+    {
+      "index": 23,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly recommends BH-FDR for a discovery/screening context and accurately explains FWER vs. FDR distinction. Holm vs. Bonferroni framing is correct. Missing: no mention of Benjamini-Yekutieli for arbitrary dependence, and the truncated ending cuts off what may have been additional content. Does not quantify the Bonferroni threshold (~5.9\u00d710\u207b\u2078) for concreteness."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Correctly notes that wet-lab validation serves as downstream FWER control and flags cell-type composition as a confound. However, completely omits the critical independence assumption underlying BH (PRDS condition), the correlation structure among co-located CpG probes, and the implication that correlated probes violate BH assumptions\u2014a key caveat the reference answer explicitly addresses."
+        },
+        "tradeoff_discussion": {
+          "score": 4,
+          "justification": "Provides substantive comparison of all three methods (Bonferroni, BH, Holm) with clear mechanistic reasoning. Correctly characterizes Holm as uniformly more powerful than Bonferroni while still wrong-framework for this use case. Misses BY correction as the valid fallback under arbitrary dependence, which is a meaningful gap in the tradeoff landscape."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Highly actionable: names specific R packages (limma, qvalue, minfi, ChAMP, RnBeads), recommends concrete effect-size thresholds (\u0394\u03b2 \u2265 5%), advises checking genomic inflation factor with target range (\u03bb ~1.0\u20131.1), suggests a two-tier q-value strategy (0.05 + 0.10), and explicitly connects cell-type deconvolution methods (Houseman, RefBase) to the inflation problem. Directly addresses the n=48/52 power constraint."
+        }
+      }
+    },
+    {
+      "index": 24,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 4,
+          "justification": "Correctly interprets the uniform histogram as low-signal null-dominated behavior and distinguishes it from pathological patterns (mid-peak, bimodal, p\u22481 spike). Accurately describes BH calibration in this setting. Minor omission: doesn't mention that a small anti-conservative spike can indicate mild dispersion inflation, and misses the nuance that with n=4 DESeq2's empirical Bayes shrinkage is especially load-bearing."
+        },
+        "assumption_awareness": {
+          "score": 3,
+          "justification": "Mentions n=4 vulnerability to outliers and recommends PCA/dispersion checks, which is appropriate. However, does not flag that BH power will be poor when pi0 is near 1, doesn't raise normalization assumptions, and omits the dispersion shrinkage reliability concern that the reference answer correctly highlights as critical at this sample size."
+        },
+        "tradeoff_discussion": {
+          "score": 3,
+          "justification": "Distinguishes biology-expected-similar vs. biology-expected-different scenarios, which is useful framing. Lists alternative bad-histogram patterns clearly. But does not discuss the tradeoff between calling hits vs. reporting effect sizes with CIs for the low-signal contrast, nor mention formal pi0 estimation tools like qvalue \u2014 both of which add meaningful analytical nuance."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Provides concrete, actionable diagnostics (PCA, sample-distance heatmap, dispersion plot, per-sample counts) and frames the decision around biological expectation. The bullet-pointed bad-histogram taxonomy is directly usable. Slightly less helpful than optimal because it doesn't advise on what to *report* for the weak-signal contrast or flag that FDR estimates will be underpowered rather than miscalibrated."
+        }
+      }
+    },
+    {
+      "index": 25,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies residual confounding, information loss, and cutpoint arbitrariness as core problems with dichotomization. Citations (Royston/Altman/MacCallum) are appropriate. DESeq2 syntax and spline suggestion are technically correct. Slight overstatement on '1/3 sample loss' vs reference's '20%', but both convey the same valid point."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Acknowledges the key caveat that dichotomization is cosmetic if BMI is uncorrelated with exposure. Mentions non-linearity as a concern warranting splines. Misses the reference's specific caveat about sparse middle-range BMI distributions making linear continuous terms a poor fit, which is a practically important edge case."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Goes beyond a single recommendation: discusses when dichotomization matters less, proposes comparing dichotomized vs. spline models, and frames the continuous model as both principled and practically easy. Covers the 'strong a priori threshold effect' scenario as a legitimate exception with guidance on how to handle it."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Provides concrete DESeq2 design formula, centering advice, and spline syntax with df suggestion. Output is truncated mid-sentence ('or descr'), losing whatever final reporting guidance was intended, which slightly reduces actionability. Otherwise highly specific to the user's actual workflow."
+        }
+      }
+    },
+    {
+      "index": 26,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly identifies per-contrast BH as DESeq2 standard, accurately explains the LRT alternative for omnibus testing, and correctly diagnoses why pooling Wald contrast p-values is statistically incoherent given contrast correlation structure."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Correctly notes that the three contrasts are correlated and share control samples, and that drug A vs drug B is a linear combination of the other two. Misses the reference answer's important caveat about exploratory vs. pre-specified contrasts and experiment-level error rate inflation from cherry-picking."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Substantively compares three distinct frameworks (per-contrast BH, pooled correction, LRT) with clear reasoning for when each applies, explains the mechanistic flaw in pooling, and integrates both into a two-step practical workflow rather than forcing a single recommendation."
+        },
+        "practical_helpfulness": {
+          "score": 5,
+          "justification": "Provides a concrete numbered workflow matching the DESeq2 vignette, names the exact function and test parameter (`test='LRT'`, reduced model), and suggests pointing the collaborator to primary documentation \u2014 directly actionable for someone mid-analysis."
+        }
+      }
+    },
+    {
+      "index": 27,
+      "model": "claude-opus",
+      "scores": {
+        "methodological_accuracy": {
+          "score": 5,
+          "justification": "Correctly describes DESeq2's per-contrast BH behavior, accurately distinguishes inferential families, and appropriately recommends LRT for structured factorial designs. No technical errors detected."
+        },
+        "assumption_awareness": {
+          "score": 4,
+          "justification": "Acknowledges that the appropriate correction family depends on the inferential claim, not the number of contrasts. Mentions independent filtering. Misses the reference answer's important caveat about n=3 per group limiting power, and does not warn against the anti-pattern of pooling p-values across contrasts before correction."
+        },
+        "tradeoff_discussion": {
+          "score": 5,
+          "justification": "Clearly contrasts per-contrast BH, joint BH, and LRT with explicit descriptions of when each is appropriate and the power/conservatism tradeoffs. Matches and arguably organizes the tradeoffs more clearly than the reference answer."
+        },
+        "practical_helpfulness": {
+          "score": 4,
+          "justification": "Actionable three-step recommendation is concrete and design-specific. However, omits the explicit warning against pooling all 15 contrast p-values into one vector for joint correction, which the reference identifies as a common and non-trivial error. Also misses the low-power warning for n=3 replicates that would directly affect experimental decisions."
+        }
+      }
+    }
+  ]
+}
