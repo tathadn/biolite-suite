@@ -1,0 +1,209 @@
+{
+  "_note": "Two evaluation sets. pinned_64 = the 64 examples used for the v1\u2194v2 main paper comparison (canonical, one denominator). full_126 = complete v2 test set, where available, for supplementary tables. Index alignment per evaluation/statistical_tests.py.",
+  "pinned_64_definition": {
+    "indices_file": "evaluation/pinned_64_indices.json",
+    "n_pinned": 64,
+    "n_total_v2": 126
+  },
+  "criteria": [
+    "biological_accuracy",
+    "completeness",
+    "clarity"
+  ],
+  "pinned_64": {
+    "baseline_1b": {
+      "source_file": "judge_baseline.json",
+      "n": 63,
+      "biological_accuracy": {
+        "mean": 1.952,
+        "std": 1.3
+      },
+      "completeness": {
+        "mean": 1.73,
+        "std": 1.181
+      },
+      "clarity": {
+        "mean": 2.714,
+        "std": 1.038
+      }
+    },
+    "ft_1b_v1": {
+      "source_file": "judge_finetuned.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 2.297,
+        "std": 1.33
+      },
+      "completeness": {
+        "mean": 1.859,
+        "std": 0.957
+      },
+      "clarity": {
+        "mean": 3.172,
+        "std": 1.062
+      }
+    },
+    "ft_3b_v1": {
+      "source_file": "judge_finetuned_3b.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 2.531,
+        "std": 1.309
+      },
+      "completeness": {
+        "mean": 2.203,
+        "std": 1.129
+      },
+      "clarity": {
+        "mean": 3.734,
+        "std": 0.947
+      }
+    },
+    "ft_1b_v2": {
+      "source_file": "judge_finetuned_1b_v2.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 2.156,
+        "std": 1.336
+      },
+      "completeness": {
+        "mean": 1.922,
+        "std": 1.044
+      },
+      "clarity": {
+        "mean": 3.203,
+        "std": 1.086
+      }
+    },
+    "ft_3b_v2": {
+      "source_file": "judge_finetuned_3b_v2.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 2.781,
+        "std": 1.228
+      },
+      "completeness": {
+        "mean": 2.312,
+        "std": 1.22
+      },
+      "clarity": {
+        "mean": 3.969,
+        "std": 0.959
+      }
+    },
+    "qwen_1.5b_v2": {
+      "source_file": "judge_qwen_1.5b_v2.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 2.594,
+        "std": 1.218
+      },
+      "completeness": {
+        "mean": 2.172,
+        "std": 1.032
+      },
+      "clarity": {
+        "mean": 3.422,
+        "std": 0.956
+      }
+    },
+    "fewshot_3b": {
+      "source_file": "judge_3b_fewshot.json",
+      "n": 63,
+      "biological_accuracy": {
+        "mean": 2.571,
+        "std": 1.304
+      },
+      "completeness": {
+        "mean": 2.206,
+        "std": 1.259
+      },
+      "clarity": {
+        "mean": 3.397,
+        "std": 0.993
+      }
+    },
+    "claude_sonnet": {
+      "source_file": "judge_claude_sonnet.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 4.078,
+        "std": 1.325
+      },
+      "completeness": {
+        "mean": 2.969,
+        "std": 1.414
+      },
+      "clarity": {
+        "mean": 4.703,
+        "std": 0.609
+      }
+    },
+    "claude_opus": {
+      "source_file": "judge_claude_opus.json",
+      "n": 64,
+      "biological_accuracy": {
+        "mean": 4.172,
+        "std": 1.242
+      },
+      "completeness": {
+        "mean": 3.078,
+        "std": 1.406
+      },
+      "clarity": {
+        "mean": 4.672,
+        "std": 0.691
+      }
+    }
+  },
+  "full_126": {
+    "ft_1b_v2": {
+      "source_file": "judge_finetuned_1b_v2.json",
+      "n": 126,
+      "biological_accuracy": {
+        "mean": 2.04,
+        "std": 1.084
+      },
+      "completeness": {
+        "mean": 2.206,
+        "std": 0.888
+      },
+      "clarity": {
+        "mean": 3.151,
+        "std": 0.913
+      }
+    },
+    "ft_3b_v2": {
+      "source_file": "judge_finetuned_3b_v2.json",
+      "n": 126,
+      "biological_accuracy": {
+        "mean": 2.706,
+        "std": 1.051
+      },
+      "completeness": {
+        "mean": 2.746,
+        "std": 1.043
+      },
+      "clarity": {
+        "mean": 3.937,
+        "std": 0.817
+      }
+    },
+    "qwen_1.5b_v2": {
+      "source_file": "judge_qwen_1.5b_v2.json",
+      "n": 126,
+      "biological_accuracy": {
+        "mean": 2.492,
+        "std": 1.185
+      },
+      "completeness": {
+        "mean": 2.294,
+        "std": 0.997
+      },
+      "clarity": {
+        "mean": 3.413,
+        "std": 0.932
+      }
+    }
+  }
+}

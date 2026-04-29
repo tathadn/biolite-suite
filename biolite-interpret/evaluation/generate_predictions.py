@@ -44,6 +44,8 @@ def main():
     parser.add_argument("--adapter_path", type=str, default=None)
     parser.add_argument("--base_model", type=str, default=DEFAULT_BASE_MODEL)
     parser.add_argument("--max_new_tokens", type=int, default=512)
+    parser.add_argument("--pinned_indices", type=str, default=None,
+                        help="JSON file with {'pinned_indices': [...]} to filter test set")
     args = parser.parse_args()
 
     bnb_config = BitsAndBytesConfig(
@@ -75,6 +77,11 @@ def main():
 
     with open(args.test_file) as f:
         test = json.load(f)
+    if args.pinned_indices:
+        with open(args.pinned_indices) as f:
+            pinned = json.load(f)["pinned_indices"]
+        test = [test[i] for i in pinned]
+        print(f"Filtered to {len(test)} pinned examples")
 
     print(f"Generating predictions for {len(test)} test examples ({args.model_name})...")
     predictions = []
